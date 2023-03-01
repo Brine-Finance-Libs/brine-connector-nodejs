@@ -1,19 +1,19 @@
 {
   "root": true,
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "prettier", "jest"],
+  "plugins": ["@typescript-eslint", "prettier"],
   "extends": [
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
   "rules": {
-    "no-console": 1,
-    "prettier/prettier": 2
+    "prettier/prettier": 2,
+    "semi": "off",
+    "ts-expect-error": "allow-with-description"
   },
   "env": {
     "browser": true,
-    "node": true,
-    "jest/globals": true
+    "node": true
   }
 }
