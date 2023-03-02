@@ -1,16 +1,91 @@
 import { AxiosError, AxiosInstance as AxiosInstanceType } from 'axios'
-import { IClient, LoginPayload, ProfileInformation, Response } from '../types'
+import {
+  CandleStickParams,
+  IClient,
+  LoginPayload,
+  OrderBookParams,
+  ProfileInformation,
+  RecentTradesParams,
+  Response,
+} from '../types'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './blockchain_utils'
 
+const protectedRouteResponse: Response<string> = {
+  message: 'This is a private endpoint... Please using login() first',
+  status: 'error',
+  payload: '',
+}
+
 export class Client implements IClient {
   axiosInstance: AxiosInstanceType
+  getAuthStatus: () => boolean
   setToken: (token: string) => void
 
   constructor() {
     const axios = new AxiosInstance()
     this.axiosInstance = axios.axiosInstance
     this.setToken = axios.setToken
+    this.getAuthStatus = axios.getAuthStatus
+  }
+
+  async testConnection() {
+    try {
+      const res = await this.axiosInstance.get<Response<string>>(
+        '/sapi/v1/health/',
+      )
+      return res.data
+    } catch (e) {
+      return (e as AxiosError)?.response?.data as Response<string>
+    }
+  }
+
+  async get24hPrice(params: { market: string }) {
+    try {
+      const res = await this.axiosInstance.get<Response<string>>(
+        `/sapi/v1/market/tickers/`,
+        { params: params },
+      )
+      return res.data
+    } catch (e) {
+      return (e as AxiosError)?.response?.data as Response<string>
+    }
+  }
+
+  async getCandlestick(params: CandleStickParams) {
+    try {
+      const res = await this.axiosInstance.get<Response<string>>(
+        `/sapi/v1/market/kline/`,
+        { params: params },
+      )
+      return res.data
+    } catch (e) {
+      return (e as AxiosError)?.response?.data as Response<string>
+    }
+  }
+
+  async getOrderBook(params: OrderBookParams) {
+    try {
+      const res = await this.axiosInstance.get<Response<string>>(
+        `/sapi/v1/market/orderbook/`,
+        { params: params },
+      )
+      return res.data
+    } catch (e) {
+      return (e as AxiosError)?.response?.data as Response<string>
+    }
+  }
+
+  async getRecentTrades(params: RecentTradesParams) {
+    try {
+      const res = await this.axiosInstance.get<Response<string>>(
+        `/sapi/v1/market/trades/`,
+        { params: params },
+      )
+      return res.data
+    } catch (e) {
+      return (e as AxiosError)?.response?.data as Response<string>
+    }
   }
 
   async login(ethAddress: string, privateKey: string) {
@@ -42,6 +117,8 @@ export class Client implements IClient {
   }
 
   async getProfileInfo() {
+    const auth = this.getAuthStatus()
+    if (!auth) return protectedRouteResponse
     try {
       const profileRes = await this.axiosInstance.get<
         Response<ProfileInformation>

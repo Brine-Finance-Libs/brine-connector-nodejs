@@ -11,12 +11,28 @@ const main = async () => {
 
   if (privateKey && ethAddress) {
     try {
-      const loginRes = await client.login(ethAddress, privateKey)
-      console.log(loginRes.message)
+      // const testRes = await client.testConnection()
+      // console.log(testRes)
 
-      const profileRes = await client.getProfileInfo()
-      console.log(profileRes.payload)
+      // const res = await client.get24hPrice({market: 'ethusdc'})
+      // console.log(res)
+      // const res = await client.getCandlestick({
+      //   market: 'ethusdc',
+      //   period: 120,
+      // })
+      // const res = await client.getOrderBook({
+      //   market: 'ethusdc',
+      // })
+      const res = await client.getRecentTrades({
+        market: 'ethusdc',
+      })
+      console.log(res.message)
 
+      // const loginRes = await client.login(ethAddress, privateKey)
+      // console.log(loginRes.message)
+
+      // const profileRes = await client.getProfileInfo()
+      // console.log(profileRes)
     } catch (e) {
       console.log(e as Response<string>)
     }

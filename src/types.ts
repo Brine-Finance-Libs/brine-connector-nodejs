@@ -1,7 +1,8 @@
-import { AxiosInstance } from "axios"
+import { AxiosInstance } from 'axios'
 
 export interface IClient {
   axiosInstance: AxiosInstance
+  testConnection: () => Promise<Response<string>>
   setToken: (token: string) => void
   login: (
     ethAddress: string,
@@ -30,4 +31,26 @@ export interface ProfileInformation {
   img: string | null
   username: string
   stark_key: string
+}
+
+export interface CandleStickParams {
+  market: string
+  limit?: number
+  period?: 1 | 5 | 15 | 30 | 60 | 120 | 240 | 360 | 720 | 1440 | 4320 | 10080
+  start_time?: number
+  end_time?: number
+}
+
+export interface OrderBookParams {
+  market: string
+  asks_limit?: number
+  bids_limit?: number
+}
+
+
+export interface RecentTradesParams {
+  market: string
+  limit?: number
+  timestamp?: number
+  order_by?: string
 }
