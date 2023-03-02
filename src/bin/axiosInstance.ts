@@ -1,5 +1,10 @@
 import axios, { AxiosInstance as AxiosInstanceType } from 'axios'
 
+const protectedRouteResponse = {
+  message: 'This is a private endpoint... Please use login() or completeLogin() first',
+  status: 'error',
+}
+
 export class AxiosInstance {
   axiosInstance: AxiosInstanceType
   token?: string
@@ -19,6 +24,7 @@ export class AxiosInstance {
   }
 
   getAuthStatus() {
-    return this.token ? true : false
+    const auth =  this.token ? true : false
+    if(!auth) throw protectedRouteResponse
   }
 }
