@@ -26,7 +26,7 @@ export interface IClient {
 export interface Response<T> {
   status: string
   message: string
-  payload?: T
+  payload: T
 }
 
 export interface LoginPayload {
@@ -35,6 +35,7 @@ export interface LoginPayload {
     refresh: string
     access: string
   }
+  signature?: string
 }
 
 export interface ProfileInformationPayload {
@@ -136,7 +137,7 @@ export interface RecentTradesParams {
 
 export interface CreateOrderNonceBody {
   market: string
-  ord_type: string
+  ord_type: 'market' | 'limit'
   price?: number
   side: string
   volume: number | 0.015

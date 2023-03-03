@@ -1,8 +1,10 @@
 import axios, { AxiosInstance as AxiosInstanceType } from 'axios'
+import { Response } from '../types'
 
-const protectedRouteResponse = {
+const protectedRouteResponse: Response<string> = {
   message: 'This is a private endpoint... Please use login() or completeLogin() first',
   status: 'error',
+  payload: ''
 }
 
 export class AxiosInstance {
