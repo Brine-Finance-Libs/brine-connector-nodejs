@@ -1,7 +1,6 @@
-import * as dotenv from 'dotenv'
 import { assert, expect } from 'chai'
-import { Client } from '../src/bin/client'
-import { Balance, OrderPayload, Response } from '../src/types'
+import { Client } from '../src/client'
+import { Balance, OrderPayload, Response } from '..'
 
 describe('Brine Wrapper', () => {
   describe('REST Client', () => {
@@ -139,7 +138,7 @@ describe('Brine Wrapper', () => {
         expect(res.status).to.eql('success')
         expect(res).to.have.property('payload')
         expect(res.payload[0]).to.have.property('id')
-      })  
+      })
     })
   })
 })

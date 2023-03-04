@@ -10,6 +10,6 @@
     "types": ["node", "mocha"],
     "skipLibCheck": true
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "sample/index.ts", "index.d.ts"],
   "exclude": ["./src/**/*.spec.ts"]
 }

@@ -1,39 +1,39 @@
-import { AxiosError, AxiosInstance as AxiosInstanceType } from 'axios'
+import { AxiosInstance as AxiosInstanceType } from 'axios'
 import {
-  CandleStickPayload,
+  Balance,
   CandleStickParams,
-  IClient,
-  LoginPayload,
-  OrderBookPayload,
-  OrderBookParams,
-  ProfileInformationPayload,
-  RecentTradesPayload,
-  RecentTradesParams,
-  Response,
-  FullDayPricePayload,
-  ProfitAndLossPayload,
+  CandleStickPayload,
+  CreateNewOrderBody,
+  Order,
   CreateOrderNonceBody,
   CreateOrderNoncePayload,
-  CreateNewOrderBody,
-  CreateNewOrderPayload,
-  OrderPayload,
+  FullDayPricePayload,
   ListOrdersParams,
+  LoginPayload,
+  OrderBookParams,
+  OrderBookPayload,
+  OrderPayload,
+  ProfileInformationPayload,
+  ProfitAndLossPayload,
+  RecentTradesParams,
+  RecentTradesPayload,
+  Response,
   TradeParams,
   TradePayload,
-  Balance,
-} from '../types'
+  Market,
+} from '..'
 import { AxiosInstance } from './axiosInstance'
-import { signMsg } from './blockchain_utils'
+import { signMsg } from './bin/blockchain_utils'
 
-export class Client implements IClient {
+export class Client {
   axiosInstance: AxiosInstanceType
   getAuthStatus: () => void
   setToken: (token: string) => void
   private ethAddress?: string
   private userSignature?: string
 
-  constructor() {
-    const axios = new AxiosInstance(this.retryLogin)
+  constructor(baseUrl?: string) {
+    const axios = new AxiosInstance(this.retryLogin, baseUrl)
     this.axiosInstance = axios.axiosInstance
     this.setToken = axios.setToken
     this.getAuthStatus = axios.getAuthStatus
@@ -55,7 +55,7 @@ export class Client implements IClient {
     }
   }
 
-  async get24hPrice(params: { market?: string }) {
+  async get24hPrice(params: { market?: Market }) {
     try {
       const res = await this.axiosInstance.get<Response<FullDayPricePayload>>(
         `/sapi/v1/market/tickers/`,
@@ -161,13 +161,14 @@ export class Client implements IClient {
       throw e
     }
   }
-  
+
   async getBalance(params?: { currency?: string }) {
     try {
       this.getAuthStatus()
-      const res = await this.axiosInstance.get<
-        Response<Balance | Balance[]>
-      >('/sapi/v1/user/balance/', { params: params })
+      const res = await this.axiosInstance.get<Response<Balance | Balance[]>>(
+        '/sapi/v1/user/balance/',
+        { params: params },
+      )
       return res.data
     } catch (e) {
       throw e
@@ -201,9 +202,10 @@ export class Client implements IClient {
   async createNewOrder(body: CreateNewOrderBody) {
     try {
       this.getAuthStatus()
-      const res = await this.axiosInstance.post<
-        Response<CreateNewOrderPayload>
-      >('/sapi/v1/orders/create/', body)
+      const res = await this.axiosInstance.post<Response<Order>>(
+        '/sapi/v1/orders/create/',
+        body,
+      )
       return res.data
     } catch (e) {
       throw e

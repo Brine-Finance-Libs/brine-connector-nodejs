@@ -1,5 +1,7 @@
+import * as dotenv from 'dotenv'
 import axios, { AxiosInstance as AxiosInstanceType } from 'axios'
-import { LoginPayload, Response } from '../types'
+import { LoginPayload, Response } from '..'
+dotenv.config()
 
 const protectedRouteResponse: Response<string> = {
   message:
@@ -13,11 +15,14 @@ export class AxiosInstance {
   token?: string
   reLogin: () => Promise<Response<LoginPayload> | undefined>
 
-  constructor(reLogin: () => Promise<Response<LoginPayload> | undefined>) {
+  constructor(
+    reLogin: () => Promise<Response<LoginPayload> | undefined>,
+    baseUrl?: string,
+  ) {
     this.reLogin = reLogin
 
     this.axiosInstance = axios.create({
-      baseURL: 'https://api-testnet.brine.fi',
+      baseURL: baseUrl ?? 'https://api-testnet.brine.fi',
     })
 
     this.axiosInstance.interceptors.response.use(
@@ -30,7 +35,7 @@ export class AxiosInstance {
         if (error.response.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true
           const res = await this.reLogin()
-          
+
           if (res) {
             axios.defaults.headers.common[
               'Authorization'
