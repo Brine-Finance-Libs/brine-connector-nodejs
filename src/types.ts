@@ -230,3 +230,10 @@ export interface TradePayload {
   side: string
   order_id: number
 }
+
+export interface Balance {
+  currency: string
+  balance: string
+  locked: string
+  deposit_address: null
+}

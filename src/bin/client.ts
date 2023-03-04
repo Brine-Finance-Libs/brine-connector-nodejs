@@ -20,6 +20,7 @@ import {
   ListOrdersParams,
   TradeParams,
   TradePayload,
+  Balance,
 } from '../types'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './blockchain_utils'
@@ -160,12 +161,12 @@ export class Client implements IClient {
       throw e
     }
   }
-
+  
   async getBalance(params?: { currency?: string }) {
     try {
       this.getAuthStatus()
       const res = await this.axiosInstance.get<
-        Response<ProfileInformationPayload>
+        Response<Balance | Balance[]>
       >('/sapi/v1/user/balance/', { params: params })
       return res.data
     } catch (e) {
@@ -249,8 +250,8 @@ export class Client implements IClient {
   async listTrades(params?: TradeParams) {
     try {
       this.getAuthStatus()
-      const res = await this.axiosInstance.post<Response<TradePayload[]>>(
-        `/sapi/v1/orders/cancel/`,
+      const res = await this.axiosInstance.get<Response<TradePayload[]>>(
+        `/sapi/v1/trades/`,
         { params: params },
       )
       return res.data
