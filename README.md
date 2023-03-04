@@ -19,6 +19,12 @@ Brine-wrapperJS uses axios internally to handle all requests. It includes interc
 ## Installation
 
 First go to the [Brine Website](https://www.brine.finance/) and create an account with your wallet.
+
+Clone this repository.
+```sh
+git clone https://github.com/upsurge0/brine-wrapperjs.git
+```
+
 Install the dependencies and devDependencies.
 
 ```sh
