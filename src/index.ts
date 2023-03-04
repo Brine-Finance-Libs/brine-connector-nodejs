@@ -2,6 +2,7 @@ import { Client } from './bin/client'
 import * as dotenv from 'dotenv'
 import { Response } from './types'
 import { signMsg } from './bin/blockchain_utils'
+import { WsClient } from './bin/wsClient'
 dotenv.config()
 
 const main = async () => {
@@ -27,11 +28,7 @@ const main = async () => {
       // const res = await client.getRecentTrades({
       //   market: 'ethusdc',
       // })
-      const loginRes = await client.completeLogin(ethAddress, privateKey)
-      // console.log(loginRes.payload)
-      // const nonce = await client.getNonce(ethAddress)
-      // const signedMsg = signMsg(nonce.payload, privateKey)
-      // const loginRes = await client.login(ethAddress, signedMsg.signature)
+      // const loginRes = await client.completeLogin(ethAddress, privateKey)
       // console.log(loginRes)
 
       // client.getProfitAndLoss().then(res => {
@@ -56,16 +53,50 @@ const main = async () => {
       //   signature: { r: '', s: '' },
       // })
 
+      const nonce = await client.getNonce(ethAddress)
+      const signedMsg = signMsg(nonce.payload, privateKey)
+      const loginRes = await client.login(ethAddress, signedMsg.signature)
+
+      // const orders = await client.listOrders()
+      // console.log(orders.payload)
+
+      const wsClient2 = new WsClient('public')
+
+      await wsClient2.connect()
+      await wsClient2.subOrUnsub('subscribe', [
+        'btcusdc.trades',
+        'btcusdc.ob-inc',
+        'btcusdc.kline-5m',
+      ])
+
+      wsClient2.ws.on('message', (data) => {
+        console.log(data.toString())
+      })
+      // @ts-expect-error
+      const wsClient = new WsClient('private', loginRes.token.access)
+
+      await wsClient.connect()
+      await wsClient.subOrUnsub('subscribe', ['trade', 'order'])
+
+      wsClient.ws.on('message', (data) => {
+        console.log(data.toString())
+      })
+      await wsClient.subOrUnsub('unsubscribe', [
+        'btcusdc.trades',
+        'btcusdc.ob-inc',
+        'btcusdc.kline-5m',
+      ])
     } catch (e) {
       console.log(e as Response<string>)
     }
 
-    try {
-      const profileRes = await client.getProfileInfo()
-      console.log(profileRes.payload)
-    } catch (error) {
-      console.log(error)
-    }
+    // try {
+    //   console.log('profile res')
+    //   const profileRes = await client.getProfileInfo()
+    //   console.log(profileRes.payload)
+    // } catch (error) {
+    //   console.log(error)
+    // }
   }
 }
 

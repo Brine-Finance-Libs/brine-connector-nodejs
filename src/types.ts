@@ -173,3 +173,60 @@ export interface CreateNewOrderPayload {
   taker_fee: string
   trades_count: number
 }
+
+export interface OrderPayload {
+  id: number
+  uuid: string
+  side: string
+  ord_type: string
+  price: null
+  avg_price: string
+  state: string
+  market: string
+  created_at: string
+  updated_at: string
+  origin_volume: string
+  remaining_volume: string
+  executed_volume: string
+  maker_fee: string
+  taker_fee: string
+  trades_count: number
+  trades?: []
+}
+
+export interface ListOrdersParams {
+  limit?: number
+  page?: number
+  market?: string
+  ord_type?: string
+  state?: string
+  base_unit?: string
+  quote_unit?: string
+  start_time?: number
+  end_time?: number
+  side?: string
+}
+
+export interface TradeParams {
+  limit?: number
+  page?: number
+  market?: string
+  start_time?: number
+  end_time?: number
+  order_by?: string
+}
+
+export interface TradePayload {
+  id: number
+  price: string
+  amount: string
+  total: string
+  fee_currency: string
+  fee: string
+  fee_amount: string
+  market: string
+  created_at: string
+  taker_type: string
+  side: string
+  order_id: number
+}

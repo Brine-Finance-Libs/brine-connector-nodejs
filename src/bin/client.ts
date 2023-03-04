@@ -16,6 +16,10 @@ import {
   CreateOrderNoncePayload,
   CreateNewOrderBody,
   CreateNewOrderPayload,
+  OrderPayload,
+  ListOrdersParams,
+  TradeParams,
+  TradePayload,
 } from '../types'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './blockchain_utils'
@@ -24,12 +28,19 @@ export class Client implements IClient {
   axiosInstance: AxiosInstanceType
   getAuthStatus: () => void
   setToken: (token: string) => void
+  private ethAddress?: string
+  private userSignature?: string
 
   constructor() {
-    const axios = new AxiosInstance()
+    const axios = new AxiosInstance(this.retryLogin)
     this.axiosInstance = axios.axiosInstance
     this.setToken = axios.setToken
     this.getAuthStatus = axios.getAuthStatus
+  }
+
+  retryLogin = async () => {
+    if (this.ethAddress && this.userSignature)
+      return await this.login(this.ethAddress, this.userSignature)
   }
 
   async testConnection() {
@@ -115,9 +126,10 @@ export class Client implements IClient {
           user_signature: userSignature,
         },
       )
-
-      // @ts-expect-error: the api response format is incorrect
+      // @ts-expect-error
       this.setToken(loginRes.data.token.access)
+      this.ethAddress = ethAddress
+      this.userSignature = userSignature
 
       return loginRes.data
     } catch (e: unknown) {
@@ -191,6 +203,56 @@ export class Client implements IClient {
       const res = await this.axiosInstance.post<
         Response<CreateNewOrderPayload>
       >('/sapi/v1/orders/create/', body)
+      return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async getOrder(orderId: number) {
+    try {
+      this.getAuthStatus()
+      const res = await this.axiosInstance.post<Response<OrderPayload>>(
+        `/sapi/v1/orders${orderId}`,
+      )
+      return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async listOrders(params?: ListOrdersParams) {
+    try {
+      this.getAuthStatus()
+      const res = await this.axiosInstance.post<Response<OrderPayload[]>>(
+        `/sapi/v1/orders`,
+        { params: params },
+      )
+      return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async cancelOrder(orderId: number) {
+    try {
+      this.getAuthStatus()
+      const res = await this.axiosInstance.post<
+        Response<Omit<OrderPayload, 'id'> & { order_id: number }>
+      >(`/sapi/v1/orders/cancel/`, { order_id: orderId })
+      return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async listTrades(params?: TradeParams) {
+    try {
+      this.getAuthStatus()
+      const res = await this.axiosInstance.post<Response<TradePayload[]>>(
+        `/sapi/v1/orders/cancel/`,
+        { params: params },
+      )
       return res.data
     } catch (e) {
       throw e
