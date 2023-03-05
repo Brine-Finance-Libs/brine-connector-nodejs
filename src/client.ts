@@ -1,35 +1,48 @@
-import { AxiosError, AxiosInstance as AxiosInstanceType } from 'axios'
+import { AxiosInstance as AxiosInstanceType } from 'axios'
 import {
-  CandleStickPayload,
+  Balance,
   CandleStickParams,
-  IClient,
-  LoginPayload,
-  OrderBookPayload,
-  OrderBookParams,
-  ProfileInformationPayload,
-  RecentTradesPayload,
-  RecentTradesParams,
-  Response,
-  FullDayPricePayload,
-  ProfitAndLossPayload,
+  CandleStickPayload,
+  CreateNewOrderBody,
+  Order,
   CreateOrderNonceBody,
   CreateOrderNoncePayload,
-  CreateNewOrderBody,
-  CreateNewOrderPayload,
-} from '../types'
+  FullDayPricePayload,
+  ListOrdersParams,
+  LoginPayload,
+  OrderBookParams,
+  OrderBookPayload,
+  OrderPayload,
+  ProfileInformationPayload,
+  ProfitAndLossPayload,
+  RecentTradesParams,
+  RecentTradesPayload,
+  Response,
+  TradeParams,
+  TradePayload,
+  Market,
+} from '..'
 import { AxiosInstance } from './axiosInstance'
-import { signMsg } from './blockchain_utils'
+import { signMsg } from './bin/blockchain_utils'
+import { getKeyPairFromSignature, sign } from './bin/signature'
 
-export class Client implements IClient {
+export class Client {
   axiosInstance: AxiosInstanceType
   getAuthStatus: () => void
   setToken: (token: string) => void
+  private ethAddress?: string
+  private userSignature?: string
 
-  constructor() {
-    const axios = new AxiosInstance()
+  constructor(baseUrl?: string) {
+    const axios = new AxiosInstance(this.retryLogin, baseUrl)
     this.axiosInstance = axios.axiosInstance
     this.setToken = axios.setToken
     this.getAuthStatus = axios.getAuthStatus
+  }
+
+  retryLogin = async () => {
+    if (this.ethAddress && this.userSignature)
+      return await this.login(this.ethAddress, this.userSignature)
   }
 
   async testConnection() {
@@ -43,7 +56,7 @@ export class Client implements IClient {
     }
   }
 
-  async get24hPrice(params: { market?: string }) {
+  async get24hPrice(params: { market?: Market }) {
     try {
       const res = await this.axiosInstance.get<Response<FullDayPricePayload>>(
         `/sapi/v1/market/tickers/`,
@@ -115,9 +128,12 @@ export class Client implements IClient {
           user_signature: userSignature,
         },
       )
-
-      // @ts-expect-error: the api response format is incorrect
+      // @ts-expect-error
       this.setToken(loginRes.data.token.access)
+      this.ethAddress = ethAddress
+      this.userSignature = userSignature
+
+      loginRes.data.payload.signature = userSignature
 
       return loginRes.data
     } catch (e: unknown) {
@@ -152,9 +168,10 @@ export class Client implements IClient {
   async getBalance(params?: { currency?: string }) {
     try {
       this.getAuthStatus()
-      const res = await this.axiosInstance.get<
-        Response<ProfileInformationPayload>
-      >('/sapi/v1/user/balance/', { params: params })
+      const res = await this.axiosInstance.get<Response<Balance | Balance[]>>(
+        '/sapi/v1/user/balance/',
+        { params: params },
+      )
       return res.data
     } catch (e) {
       throw e
@@ -185,12 +202,97 @@ export class Client implements IClient {
     }
   }
 
+  
+  signMsgHash(nonce: CreateOrderNoncePayload, privateKey: string) {
+    try {
+      const msgToBeSigned = "Click sign to verify you're a human - Brine.finance"
+      const userSignature = signMsg(msgToBeSigned, privateKey)
+      const keyPair = getKeyPairFromSignature(userSignature.signature)
+      const msg = sign(keyPair, nonce.msg_hash.replace('0x', ''))
+      const createOrderBody: CreateNewOrderBody = {
+        msg_hash: nonce.msg_hash,
+        signature: {
+          r: `0x${msg.r.toString('hex')}`,
+          s: `0x${msg.s.toString('hex')}`,
+        },
+        nonce: nonce.nonce,
+      }
+      return createOrderBody
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async createCompleteOrder(nonce: CreateOrderNonceBody, privateKey: string) {
+    try {
+      this.getAuthStatus()
+      const nonceRes = await this.createOrderNonce(nonce)
+      const signedMsg = this.signMsgHash(nonceRes.payload, privateKey)
+      const order = await this.createNewOrder(signedMsg)
+
+      return order
+    } catch (e) {
+      throw e
+    }
+  }
+
   async createNewOrder(body: CreateNewOrderBody) {
     try {
       this.getAuthStatus()
+      const res = await this.axiosInstance.post<Response<Order>>(
+        '/sapi/v1/orders/create/',
+        body,
+      )
+      return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async getOrder(orderId: number) {
+    try {
+      this.getAuthStatus()
+      const res = await this.axiosInstance.post<Response<OrderPayload>>(
+        `/sapi/v1/orders${orderId}`,
+      )
+      return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async listOrders(params?: ListOrdersParams) {
+    try {
+      this.getAuthStatus()
+      const res = await this.axiosInstance.post<Response<OrderPayload[]>>(
+        `/sapi/v1/orders`,
+        { params: params },
+      )
+      return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async cancelOrder(orderId: number) {
+    try {
+      this.getAuthStatus()
       const res = await this.axiosInstance.post<
-        Response<CreateNewOrderPayload>
-      >('/sapi/v1/orders/create/', body)
+        Response<Omit<OrderPayload, 'id'> & { order_id: number }>
+      >(`/sapi/v1/orders/cancel/`, { order_id: orderId })
+      return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async listTrades(params?: TradeParams) {
+    try {
+      this.getAuthStatus()
+      const res = await this.axiosInstance.get<Response<TradePayload[]>>(
+        `/sapi/v1/trades/`,
+        { params: params },
+      )
       return res.data
     } catch (e) {
       throw e
