@@ -106,7 +106,7 @@ describe('Brine Wrapper', () => {
             ord_type: 'limit',
             price: 29580.51,
             side: 'sell',
-            volume: 0.015,
+            volume: 0.00001,
           })
           expect(res).to.have.property('status')
           expect(res.status).to.eql('success')

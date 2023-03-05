@@ -24,6 +24,7 @@ import {
 } from '..'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
+import { getKeyPairFromSignature, sign } from './bin/signature'
 
 export class Client {
   axiosInstance: AxiosInstanceType
@@ -132,6 +133,8 @@ export class Client {
       this.ethAddress = ethAddress
       this.userSignature = userSignature
 
+      loginRes.data.payload.signature = userSignature
+
       return loginRes.data
     } catch (e: unknown) {
       throw e
@@ -194,6 +197,40 @@ export class Client {
         Response<CreateOrderNoncePayload>
       >('/sapi/v1/orders/nonce/', body)
       return res.data
+    } catch (e) {
+      throw e
+    }
+  }
+
+  
+  signMsgHash(nonce: CreateOrderNoncePayload, privateKey: string) {
+    try {
+      const msgToBeSigned = "Click sign to verify you're a human - Brine.finance"
+      const userSignature = signMsg(msgToBeSigned, privateKey)
+      const keyPair = getKeyPairFromSignature(userSignature.signature)
+      const msg = sign(keyPair, nonce.msg_hash.replace('0x', ''))
+      const createOrderBody: CreateNewOrderBody = {
+        msg_hash: nonce.msg_hash,
+        signature: {
+          r: `0x${msg.r.toString('hex')}`,
+          s: `0x${msg.s.toString('hex')}`,
+        },
+        nonce: nonce.nonce,
+      }
+      return createOrderBody
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async createCompleteOrder(nonce: CreateOrderNonceBody, privateKey: string) {
+    try {
+      this.getAuthStatus()
+      const nonceRes = await this.createOrderNonce(nonce)
+      const signedMsg = this.signMsgHash(nonceRes.payload, privateKey)
+      const order = await this.createNewOrder(signedMsg)
+
+      return order
     } catch (e) {
       throw e
     }

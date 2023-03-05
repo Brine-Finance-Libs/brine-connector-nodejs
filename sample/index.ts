@@ -1,8 +1,9 @@
 import { Client } from '../src/client'
 import * as dotenv from 'dotenv'
-import { Response } from '..'
+import { CreateNewOrderBody, CreateOrderNonceBody, Response } from '..'
 import { signMsg } from '../src/bin/blockchain_utils'
 import { WsClient } from '../src/wsClient'
+import { getKeyPairFromSignature, sign } from '../src/bin/signature'
 dotenv.config()
 
 const main = async () => {
@@ -29,21 +30,37 @@ const main = async () => {
       //   market: 'ethusdc',
       // })
       const loginRes = await client.completeLogin(ethAddress, privateKey)
-      // console.log(loginRes)
 
-      // client.getProfitAndLoss().then(res => {
-      //   res.payload['']
-      // })
-      // console.log(res.payload)
-      // const nonce = await client.createOrderNonce({
+      // const nonce = await client.createOrderNonce()
+
+      // const signedMsg = client.signMsgHash(nonce.payload, privateKey)
+
+      // const order = await client.createNewOrder(signedMsg)
+      // const nonce: CreateOrderNonceBody = {
       //   market: 'btcusdt',
-      //   ord_type: 'limit',
+      //   ord_type: 'market',
       //   price: 29580.51,
-      //   side: 'sell',
-      //   volume: 0.015,
-      // })
+      //   side: 'buy',
+      //   volume: 0.0001,
+      // }
 
-      // console.log(nonce.payload)
+      // const order = await client.createCompleteOrder(nonce, privateKey)
+      // console.log(order)
+
+      const nonceBody: CreateOrderNonceBody = {
+        market: 'btcusdt',
+        ord_type: 'market',
+        price: 29580.51,
+        side: 'buy',
+        volume: 0.0001,
+      }
+      const order = await client.createCompleteOrder(nonceBody, privateKey)
+      console.log(order)
+
+      // console.log(createOrderRequestData)
+
+      // const res = await client.createNewOrder(createOrderRequestData)
+      // console.log(res)
 
       // const signedMsg = signMsg(nonce.payload, privateKey)
 
