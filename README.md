@@ -10,6 +10,7 @@ Brine-wrapperJS is a NodeJS wrapper for the [Brine API](https://docs.brine.finan
 
 - Complete endpoints including REST and WebSockets
 - Methods return parsed JSON.
+- High level abstraction for ease of use.
 - Easy authentication
 - Automatically sets JWT token internally
 - Auto relogin when JWT expires
@@ -216,12 +217,22 @@ wsClient.connect()
 #### Subscribe
 
 ```ts
+const streams = [
+  'btcusdc.trades',
+  'btcusdc.ob-inc',
+  'btcusdc.kline-5m',
+]
 wsClient.subOrUnsub('subscribe', streams)
 ```
 
 #### Unsubscribe
 
 ```ts
+const streams = [
+  'btcusdc.trades',
+  'btcusdc.ob-inc',
+  'btcusdc.kline-5m',
+]
 wsClient.subOrUnsub('unsubscribe', streams)
 ```
 
