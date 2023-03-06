@@ -173,11 +173,14 @@ export interface TradePayload {
 
 export interface LoginPayload {
   uid: string
+  signature?: string
+}
+
+export type LoginResponse = Response<LoginPayload> & {
   token: {
     refresh: string
     access: string
   }
-  signature?: string
 }
 
 export interface ProfileInformationPayload {

@@ -22,7 +22,6 @@ const main = async () => {
       //   console.log(data.toString())
       // })
       // const loginRes = await client.completeLogin(ethAddress, privateKey)
-      // // @ts-expect-error
       const wsClient = new WsClient('private')
 
       await wsClient.connect()

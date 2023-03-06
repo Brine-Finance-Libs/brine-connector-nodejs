@@ -21,6 +21,7 @@ import {
   TradeParams,
   TradePayload,
   Market,
+  LoginResponse,
 } from '..'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
@@ -121,14 +122,13 @@ export class Client {
 
   async login(ethAddress: string, userSignature: string) {
     try {
-      const loginRes = await this.axiosInstance.post<Response<LoginPayload>>(
+      const loginRes = await this.axiosInstance.post<LoginResponse>(
         '/sapi/v1/auth/login/',
         {
           eth_address: ethAddress,
           user_signature: userSignature,
         },
       )
-      // @ts-expect-error
       this.setToken(loginRes.data.token.access)
       this.ethAddress = ethAddress
       this.userSignature = userSignature

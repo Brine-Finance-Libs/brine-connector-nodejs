@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 import axios, { AxiosInstance as AxiosInstanceType } from 'axios'
-import { ClientError, LoginPayload, Response } from '..'
+import { ClientError, LoginPayload, LoginResponse, Response } from '..'
 dotenv.config()
 
 const protectedRouteResponse: ClientError = {
@@ -13,10 +13,10 @@ const protectedRouteResponse: ClientError = {
 export class AxiosInstance {
   axiosInstance: AxiosInstanceType
   token?: string
-  reLogin: () => Promise<Response<LoginPayload> | undefined>
+  reLogin: () => Promise<LoginResponse | undefined>
 
   constructor(
-    reLogin: () => Promise<Response<LoginPayload> | undefined>,
+    reLogin: () => Promise<LoginResponse | undefined>,
     baseUrl?: string,
   ) {
     this.reLogin = reLogin
@@ -31,16 +31,14 @@ export class AxiosInstance {
       },
       async (error) => {
         const originalRequest = error.config
-        if (error?.response?.status === 401 && !originalRequest._retry) {
+        if (error?.response?.status === 401 && !originalRequest._retry && this.token) {
           originalRequest._retry = true
           const res = await this.reLogin()
 
           if (res) {
             axios.defaults.headers.common[
               'Authorization'
-              // @ts-expect-error: Response format is wrong
             ] = `JWT ${res.token.access}`
-            // @ts-expect-error
             this.setToken(res.token.access)
           }
           return this.axiosInstance(originalRequest)

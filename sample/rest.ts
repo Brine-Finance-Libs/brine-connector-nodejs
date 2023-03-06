@@ -14,8 +14,9 @@ const main = async () => {
     try {
       const client = new Client()
 
+      const loginRes = await client.completeLogin(ethAddress, privateKey)
       const res = await client.testConnection()
-      // const loginRes = await client.completeLogin(ethAddress, privateKey)
+      console.log(res)
 
         const nonceBody: CreateOrderNonceBody = {
           market: 'btcusdt',
