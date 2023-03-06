@@ -106,7 +106,7 @@ describe('Brine Wrapper', () => {
             ord_type: 'limit',
             price: 29580.51,
             side: 'sell',
-            volume: 0.00001,
+            volume: 0.0001,
           })
           expect(res).to.have.property('status')
           expect(res.status).to.eql('success')
@@ -122,10 +122,8 @@ describe('Brine Wrapper', () => {
         // })
       })
 
-      let listOrdersRes: Response<OrderPayload[]>
-
       it('List Orders', async () => {
-        listOrdersRes = await client.listOrders()
+        const listOrdersRes = await client.listOrders()
         expect(listOrdersRes).to.have.property('status')
         expect(listOrdersRes.status).to.eql('success')
         expect(listOrdersRes).to.have.property('payload')

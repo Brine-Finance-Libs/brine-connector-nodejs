@@ -33,9 +33,22 @@ export class WsClient {
     })
   }
 
-  async subOrUnsub(event: 'subscribe' | 'unsubscribe', streams: string[]) {
+  async subscribe(streams: string[]) {
     const msg = {
-      event,
+      event: 'subscribe',
+      streams,
+    }
+
+    try {
+      this.ws.send(JSON.stringify(msg))
+    } catch (e) {
+      throw e
+    }
+  }
+  
+  async unsubscribe(streams: string[]) {
+    const msg = {
+      event: 'unsubscribe',
       streams,
     }
 
