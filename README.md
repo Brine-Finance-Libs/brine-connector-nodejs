@@ -2,7 +2,11 @@
 
 ## _A NodeJS Wrapper for the Brine API_
 
-![N|Solid](https://www.brine.finance/img/brine-logo-nas.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://brine-assets-public.s3.ap-southeast-1.amazonaws.com/img/logo-white.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://brine-assets-public.s3.ap-southeast-1.amazonaws.com/img/krypto-logo-dark.png">
+  <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://www.brine.finance/img/brine-logo-dark.png" width="300">
+</picture>
 
 Brine-wrapperJS is a NodeJS wrapper for the [Brine API](https://docs.brine.finance/docs/introduction).
 
