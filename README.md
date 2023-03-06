@@ -17,10 +17,10 @@ Brine-wrapperJS is a NodeJS wrapper for the [Brine API](https://docs.brine.finan
 - High level abstraction for ease of use.
 - Easy authentication
 - Automatically sets JWT token internally
-- Auto relogin when JWT expires
+- Auto re-login when JWT expires
 - Typescript Types✨
 
-Brine-wrapperJS uses axios internally to handle all requests. It includes interceptors for handling setting JWT and Relogin on token expiry.
+Brine-wrapperJS includes utility/connector functions which can be used to interact with the Brine API. It uses axios internally to handle all requests. It includes interceptors for handling setting JWT and re-login on token expiry.
 
 ## Installation
 
@@ -52,9 +52,7 @@ pnpm i
 
 ## Getting Started
 
-The default base url is https://api-testnet.brine.fi
-You can change it by providing a baseUrl through the constructor.
-All REST apis, WebSockets are handled by Client, WsClient classes respectively
+The default base url is https://api-testnet.brine.fi .You can change it by providing a baseUrl through the constructor. All REST apis, WebSockets are handled by Client, WsClient classes respectively. All operations must be handled in a try-catch block.
 
 ### Rest Client
 
@@ -76,17 +74,23 @@ const client = new Client(baseUrl)
 
 #### Test connectivity
 
+`GET /sapi/v1/health/`
+
 ```ts
 client.testConnection()
 ```
 
 #### 24hr Price
 
+`GET /sapi/v1/market/tickers/`
+
 ```ts
 client.get24hPrice({market: 'ethusdc'})
 ```
 
 #### Kline/Candlestick Data
+
+`GET /sapi/v1/market/kline/`
 
 ```ts
 client.getCandlestick({
@@ -97,6 +101,8 @@ client.getCandlestick({
 
 #### Order Book
 
+`GET /sapi/v1/market/orderbook/`
+
 ```ts
 client.getOrderBook({
      market: 'ethusdc',
@@ -104,6 +110,8 @@ client.getOrderBook({
 ```
 
 #### Recent trades
+
+`GET /sapi/v1/market/trades/`
 
 ```ts
 client.getRecentTrades({
@@ -113,7 +121,10 @@ client.getRecentTrades({
 
 #### Login
 
-Both login() and completeLogin() sets JWT as Authorization Token.
+Both login() and completeLogin() sets JWT as Authorization Token. Optionally, setToken() can be used to set JWT token directly, but this will not allow client to auto-relogin on token expiry.
+
+getNonce: `POST /sapi/v1/auth/nonce/`  
+login: `POST /sapi/v1/auth/login/`
 
 ```ts
 const nonce = await client.getNonce(ethAddress)
@@ -122,10 +133,16 @@ const loginRes = await client.login(ethAddress, signedMsg.signature)
 
 // or
 
-const loginRes = await client.completeLogin(ethAddress, privateKey)
+const loginRes = await client.completeLogin(ethAddress, privateKey) //calls above functions internally
+
+// or
+
+client.setToken(jwt)
 ```
 
 #### Profile Information (Private 🔒)
+
+`GET /sapi/v1/user/profile/`
 
 ```ts
 client.getProfileInfo()
@@ -133,11 +150,15 @@ client.getProfileInfo()
 
 #### Balance details (Private 🔒)
 
+`GET /sapi/v1/user/balance/`
+
 ```ts
 client.getBalance()
 ```
 
 #### Profit and Loss Detailss (Private 🔒)
+
+`GET /sapi/v1/user/pnl/`
 
 ```ts
 client.getProfitAndLoss()
@@ -159,6 +180,9 @@ const nonceBody: CreateOrderNonceBody = {
 
 Create Order
 
+createOrderNonce: `POST /sapi/v1/orders/nonce/`  
+createNewOrder: `POST /sapi/v1/orders/create/`
+
 ```ts
 const nonceRes = await client.createOrderNonce(nonceBody)
 const signedBody = client.signMsgHash(nonceRes.payload, privateKey)
@@ -166,10 +190,12 @@ const order = await client.createNewOrder(signedBody)
 
 // or
 
-const order = await client.createCompleteOrder(nonceBody, privateKey)
+const order = await client.createCompleteOrder(nonceBody, privateKey) //calls above functions internally
 ```
 
 #### Get Order (Private 🔒)
+
+`GET /sapi/v1/orders/{order_id}/`
 
 ```ts
 client.getOrder(orderId)
@@ -177,17 +203,23 @@ client.getOrder(orderId)
 
 #### List orders (Private 🔒)
 
+`GET /sapi/v1/orders/`
+
 ```ts
 client.listOrders()
 ```
 
 #### Cancel Order (Private 🔒)
 
+`POST /sapi/v1/orders/cancel/`
+
 ```ts
 client.cancelOrder({order_id})
 ```
 
 #### List Trades (Private 🔒)
+
+`GET /sapi/v1/trades/`
 
 ```ts
 client.listTrades()
@@ -226,7 +258,7 @@ const streams = [
   'btcusdc.ob-inc',
   'btcusdc.kline-5m',
 ]
-wsClient.subOrUnsub('subscribe', streams)
+wsClient.subscribe(streams)
 ```
 
 #### Unsubscribe
@@ -237,7 +269,7 @@ const streams = [
   'btcusdc.ob-inc',
   'btcusdc.kline-5m',
 ]
-wsClient.subOrUnsub('unsubscribe', streams)
+wsClient.unsubscribe(streams)
 ```
 
 #### Disconnect
