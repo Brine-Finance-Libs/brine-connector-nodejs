@@ -287,3 +287,26 @@ wsClient.ws.on('message', (data) => {
     console.log(data.toString())
 })
 ```
+
+### Error Handling
+
+Errors thrown are of types `ClientError | AxiosError`.  
+
+Example
+
+```ts
+try{
+  // async operations
+} catch (e) {
+  if (isClientError(e)) {
+    console.log(e)
+  } else {
+    console.log((e as AxiosError<Response<string>>))
+  }
+}
+
+const isClientError = (err: unknown): err is ClientError => {
+  return (<ClientError>err).type !== undefined
+}
+```
+
