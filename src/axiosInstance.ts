@@ -1,13 +1,13 @@
 import * as dotenv from 'dotenv'
 import axios, { AxiosInstance as AxiosInstanceType } from 'axios'
-import { LoginPayload, Response } from '..'
+import { ClientError, LoginPayload, Response } from '..'
 dotenv.config()
 
-const protectedRouteResponse: Response<string> = {
+const protectedRouteResponse: ClientError = {
   message:
     'This is a private endpoint... Please use login() or completeLogin() first',
+  type: 'notLoggedIn',
   status: 'error',
-  payload: '',
 }
 
 export class AxiosInstance {
@@ -31,8 +31,7 @@ export class AxiosInstance {
       },
       async (error) => {
         const originalRequest = error.config
-        console.log(originalRequest._retry)
-        if (error.response.status === 401 && !originalRequest._retry) {
+        if (error?.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true
           const res = await this.reLogin()
 
@@ -60,7 +59,6 @@ export class AxiosInstance {
   }
 
   getAuthStatus() {
-    const auth = this.token ? true : false
-    if (!auth) throw protectedRouteResponse
+    if (!this.token) throw protectedRouteResponse
   }
 }

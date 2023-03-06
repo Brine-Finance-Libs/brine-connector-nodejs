@@ -1,10 +1,10 @@
 import WebSocket from 'ws'
-import { Response } from '..'
+import { ClientError, Response } from '..'
 
-const jwtNotProvided: Response<string> = {
+const jwtNotProvided: ClientError = {
   message: 'JWT access token must be provided for private connections',
+  type: 'noToken',
   status: 'error',
-  payload: '',
 }
 
 export class WsClient {

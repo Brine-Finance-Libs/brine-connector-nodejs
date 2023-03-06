@@ -11,6 +11,10 @@ export interface Response<T> {
   payload: T
 }
 
+export interface ClientError extends Omit<Response<null>, 'payload'> {
+  type: 'notLoggedIn' | 'noToken'
+}
+
 export interface FullDayPricePayload {
   [market: Market]: {
     at: string
