@@ -6,8 +6,8 @@
   "types": "./index.d.ts",
   "scripts": {
     "build": "rimraf ./build && tsc",
-    "start:dev": "npx nodemon",
-    "start": "ts-node ./sample/index.ts",
+    "start": "ts-node ./sample/rest.ts",
+    "start:ws": "ts-node ./sample/websocket.ts",
     "test": "mocha test/test.ts -r ts-node/register -r dotenv/config",
     "lint": "eslint . --ext .ts",
     "prettier-format": "run-script-os",
