@@ -253,7 +253,7 @@ export class Client {
     try {
       this.getAuthStatus()
       const res = await this.axiosInstance.post<Response<OrderPayload>>(
-        `/sapi/v1/orders${orderId}`,
+        `/sapi/v1/orders/${orderId}`,
       )
       return res.data
     } catch (e) {

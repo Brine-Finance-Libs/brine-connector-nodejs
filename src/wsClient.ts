@@ -1,4 +1,11 @@
 import WebSocket from 'ws'
+import { Response } from '..'
+
+const jwtNotProvided: Response<string> = {
+  message: 'JWT access token must be provided for private connections',
+  status: 'error',
+  payload: '',
+}
 
 export class WsClient {
   ws: WebSocket
@@ -8,8 +15,7 @@ export class WsClient {
     if (type === 'public')
       connection = `${baseUrl ?? 'wss://api-testnet.brine.fi'}/public`
     else {
-      if (!jwt)
-        throw 'JWT access token must be provided for private connections'
+      if (!jwt) throw jwtNotProvided
       connection = `${
         baseUrl ?? 'wss://api-testnet.brine.fi'
       }/private?auth_header=${jwt}`
@@ -45,7 +51,7 @@ export class WsClient {
       throw e
     }
   }
-  
+
   async unsubscribe(streams: string[]) {
     const msg = {
       event: 'unsubscribe',

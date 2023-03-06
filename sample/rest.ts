@@ -11,7 +11,20 @@ const main = async () => {
 
   if (privateKey && ethAddress) {
     try {
+      const client = new Client()
+
+      const loginRes = await client.completeLogin(ethAddress, privateKey)
       
+    //   const nonceBody: CreateOrderNonceBody = {
+    //     market: 'btcusdt',
+    //     ord_type: 'market',
+    //     price: 29580.51,
+    //     side: 'buy',
+    //     volume: 0.0001,
+    // }
+
+      const order = await client.cancelOrder(16033822)
+      console.log(order)
     } catch (e) {
       console.log(e as Response<string>)
     }

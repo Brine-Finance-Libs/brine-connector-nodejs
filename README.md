@@ -115,7 +115,7 @@ client.getOrderBook({
 
 ```ts
 client.getRecentTrades({
-    mmarket: 'ethusdc',
+    market: 'ethusdc',
 })
 ```
 
@@ -214,7 +214,7 @@ client.listOrders()
 `POST /sapi/v1/orders/cancel/`
 
 ```ts
-client.cancelOrder({order_id})
+client.cancelOrder(order_id)
 ```
 
 #### List Trades (Private 🔒)
