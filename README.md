@@ -54,6 +54,10 @@ pnpm i
 
 The default base url is https://api-testnet.brine.fi .You can change it by providing a baseUrl through the constructor. All REST apis, WebSockets are handled by Client, WsClient classes respectively. All operations must be handled in a try-catch block.
 
+### Workflow
+
+Check out the [sample files](./sample) to see an example workflow.
+
 ### Rest Client
 
 Import the REST Client
@@ -238,7 +242,7 @@ Create a new instance
 ```ts
 const wsClient = new WsClient('public')
 // or
-const wsClient = new WsClient('public', undefined, baseUrl)
+const wsClient = new WsClient('public', null, baseUrl)
 // or
 const loginRes = await client.completeLogin(ethAddress, privateKey)
 const wsClient = new WsClient('private', loginRes.payload.token.access)
