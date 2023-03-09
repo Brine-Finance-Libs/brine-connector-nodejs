@@ -1,9 +1,7 @@
-import { AxiosInstance } from 'axios'
-
-type Market = 'ethusdc' | 'ethusdt' | 'btcusdc' | 'btcusdt'
-type Side = 'buy' | 'sell'
-type OrdType = 'market' | 'limit'
-type State = 'pending' | 'wait' | 'done' | 'cancel'
+export type Market = 'ethusdc' | 'ethusdt' | 'btcusdc' | 'btcusdt'
+export type Side = 'buy' | 'sell'
+export type OrdType = 'market' | 'limit'
+export type State = 'pending' | 'wait' | 'done' | 'cancel'
 
 export interface Response<T> {
   status: string
@@ -15,8 +13,8 @@ export interface ClientError extends Omit<Response<null>, 'payload'> {
   type: 'notLoggedIn' | 'noToken'
 }
 
-export interface FullDayPricePayload {
-  [market: Market]: {
+export type FullDayPricePayload = {
+  [market in Market]: {
     at: string
     ticker: {
       at: string

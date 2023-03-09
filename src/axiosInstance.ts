@@ -1,6 +1,6 @@
-import * as dotenv from 'dotenv'
 import axios, { AxiosInstance as AxiosInstanceType } from 'axios'
-import { ClientError, LoginPayload, LoginResponse, Response } from '..'
+import * as dotenv from 'dotenv'
+import { ClientError, LoginResponse } from './types'
 dotenv.config()
 
 const protectedRouteResponse: ClientError = {
@@ -31,7 +31,11 @@ export class AxiosInstance {
       },
       async (error) => {
         const originalRequest = error.config
-        if (error?.response?.status === 401 && !originalRequest._retry && this.token) {
+        if (
+          error?.response?.status === 401 &&
+          !originalRequest._retry &&
+          this.token
+        ) {
           originalRequest._retry = true
           const res = await this.reLogin()
 

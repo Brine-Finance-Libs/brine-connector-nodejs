@@ -1,12 +1,9 @@
-import { Client } from "./client";
-import { WsClient } from "./wsClient";
+import { Client } from './client'
+import { WsClient } from './wsClient'
 
-export {
-    Client,
-    WsClient
-}
+export { Client, WsClient }
 
 export default {
-    Client,
-    WsClient
+  Client,
+  WsClient,
 }

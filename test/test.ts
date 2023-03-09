@@ -1,6 +1,6 @@
-import { assert, expect } from 'chai'
+import { expect } from 'chai'
+import { Balance, Response } from '../src/types'
 import { Client } from '../src/client'
-import { Balance, OrderPayload, Response } from '..'
 
 describe('Brine Wrapper', () => {
   describe('REST Client', () => {
@@ -15,7 +15,7 @@ describe('Brine Wrapper', () => {
 
     describe('Ping', () => {
       it('Test Connection', async () => {
-        let res = await client.testConnection()
+        const res = await client.testConnection()
         expect(res).to.have.property('payload')
         expect(res).to.have.property('status')
         expect(res.status).to.eql('success')
@@ -24,14 +24,14 @@ describe('Brine Wrapper', () => {
 
     describe('Market', () => {
       it('24hr Price', async () => {
-        let res = await client.get24hPrice({ market: 'ethusdc' })
+        const res = await client.get24hPrice({ market: 'ethusdc' })
         expect(res).to.have.property('payload')
         expect(res).to.have.property('status')
         expect(res.status).to.eql('success')
       })
 
       it('Kline/Candlestick Data', async () => {
-        let res = await client.getCandlestick({
+        const res = await client.getCandlestick({
           market: 'ethusdc',
           period: 120,
         })
@@ -41,7 +41,7 @@ describe('Brine Wrapper', () => {
       })
 
       it('Order Book', async () => {
-        let res = await client.getOrderBook({
+        const res = await client.getOrderBook({
           market: 'ethusdc',
         })
         expect(res).to.have.property('payload')
@@ -50,7 +50,7 @@ describe('Brine Wrapper', () => {
       })
 
       it('Recent Trades', async () => {
-        let res = await client.getRecentTrades({
+        const res = await client.getRecentTrades({
           market: 'ethusdc',
         })
         expect(res).to.have.property('payload')
