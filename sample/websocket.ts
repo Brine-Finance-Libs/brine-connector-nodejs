@@ -1,5 +1,6 @@
 import { Client, WsClient } from '../src'
 import * as dotenv from 'dotenv'
+import { isAuthenticationError } from '../src/error'
 dotenv.config()
 
 const main = async () => {
@@ -41,7 +42,11 @@ const main = async () => {
       })
     }
   } catch (e) {
-    console.log(e)
+    if (isAuthenticationError(e)) {
+      console.log(e)
+    } else {
+      console.log(e)
+    }
   }
 }
 main()

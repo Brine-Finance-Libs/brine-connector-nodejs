@@ -1,14 +1,8 @@
 import axios, { AxiosInstance as AxiosInstanceType } from 'axios'
 import * as dotenv from 'dotenv'
-import { ClientError, LoginResponse } from './types'
+import { AuthenticationError } from './error'
+import { LoginResponse } from './types'
 dotenv.config()
-
-const protectedRouteResponse: ClientError = {
-  message:
-    'This is a private endpoint... Please use login() or completeLogin() first',
-  type: 'notLoggedIn',
-  status: 'error',
-}
 
 export class AxiosInstance {
   axiosInstance: AxiosInstanceType
@@ -61,6 +55,9 @@ export class AxiosInstance {
   }
 
   getAuthStatus() {
-    if (!this.token) throw protectedRouteResponse
+    if (!this.token)
+      throw new AuthenticationError(
+        'This is a private endpoint... Please use login() or completeLogin() first',
+      )
   }
 }

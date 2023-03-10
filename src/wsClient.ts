@@ -1,11 +1,5 @@
 import WebSocket from 'ws'
-import { ClientError } from './types'
-
-const jwtNotProvided: ClientError = {
-  message: 'JWT access token must be provided for private connections',
-  type: 'noToken',
-  status: 'error',
-}
+import { AuthenticationError } from './error'
 
 export class WsClient {
   ws: WebSocket
@@ -19,7 +13,10 @@ export class WsClient {
     if (type === 'public')
       connection = `${baseUrl ?? 'wss://api-testnet.brine.fi'}/public`
     else {
-      if (!jwt) throw jwtNotProvided
+      if (!jwt)
+        throw new AuthenticationError(
+          'JWT access token must be provided for private connections',
+        )
       connection = `${
         baseUrl ?? 'wss://api-testnet.brine.fi'
       }/private?auth_header=${jwt}`

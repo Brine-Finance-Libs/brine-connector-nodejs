@@ -1,7 +1,8 @@
 import { AxiosError } from 'axios'
 import * as dotenv from 'dotenv'
-import { ClientError, CreateOrderNonceBody, Response } from '../src/types'
+import { CreateOrderNonceBody, Response } from '../src/types'
 import { Client } from '../src/client'
+import { isAuthenticationError } from '../src/error'
 dotenv.config()
 
 const main = async () => {
@@ -42,8 +43,8 @@ const main = async () => {
       const profile = await client.getProfileInfo()
       console.log(profile.payload.username)
     } catch (e) {
-      // Error: ClientError | AxiosError
-      if (isClientError(e)) {
+      // Error: AuthenticationError | AxiosError
+      if (isAuthenticationError(e)) {
         console.log(e)
       } else {
         console.log(e as AxiosError<Response<string>>)
@@ -53,8 +54,3 @@ const main = async () => {
 }
 
 main()
-
-// check if ClientError
-const isClientError = (err: unknown): err is ClientError => {
-  return (<ClientError>err).type !== undefined
-}
