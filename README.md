@@ -63,7 +63,7 @@ Check out the [sample files](./sample) to see an example workflow.
 Import the REST Client
 
 ```ts
-import {Client} from './client'
+import { Client } from './wsClient'
 ```
 
 Create a new instance
@@ -234,7 +234,7 @@ client.listTrades()
 Import the WebSocket Client
 
 ```ts
-import {WsClient} from './wsClient'
+import { WsClient } from 'brine-wrapperjs'
 ```
 
 Create a new instance
@@ -294,23 +294,20 @@ wsClient.ws.on('message', (data) => {
 
 ### Error Handling
 
-Errors thrown are of types `ClientError | AxiosError`.  
+Errors thrown are of types `AuthenticationError | AxiosError`.  
 
 Example
 
 ```ts
+import { isAuthenticationError } from 'brine-wrapperjs'
 try{
   // async operations
 } catch (e) {
-  if (isClientError(e)) {
+  if (isAuthenticationError(e)) {
     console.log(e)
   } else {
     console.log((e as AxiosError<Response<string>>))
   }
-}
-
-const isClientError = (err: unknown): err is ClientError => {
-  return (<ClientError>err).type !== undefined
 }
 ```
 
