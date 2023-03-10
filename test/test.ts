@@ -1,16 +1,28 @@
+import { AxiosError } from 'axios'
 import { expect } from 'chai'
-import { Balance, Response } from '../src/types'
 import { Client } from '../src/client'
+import {
+  Balance,
+  ClientError,
+  CreateOrderNonceBody,
+  Response,
+} from '../src/types'
 
 describe('Brine Wrapper', () => {
   describe('REST Client', () => {
     let client: Client
+    let client2: Client
+    let mockClient: Client
     let privateKey: string | undefined
     let ethAddress: string | undefined
     before(() => {
       privateKey = process.env.PRIVATE_KEY
       ethAddress = process.env.ETH_ADDRESS
       client = new Client()
+      client2 = new Client()
+      mockClient = new Client(
+        'https://e0b41562-40df-4e2a-9629-bcd41f8fcdc1.mock.pstmn.io',
+      )
     })
 
     describe('Ping', () => {
@@ -38,6 +50,23 @@ describe('Brine Wrapper', () => {
         expect(res).to.have.property('payload')
         expect(res).to.have.property('status')
         expect(res.status).to.eql('success')
+      })
+
+      it('Kline/Candlestick 400', async () => {
+        try {
+          const res = await client.getCandlestick({
+            // @ts-expect-error: javascript use-case
+            market: 'test',
+            period: 120,
+          })
+        } catch (e: unknown) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('market')
+          }
+        }
       })
 
       it('Order Book', async () => {
@@ -113,13 +142,63 @@ describe('Brine Wrapper', () => {
           expect(res).to.have.property('payload')
           expect(res.payload).to.have.property('nonce')
         })
-        // it('New order', async () => {
-        //   const res = await client.createNewOrder()
-        //   expect(res).to.have.property('status')
-        //   expect(res.status).to.eql('success')
-        //   expect(res).to.have.property('payload')
-        //   expect(res.payload).to.have.property('nonce')
-        // })
+
+        it('New Order Nonce 401', async () => {
+          try {
+            await client2.createOrderNonce({
+              market: 'btcusdt',
+              ord_type: 'limit',
+              price: 29580.51,
+              side: 'sell',
+              volume: 0.0001,
+            })
+          } catch (e: unknown) {
+            const data = e as ClientError
+            if (data) {
+              expect(data).to.have.property('status')
+              expect(data.status).to.eql('error')
+              expect(data.type).to.eql('notLoggedIn')
+            }
+          }
+        })
+
+        it('New Order Nonce 400', async () => {
+          try {
+            await client.createOrderNonce({
+              market: 'btcusdt',
+              ord_type: 'limit',
+              price: 29580.51,
+              side: 'sell',
+              volume: 0.00001,
+            })
+          } catch (e: unknown) {
+            const data = (e as AxiosError<Response<string>>)?.response?.data
+            if (data) {
+              expect(data).to.have.property('status')
+              expect(data.status).to.eql('error')
+              expect(data.message).to.include('decimals')
+            }
+          }
+        })
+
+        it('Create New order', async () => {
+          const nonceBody: CreateOrderNonceBody = {
+            market: 'btcusdt',
+            ord_type: 'market',
+            price: 29580.51,
+            side: 'buy',
+            volume: 0.0001,
+          }
+          await mockClient.completeLogin(ethAddress!, privateKey!)
+          const res = await mockClient.createCompleteOrder(
+            nonceBody,
+            privateKey!,
+          )
+          expect(res).to.have.property('status')
+          expect(res.status).to.eql('success')
+          expect(res).to.have.property('payload')
+          expect(res.payload).to.have.property('id')
+        })
       })
 
       it('List Orders', async () => {
