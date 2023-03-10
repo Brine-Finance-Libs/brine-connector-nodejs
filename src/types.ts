@@ -128,6 +128,10 @@ export interface OrderPayload extends Order {
   trades?: []
 }
 
+export interface CancelOrder extends Omit<OrderPayload, 'id'> {
+  order_id: number
+}
+
 export interface ListOrdersParams {
   limit?: number
   page?: number
@@ -170,7 +174,7 @@ export interface LoginPayload {
   signature?: string
 }
 
-export type LoginResponse = Response<LoginPayload> & {
+export interface LoginResponse extends Response<LoginPayload> {
   token: {
     refresh: string
     access: string

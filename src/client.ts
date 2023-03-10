@@ -1,6 +1,7 @@
 import { AxiosInstance as AxiosInstanceType } from 'axios'
 import {
   Balance,
+  CancelOrder,
   CandleStickParams,
   CandleStickPayload,
   CreateNewOrderBody,
@@ -40,19 +41,21 @@ export class Client {
     this.getAuthStatus = axios.getAuthStatus
   }
 
-  retryLogin = async () => {
+  retryLogin = async (): Promise<LoginResponse | undefined> => {
     if (this.ethAddress && this.userSignature)
       return await this.login(this.ethAddress, this.userSignature)
   }
 
-  async testConnection() {
+  async testConnection(): Promise<Response<string>> {
     const res = await this.axiosInstance.get<Response<string>>(
       '/sapi/v1/health/',
     )
     return res.data
   }
 
-  async get24hPrice(params: { market?: Market }) {
+  async get24hPrice(params: {
+    market?: Market
+  }): Promise<Response<FullDayPricePayload>> {
     const res = await this.axiosInstance.get<Response<FullDayPricePayload>>(
       `/sapi/v1/market/tickers/`,
       { params: params },
@@ -60,7 +63,9 @@ export class Client {
     return res.data
   }
 
-  async getCandlestick(params: CandleStickParams) {
+  async getCandlestick(
+    params: CandleStickParams,
+  ): Promise<Response<CandleStickPayload>> {
     const res = await this.axiosInstance.get<Response<CandleStickPayload>>(
       `/sapi/v1/market/kline/`,
       { params: params },
@@ -68,7 +73,9 @@ export class Client {
     return res.data
   }
 
-  async getOrderBook(params: OrderBookParams) {
+  async getOrderBook(
+    params: OrderBookParams,
+  ): Promise<Response<OrderBookPayload>> {
     const res = await this.axiosInstance.get<Response<OrderBookPayload>>(
       `/sapi/v1/market/orderbook/`,
       { params: params },
@@ -76,7 +83,9 @@ export class Client {
     return res.data
   }
 
-  async getRecentTrades(params: RecentTradesParams) {
+  async getRecentTrades(
+    params: RecentTradesParams,
+  ): Promise<Response<RecentTradesPayload>> {
     const res = await this.axiosInstance.get<Response<RecentTradesPayload>>(
       `/sapi/v1/market/trades/`,
       { params: params },
@@ -84,7 +93,7 @@ export class Client {
     return res.data
   }
 
-  async getNonce(ethAddress: string) {
+  async getNonce(ethAddress: string): Promise<Response<string>> {
     const nonceRes = await this.axiosInstance.post<Response<string>>(
       '/sapi/v1/auth/nonce/',
       {
@@ -95,7 +104,10 @@ export class Client {
     return nonceRes.data
   }
 
-  async login(ethAddress: string, userSignature: string) {
+  async login(
+    ethAddress: string,
+    userSignature: string,
+  ): Promise<LoginResponse> {
     const loginRes = await this.axiosInstance.post<LoginResponse>(
       '/sapi/v1/auth/login/',
       {
@@ -112,7 +124,10 @@ export class Client {
     return loginRes.data
   }
 
-  async completeLogin(ethAddress: string, privateKey: string) {
+  async completeLogin(
+    ethAddress: string,
+    privateKey: string,
+  ): Promise<LoginResponse> {
     const nonce = await this.getNonce(ethAddress)
     const signedMsg = signMsg(nonce.payload!, privateKey)
     const loginRes = await this.login(ethAddress, signedMsg.signature)
@@ -120,7 +135,7 @@ export class Client {
     return loginRes
   }
 
-  async getProfileInfo() {
+  async getProfileInfo(): Promise<Response<ProfileInformationPayload>> {
     this.getAuthStatus()
     const profileRes = await this.axiosInstance.get<
       Response<ProfileInformationPayload>
@@ -128,7 +143,9 @@ export class Client {
     return profileRes.data
   }
 
-  async getBalance(params?: { currency?: string }) {
+  async getBalance(params?: {
+    currency?: string
+  }): Promise<Response<Balance | Balance[]>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.get<Response<Balance | Balance[]>>(
       '/sapi/v1/user/balance/',
@@ -137,7 +154,7 @@ export class Client {
     return res.data
   }
 
-  async getProfitAndLoss() {
+  async getProfitAndLoss(): Promise<Response<ProfitAndLossPayload>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.get<Response<ProfitAndLossPayload>>(
       '/sapi/v1/user/pnl/',
@@ -145,7 +162,9 @@ export class Client {
     return res.data
   }
 
-  async createOrderNonce(body: CreateOrderNonceBody) {
+  async createOrderNonce(
+    body: CreateOrderNonceBody,
+  ): Promise<Response<CreateOrderNoncePayload>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.post<
       Response<CreateOrderNoncePayload>
@@ -153,7 +172,10 @@ export class Client {
     return res.data
   }
 
-  signMsgHash(nonce: CreateOrderNoncePayload, privateKey: string) {
+  signMsgHash(
+    nonce: CreateOrderNoncePayload,
+    privateKey: string,
+  ): CreateNewOrderBody {
     const msgToBeSigned = "Click sign to verify you're a human - Brine.finance"
     const userSignature = signMsg(msgToBeSigned, privateKey)
     const keyPair = getKeyPairFromSignature(userSignature.signature)
@@ -169,7 +191,10 @@ export class Client {
     return createOrderBody
   }
 
-  async createCompleteOrder(nonce: CreateOrderNonceBody, privateKey: string) {
+  async createCompleteOrder(
+    nonce: CreateOrderNonceBody,
+    privateKey: string,
+  ): Promise<Response<Order>> {
     this.getAuthStatus()
     const nonceRes = await this.createOrderNonce(nonce)
     const signedMsg = this.signMsgHash(nonceRes.payload, privateKey)
@@ -178,7 +203,7 @@ export class Client {
     return order
   }
 
-  async createNewOrder(body: CreateNewOrderBody) {
+  async createNewOrder(body: CreateNewOrderBody): Promise<Response<Order>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.post<Response<Order>>(
       '/sapi/v1/orders/create/',
@@ -187,7 +212,7 @@ export class Client {
     return res.data
   }
 
-  async getOrder(orderId: number) {
+  async getOrder(orderId: number): Promise<Response<OrderPayload>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.post<Response<OrderPayload>>(
       `/sapi/v1/orders/${orderId}`,
@@ -195,7 +220,9 @@ export class Client {
     return res.data
   }
 
-  async listOrders(params?: ListOrdersParams) {
+  async listOrders(
+    params?: ListOrdersParams,
+  ): Promise<Response<OrderPayload[]>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.post<Response<OrderPayload[]>>(
       `/sapi/v1/orders`,
@@ -204,7 +231,7 @@ export class Client {
     return res.data
   }
 
-  async cancelOrder(orderId: number) {
+  async cancelOrder(orderId: number): Promise<Response<CancelOrder>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.post<
       Response<Omit<OrderPayload, 'id'> & { order_id: number }>
@@ -212,7 +239,7 @@ export class Client {
     return res.data
   }
 
-  async listTrades(params?: TradeParams) {
+  async listTrades(params?: TradeParams): Promise<Response<TradePayload[]>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.get<Response<TradePayload[]>>(
       `/sapi/v1/trades/`,

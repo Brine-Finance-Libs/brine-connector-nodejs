@@ -1,12 +1,8 @@
 import { AxiosError } from 'axios'
 import { expect } from 'chai'
 import { Client } from '../src/client'
-import {
-  Balance,
-  ClientError,
-  CreateOrderNonceBody,
-  Response,
-} from '../src/types'
+import { Balance, CreateOrderNonceBody, Response } from '../src/types'
+import { AuthenticationError } from '../src/error'
 
 describe('Brine Wrapper', () => {
   describe('REST Client', () => {
@@ -198,11 +194,10 @@ describe('Brine Wrapper', () => {
               volume: 0.0001,
             })
           } catch (e: unknown) {
-            const data = e as ClientError
+            const data = e as AuthenticationError
             if (data) {
-              expect(data).to.have.property('status')
-              expect(data.status).to.eql('error')
-              expect(data.type).to.eql('notLoggedIn')
+              expect(data).to.have.property('name')
+              expect(data.name).to.eql('AuthenticationError')
             }
           }
         })

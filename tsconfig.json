@@ -8,8 +8,10 @@
     "strict": true,
     "esModuleInterop": true,
     "types": ["node", "mocha"],
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true,
+    "strictFunctionTypes": true
   },
-  "include": ["./src/**/*", "sample/rest.ts", "src/types.ts"],
+  "include": ["./src/**/*", "sample/rest.ts", "index.ts"],
   "exclude": ["./src/**/*.spec.ts"]
 }

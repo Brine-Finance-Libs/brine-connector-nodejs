@@ -24,23 +24,23 @@ export class WsClient {
     this.ws = new WebSocket(connection)
   }
 
-  async connect() {
+  async connect(): Promise<void> {
     while (this.ws.readyState === 0) {
       await this.sleep(500)
     }
   }
 
-  async disconnect() {
+  async disconnect(): Promise<void> {
     this.ws.close()
   }
 
-  async sleep(ms: number) {
+  async sleep(ms: number): Promise<unknown> {
     return new Promise((resolve) => {
       setTimeout(resolve, ms)
     })
   }
 
-  async subscribe(streams: string[]) {
+  async subscribe(streams: string[]): Promise<void> {
     const msg = {
       event: 'subscribe',
       streams,
@@ -49,7 +49,7 @@ export class WsClient {
     this.ws.send(JSON.stringify(msg))
   }
 
-  async unsubscribe(streams: string[]) {
+  async unsubscribe(streams: string[]): Promise<void> {
     const msg = {
       event: 'unsubscribe',
       streams,
