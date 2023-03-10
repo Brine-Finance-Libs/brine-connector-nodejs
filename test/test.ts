@@ -78,6 +78,20 @@ describe('Brine Wrapper', () => {
         expect(res.status).to.eql('success')
       })
 
+      it('Order Book 400', async () => {
+        try {
+          // @ts-expect-error: javascript use-case
+          const res = await client.getOrderBook({})
+        } catch (e: unknown) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('market')
+          }
+        }
+      })
+
       it('Recent Trades', async () => {
         const res = await client.getRecentTrades({
           market: 'ethusdc',
@@ -95,6 +109,37 @@ describe('Brine Wrapper', () => {
         expect(res).to.have.property('status')
         expect(res).to.have.property('payload')
         expect(res.status).to.eql('success')
+      })
+
+      it('Login Invalid Eth Address 400', async () => {
+        try {
+          const client = new Client()
+          const res = await client.completeLogin('test', privateKey!)
+        } catch (e) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('characters')
+          }
+        }
+      })
+
+      it('Login Incorrect Address 400', async () => {
+        try {
+          const client = new Client()
+          const res = await client.completeLogin(
+            '0x83D37295507F7C838f6a7dd1E41a4A81aC7C9a5E',
+            privateKey!,
+          )
+        } catch (e) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('login')
+          }
+        }
       })
 
       it('Profile Information', async () => {
