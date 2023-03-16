@@ -56,7 +56,7 @@ The default base url is https://api-testnet.brine.fi .You can change it by provi
 
 ### Workflow
 
-Check out the [sample files](./sample) to see an example workflow.
+Check out the [example files](./example) to see an example workflow.
 
 ### Rest Client
 
