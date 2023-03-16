@@ -214,7 +214,7 @@ export class Client {
 
   async getOrder(orderId: number): Promise<Response<OrderPayload>> {
     this.getAuthStatus()
-    const res = await this.axiosInstance.post<Response<OrderPayload>>(
+    const res = await this.axiosInstance.get<Response<OrderPayload>>(
       `/sapi/v1/orders/${orderId}`,
     )
     return res.data
@@ -224,7 +224,7 @@ export class Client {
     params?: ListOrdersParams,
   ): Promise<Response<OrderPayload[]>> {
     this.getAuthStatus()
-    const res = await this.axiosInstance.post<Response<OrderPayload[]>>(
+    const res = await this.axiosInstance.get<Response<OrderPayload[]>>(
       `/sapi/v1/orders`,
       { params: params },
     )
