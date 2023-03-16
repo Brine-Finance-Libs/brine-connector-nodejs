@@ -38,6 +38,8 @@ const main = async () => {
       // create order (private)
       // const order = await client.createCompleteOrder(nonceBody, privateKey)
       // console.log(order)
+      const orders = await client.listOrders()
+      console.log(orders.payload[0])
 
       // get profile info (private)
       const profile = await client.getProfileInfo()

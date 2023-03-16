@@ -7,8 +7,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsup ./src/index.ts --format cjs,esm --dts",
-    "start": "ts-node ./sample/rest.ts",
-    "start:ws": "ts-node ./sample/websocket.ts",
+    "start": "ts-node ./example/rest.ts",
+    "start:ws": "ts-node ./example/websocket.ts",
     "test": "mocha test/test.ts -r ts-node/register -r dotenv/config --timeout 10000",
     "lint": "eslint . --ext .ts",
     "ci": "pnpm run lint && pnpm run build",

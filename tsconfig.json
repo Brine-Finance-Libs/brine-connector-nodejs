@@ -12,6 +12,6 @@
     "declaration": true,
     "strictFunctionTypes": true
   },
-  "include": ["./src/**/*", "sample/rest.ts", "index.ts"],
+  "include": ["./src/**/*", "example/rest.ts", "index.ts"],
   "exclude": ["./src/**/*.spec.ts"]
 }
