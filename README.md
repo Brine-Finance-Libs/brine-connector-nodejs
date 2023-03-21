@@ -160,7 +160,7 @@ client.getProfileInfo()
 client.getBalance()
 ```
 
-#### Profit and Loss Detailss (Private 🔒)
+#### Profit and Loss Details (Private 🔒)
 
 `GET /sapi/v1/user/pnl/`
 
@@ -245,7 +245,7 @@ const wsClient = new WsClient('public')
 const wsClient = new WsClient('public', null, baseUrl)
 // or
 const loginRes = await client.completeLogin(ethAddress, privateKey)
-const wsClient = new WsClient('private', loginRes.payload.token.access)
+const wsClient = new WsClient('private', loginRes.token.access)
 ```
 
 #### Connect
@@ -263,6 +263,10 @@ const streams = [
   'btcusdc.kline-5m',
 ]
 wsClient.subscribe(streams)
+
+// or fpr private
+
+wsClient.subscribe(['trade', 'order'])
 ```
 
 #### Unsubscribe
@@ -274,6 +278,10 @@ const streams = [
   'btcusdc.kline-5m',
 ]
 wsClient.unsubscribe(streams)
+
+// or fpr private
+
+wsClient.unsubscribe(['trade', 'order'])
 ```
 
 #### Disconnect

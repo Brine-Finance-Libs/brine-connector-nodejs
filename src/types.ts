@@ -59,7 +59,7 @@ export interface AskBid {
 
 export interface OrderBookPayload {
   asks: AskBid[]
-  bid: AskBid[]
+  bids: AskBid[]
 }
 
 export interface OrderBookParams {
@@ -193,7 +193,7 @@ export interface Balance {
   currency: string
   balance: string
   locked: string
-  deposit_address: null
+  deposit_address: string | null
 }
 
 export type ProfitAndLossPayload = {

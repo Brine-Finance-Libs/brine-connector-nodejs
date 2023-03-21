@@ -85,8 +85,8 @@ export class Client {
 
   async getRecentTrades(
     params: RecentTradesParams,
-  ): Promise<Response<RecentTradesPayload>> {
-    const res = await this.axiosInstance.get<Response<RecentTradesPayload>>(
+  ): Promise<Response<RecentTradesPayload[]>> {
+    const res = await this.axiosInstance.get<Response<RecentTradesPayload[]>>(
       `/sapi/v1/market/trades/`,
       { params: params },
     )
