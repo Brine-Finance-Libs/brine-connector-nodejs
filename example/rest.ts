@@ -36,7 +36,7 @@ const main = async () => {
       }
 
       // create order (private)
-      // const order = await client.createCompleteOrder(nonceBody, privateKey)
+      const order = await client.createCompleteOrder(nonceBody, privateKey)
       // console.log(order)
       const orders = await client.listOrders()
       console.log(orders.payload[0])
