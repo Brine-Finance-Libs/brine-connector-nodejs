@@ -1,6 +1,6 @@
-# Brine WrapperJS
+# Brine Connector NodeJS
 
-## _A NodeJS Wrapper for the Brine API_
+## _A NodeJS Connector for the Brine API_
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://brine-assets-public.s3.ap-southeast-1.amazonaws.com/img/logo-white.png">
@@ -8,7 +8,7 @@
   <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://www.brine.finance/img/brine-logo-dark.png" width="300">
 </picture>
 
-Brine-wrapperJS is a NodeJS wrapper for the [Brine API](https://docs.brine.finance/docs/introduction).
+Brine Connector is a NodeJS connector/wrapper for the [Brine API](https://docs.brine.finance/docs/introduction).
 
 ## Features
 
@@ -20,34 +20,28 @@ Brine-wrapperJS is a NodeJS wrapper for the [Brine API](https://docs.brine.finan
 - Auto re-login when JWT expires
 - Typescript Types✨
 
-Brine-wrapperJS includes utility/connector functions which can be used to interact with the Brine API. It uses axios internally to handle all requests. It includes interceptors for handling setting JWT and re-login on token expiry.
+Brine Connector includes utility/connector functions which can be used to interact with the Brine API. It uses axios internally to handle all requests. It includes interceptors for handling setting JWT and re-login on token expiry.
 
 ## Installation
 
 First go to the [Brine Website](https://www.brine.finance/) and create an account with your wallet.
 
-Clone this repository.
+Install the npm package.
 
 ```sh
-git clone https://github.com/upsurge0/brine-wrapperjs.git
-```
-
-Install the dependencies and devDependencies.
-
-```sh
-npm i
+npm i brine-connector
 ```
 
 or
 
 ```sh
-yarn
+yarn add brine-connector
 ```
 
 or
 
 ```sh
-pnpm i
+pnpm i brine-connector
 ```
 
 ## Getting Started
@@ -63,7 +57,7 @@ Check out the [example files](./example) to see an example workflow.
 Import the REST Client
 
 ```ts
-import { Client } from './wsClient'
+import { Client } from 'brine-connector'
 ```
 
 Create a new instance
@@ -234,7 +228,7 @@ client.listTrades()
 Import the WebSocket Client
 
 ```ts
-import { WsClient } from 'brine-wrapperjs'
+import { WsClient } from 'brine-connector'
 ```
 
 Create a new instance
@@ -307,7 +301,7 @@ Errors thrown are of types `AuthenticationError | AxiosError`.
 Example
 
 ```ts
-import { isAuthenticationError } from 'brine-wrapperjs'
+import { isAuthenticationError } from 'brine-connector'
 try{
   // async operations
 } catch (e) {

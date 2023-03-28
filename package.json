@@ -1,10 +1,21 @@
 {
-  "name": "brine-wrapperjs",
-  "version": "1.0.0",
-  "description": "A NodeJS Wrapper for the Brine API",
+  "name": "brine-connector",
+  "version": "0.0.1",
+  "description": "A NodeJS Connector for the Brine API",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brine-finance/brine-connector-nodejs"
+  },
+  "homepage": "https://github.com/brine-finance/brine-connector-nodejs",
+  "author": "Brine",
+  "license": "ISC",
   "scripts": {
     "build": "tsup ./src/index.ts --format cjs,esm --dts",
     "start": "ts-node ./example/rest.ts",
@@ -29,15 +40,13 @@
   },
   "keywords": [
     "brine",
+    "connector",
     "finance",
     "api",
     "wrapper",
-    "connector",
     "typescript",
     "nodejs"
   ],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@changesets/cli": "^2.26.0",
     "@swc/core": "^1.3.38",

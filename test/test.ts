@@ -4,7 +4,7 @@ import { Client } from '../src/client'
 import { Balance, CreateOrderNonceBody, Response } from '../src/types'
 import { AuthenticationError } from '../src/error'
 
-describe('Brine Wrapper', () => {
+describe('Brine Connector', () => {
   describe('REST Client', () => {
     let client: Client
     let client2: Client
