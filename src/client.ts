@@ -26,6 +26,7 @@ import {
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
+import { signMsgHash } from './utils'
 
 export class Client {
   axiosInstance: AxiosInstanceType
@@ -39,7 +40,7 @@ export class Client {
     const baseURL =
       option === 'testnet'
         ? 'https://api-testnet.brine.fi'
-        : 'https://api.trade.fi'
+        : 'https://api.brine.fi'
     const axios = new AxiosInstance(this.retryLogin, baseURL)
     this.axiosInstance = axios.axiosInstance
     this.setToken = axios.setToken
@@ -59,7 +60,7 @@ export class Client {
     return res.data
   }
 
-  async get24hPrice(params: {
+  async get24hPrice(params?: {
     market?: Market
   }): Promise<Response<FullDayPricePayload>> {
     const res = await this.axiosInstance.get<Response<FullDayPricePayload>>(
@@ -178,37 +179,15 @@ export class Client {
     return res.data
   }
 
-  signMsgHash(
-    nonce: CreateOrderNoncePayload,
-    privateKey: string,
-  ): CreateNewOrderBody {
-    const msgToBeSigned =
-      this.option === 'testnet'
-        ? "Click sign to verify you're a human - Brine.finance"
-        : 'Get started with Brine. Make sure the origin is https://trade.brine.fi'
-    const userSignature = signMsg(msgToBeSigned, privateKey)
-    const keyPair = getKeyPairFromSignature(userSignature.signature)
-    const msg = sign(keyPair, nonce.msg_hash.replace('0x', ''))
-    const createOrderBody: CreateNewOrderBody = {
-      msg_hash: nonce.msg_hash,
-      signature: {
-        r: `0x${msg.r.toString('hex')}`,
-        s: `0x${msg.s.toString('hex')}`,
-      },
-      nonce: nonce.nonce,
-    }
-    return createOrderBody
-  }
-
   async createCompleteOrder(
     nonce: CreateOrderNonceBody,
     privateKey: string,
   ): Promise<Response<Order>> {
     this.getAuthStatus()
     const nonceRes = await this.createOrderNonce(nonce)
-    const signedMsg = this.signMsgHash(nonceRes.payload, privateKey)
-    const order = await this.createNewOrder(signedMsg)
+    const signedMsg = signMsgHash(nonceRes.payload, privateKey, this.option)
 
+    const order = await this.createNewOrder(signedMsg)
     return order
   }
 
