@@ -140,12 +140,12 @@ login: `POST /sapi/v1/auth/login/`
 import { signMsg } from 'brine-connector'
 
 const nonce = await client.getNonce(ethAddress)
-const signedMsg = signMsg(nonce.payload, privateKey)
+const signedMsg = signMsg(nonce.payload, ethPrivateKey)
 const loginRes = await client.login(ethAddress, signedMsg.signature)
 
 // or
 
-const loginRes = await client.completeLogin(ethAddress, privateKey) //calls above functions internally
+const loginRes = await client.completeLogin(ethAddress, ethPrivateKey) //calls above functions internally
 
 // or
 
@@ -198,13 +198,13 @@ createNewOrder: `POST /sapi/v1/orders/create/`
 ```ts
 import { signMsgHash } from 'brine-connector'
 
-const nonceRes = await client.createOrderNonce(nonceBody)
-const signedBody = signMsgHash(nonceRes.payload, privateKey)
+const orderNonce = await client.createOrderNonce(nonceBody)
+const signedBody = signMsgHash(orderNonce.payload, ethPrivateKey)
 const order = await client.createNewOrder(signedBody)
 
 // or
 
-const order = await client.createCompleteOrder(nonceBody, privateKey) //calls above functions internally
+const order = await client.createCompleteOrder(nonceBody, ethPrivateKey) //calls above functions internally
 ```
 
 #### Get Order (Private 🔒)
@@ -254,7 +254,7 @@ const wsClient = new WsClient('public')
 // or
 const wsClient = new WsClient('public', null, 'testnet') // or 'mainnet'
 // or
-const loginRes = await client.completeLogin(ethAddress, privateKey)
+const loginRes = await client.completeLogin(ethAddress, ethPrivateKey)
 const wsClient = new WsClient('private', loginRes.token.access)
 ```
 
