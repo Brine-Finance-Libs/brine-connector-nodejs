@@ -186,7 +186,7 @@ export class Client {
     this.getAuthStatus()
     const nonceRes = await this.createOrderNonce(nonce)
     const signedMsg = signMsgHash(nonceRes.payload, privateKey, this.option)
-    
+
     const order = await this.createNewOrder(signedMsg)
     return order
   }
