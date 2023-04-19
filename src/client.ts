@@ -40,7 +40,7 @@ export class Client {
     const baseURL =
       option === 'testnet'
         ? 'https://api-testnet.brine.fi'
-        : 'https://api.trade.fi'
+        : 'https://api.brine.fi'
     const axios = new AxiosInstance(this.retryLogin, baseURL)
     this.axiosInstance = axios.axiosInstance
     this.setToken = axios.setToken

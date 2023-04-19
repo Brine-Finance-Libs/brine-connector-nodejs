@@ -14,7 +14,7 @@ const main = async () => {
     // handle in try catch block
     try {
       // create a rest client instance (you can pass option)
-      const client = new Client('testnet')
+      const client = new Client('mainnet')
 
       //you can use public endpoints right away
       const test = await client.testConnection()
@@ -36,8 +36,8 @@ const main = async () => {
       }
 
       // create order (private)
-      const order = await client.createCompleteOrder(nonceBody, privateKey)
-      console.log(order)
+      // const order = await client.createCompleteOrder(nonceBody, privateKey)
+      // console.log(order)
       // const orders = await client.listOrders()
       // console.log(orders.payload[0])
 

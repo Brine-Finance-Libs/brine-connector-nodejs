@@ -58,7 +58,7 @@ npm link /path/to/local_repository # the path to brine-connector-nodejs reposito
 
 ## Getting Started
 
-The default base url for mainnet is https://api.trade.fi and testnet is https://api-testnet.brine.fi. You can choose between mainnet and testnet by providing it through the constructor. All REST apis, WebSockets are handled by Client, WsClient classes respectively. All operations must be handled in a try-catch block.
+The default base url for mainnet is https://api.brine.fi and testnet is https://api-testnet.brine.fi. You can choose between mainnet and testnet by providing it through the constructor. All REST apis, WebSockets are handled by Client, WsClient classes respectively. All operations must be handled in a try-catch block.
 
 ### Workflow
 

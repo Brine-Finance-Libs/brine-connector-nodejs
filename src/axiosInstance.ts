@@ -16,7 +16,7 @@ export class AxiosInstance {
     this.reLogin = reLogin
 
     this.axiosInstance = axios.create({
-      baseURL: baseUrl ?? 'https://api.trade.fi',
+      baseURL: baseUrl ?? 'https://api.brine.fi',
     })
 
     this.axiosInstance.interceptors.response.use(

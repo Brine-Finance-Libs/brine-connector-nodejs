@@ -16,7 +16,7 @@ describe('Brine Connector', () => {
       ethAddress = process.env.ETH_ADDRESS
       client = new Client()
       client2 = new Client()
-      mockClient = new Client('testnet')
+      mockClient = new Client('mainnet')
     })
 
     describe('Ping', () => {
