@@ -8,7 +8,7 @@
   <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://www.brine.finance/img/brine-logo-dark.png" width="300">
 </picture>
 
-Brine Connector is a NodeJS connector/wrapper for the [Brine API](https://docs.brine.finance/docs/introduction).
+Brine Connector is a NodeJS connector/wrapper for the [Brine API](https://docs.brine.fi/api-documentation).
 
 ## Features
 
