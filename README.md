@@ -38,12 +38,6 @@ Install dependencies
 npm i
 ```
 
-To use library inside example files
-```sh
-npm run start
-npm run start:ws
-```
-
 To use library in other projects  
 Run inside cloned repository to generate dist folder
 ```sh
@@ -63,6 +57,13 @@ The default base url for mainnet is https://api.brine.fi and testnet is https://
 ### Workflow
 
 Check out the [example files](./example) to see an example workflow.
+
+To use library inside example files
+
+```sh
+npm run start
+npm run start:ws
+```
 
 ### Rest Client
 
