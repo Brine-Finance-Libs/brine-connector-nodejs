@@ -137,6 +137,8 @@ getNonce: `POST /sapi/v1/auth/nonce/`
 login: `POST /sapi/v1/auth/login/`
 
 ```ts
+import { signMsg } from 'brine-connector'
+
 const nonce = await client.getNonce(ethAddress)
 const signedMsg = signMsg(nonce.payload, privateKey)
 const loginRes = await client.login(ethAddress, signedMsg.signature)
