@@ -196,8 +196,10 @@ createOrderNonce: `POST /sapi/v1/orders/nonce/`
 createNewOrder: `POST /sapi/v1/orders/create/`
 
 ```ts
+import { signMsgHash } from 'brine-connector'
+
 const nonceRes = await client.createOrderNonce(nonceBody)
-const signedBody = client.signMsgHash(nonceRes.payload, privateKey)
+const signedBody = signMsgHash(nonceRes.payload, privateKey)
 const order = await client.createNewOrder(signedBody)
 
 // or
