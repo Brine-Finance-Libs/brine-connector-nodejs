@@ -7,19 +7,18 @@ export class WsClient {
   constructor(
     type: 'public' | 'private',
     jwt?: string | null,
-    baseUrl?: string,
+    option: 'mainnet' | 'testnet' = 'testnet',
   ) {
     let connection = ''
-    if (type === 'public')
-      connection = `${baseUrl ?? 'wss://api-testnet.brine.fi'}/public`
+    const baseUrl =
+      option === 'testnet' ? 'wss://api-testnet.brine.fi' : 'wss://api.trade.fi'
+    if (type === 'public') connection = `${baseUrl}/public`
     else {
       if (!jwt)
         throw new AuthenticationError(
           'JWT access token must be provided for private connections',
         )
-      connection = `${
-        baseUrl ?? 'wss://api-testnet.brine.fi'
-      }/private?auth_header=${jwt}`
+      connection = `${baseUrl}/private?auth_header=${jwt}`
     }
     this.ws = new WebSocket(connection)
   }

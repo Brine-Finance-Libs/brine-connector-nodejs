@@ -26,27 +26,38 @@ Brine Connector includes utility/connector functions which can be used to intera
 
 First go to the [Brine Website](https://www.brine.finance/) and create an account with your wallet.
 
-Install the npm package.
+Clone the repo
 
 ```sh
-npm i brine-connector
+git clone https://github.com/brine-finance/brine-connector-nodejs.git
+cd brine-connector-nodejs
 ```
 
-or
-
+Install dependencies
 ```sh
-yarn add brine-connector
+npm i
 ```
 
-or
-
+To use library inside example files
 ```sh
-pnpm i brine-connector
+npm run start
+npm run start:ws
 ```
+
+To use library in other projects
+```sh
+npm run build
+```
+
+Go to your main nodejs project
+```sh
+npm link /path/to/local_repository # the path to brine-connector-nodejs repository you just cloned
+```
+
 
 ## Getting Started
 
-The default base url is https://api-testnet.brine.fi .You can change it by providing a baseUrl through the constructor. All REST apis, WebSockets are handled by Client, WsClient classes respectively. All operations must be handled in a try-catch block.
+The default base url for mainnet is https://api.trade.fi and testnet is https://api-testnet.brine.fi. You can choose between mainnet and testnet by providing it through the constructor. All REST apis, WebSockets are handled by Client, WsClient classes respectively. All operations must be handled in a try-catch block.
 
 ### Workflow
 
@@ -65,7 +76,7 @@ Create a new instance
 ```ts
 const client = new Client()
 // or
-const client = new Client(baseUrl)
+const client = new Client('testnet') //'mainnet' or 'testnet'
 ```
 
 ### General Endpoints
@@ -236,7 +247,7 @@ Create a new instance
 ```ts
 const wsClient = new WsClient('public')
 // or
-const wsClient = new WsClient('public', null, baseUrl)
+const wsClient = new WsClient('public', null, 'testnet') // or 'mainnet'
 // or
 const loginRes = await client.completeLogin(ethAddress, privateKey)
 const wsClient = new WsClient('private', loginRes.token.access)

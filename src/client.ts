@@ -33,12 +33,18 @@ export class Client {
   setToken: (token: string) => void
   private ethAddress?: string
   private userSignature?: string
+  option: 'testnet' | 'mainnet'
 
-  constructor(baseUrl?: string) {
-    const axios = new AxiosInstance(this.retryLogin, baseUrl)
+  constructor(option: 'testnet' | 'mainnet' = 'testnet') {
+    const baseURL =
+      option === 'testnet'
+        ? 'https://api-testnet.brine.fi'
+        : 'https://api.trade.fi'
+    const axios = new AxiosInstance(this.retryLogin, baseURL)
     this.axiosInstance = axios.axiosInstance
     this.setToken = axios.setToken
     this.getAuthStatus = axios.getAuthStatus
+    this.option = option
   }
 
   retryLogin = async (): Promise<LoginResponse | undefined> => {
@@ -176,7 +182,10 @@ export class Client {
     nonce: CreateOrderNoncePayload,
     privateKey: string,
   ): CreateNewOrderBody {
-    const msgToBeSigned = "Click sign to verify you're a human - Brine.finance"
+    const msgToBeSigned =
+      this.option === 'testnet'
+        ? "Click sign to verify you're a human - Brine.finance"
+        : 'Get started with Brine. Make sure the origin is https://trade.brine.fi'
     const userSignature = signMsg(msgToBeSigned, privateKey)
     const keyPair = getKeyPairFromSignature(userSignature.signature)
     const msg = sign(keyPair, nonce.msg_hash.replace('0x', ''))

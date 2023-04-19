@@ -13,8 +13,8 @@ const main = async () => {
   if (privateKey && ethAddress) {
     // handle in try catch block
     try {
-      // create a rest client instance (you can pass baseUrl if it has changed)
-      const client = new Client()
+      // create a rest client instance (you can pass option)
+      const client = new Client('testnet')
 
       //you can use public endpoints right away
       const test = await client.testConnection()
@@ -37,9 +37,9 @@ const main = async () => {
 
       // create order (private)
       const order = await client.createCompleteOrder(nonceBody, privateKey)
-      // console.log(order)
-      const orders = await client.listOrders()
-      console.log(orders.payload[0])
+      console.log(order)
+      // const orders = await client.listOrders()
+      // console.log(orders.payload[0])
 
       // get profile info (private)
       const profile = await client.getProfileInfo()

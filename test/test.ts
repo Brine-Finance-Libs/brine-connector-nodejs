@@ -16,9 +16,7 @@ describe('Brine Connector', () => {
       ethAddress = process.env.ETH_ADDRESS
       client = new Client()
       client2 = new Client()
-      mockClient = new Client(
-        'https://e0b41562-40df-4e2a-9629-bcd41f8fcdc1.mock.pstmn.io',
-      )
+      mockClient = new Client('testnet')
     })
 
     describe('Ping', () => {
