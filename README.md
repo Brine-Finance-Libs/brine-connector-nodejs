@@ -44,7 +44,8 @@ npm run start
 npm run start:ws
 ```
 
-To use library in other projects
+To use library in other projects  
+Run inside cloned repository to generate dist folder
 ```sh
 npm run build
 ```
