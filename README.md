@@ -279,7 +279,8 @@ const wsClient = new WsClient('public')
 const wsClient = new WsClient('public', 'testnet') // or 'mainnet'
 // or
 const loginRes = await client.completeLogin(ethAddress, ethPrivateKey)
-const wsClient = new WsClient('private', loginRes.token.access)
+const wsClient = new WsClient('private', 'testnet', loginRes.token.access)
+// pass in jwt as 3rd argument for private connections
 ```
 
 #### Connect
