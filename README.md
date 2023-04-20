@@ -73,15 +73,24 @@ Import the REST Client
 import { Client } from 'brine-connector'
 ```
 
-Create a new instance
+Create a new instance.  
+Choose between mainnet or testnet
 
 ```ts
 const client = new Client()
 // or
-const client = new Client('testnet') //'mainnet' or 'testnet'
+const client = new Client('mainnet') //'mainnet' or 'testnet'
 ```
 
 ### General Endpoints
+
+#### Utils
+
+Get available markets on Mainnet and Testnet
+
+```ts
+import { MAINNET, TESTNET } from 'brine-connector'
+```
 
 #### Test connectivity
 
@@ -96,7 +105,7 @@ client.testConnection()
 `GET /sapi/v1/market/tickers/`
 
 ```ts
-client.get24hPrice({market: 'ethusdc'})
+client.get24hPrice({market: MAINNET.markets.ethusdc})
 ```
 
 #### Kline/Candlestick Data
@@ -105,7 +114,7 @@ client.get24hPrice({market: 'ethusdc'})
 
 ```ts
 client.getCandlestick({
-   market: 'ethusdc',
+   market: MAINNET.markets.ethusdc,
    period: 120,
 })
 ```
@@ -116,7 +125,7 @@ client.getCandlestick({
 
 ```ts
 client.getOrderBook({
-     market: 'ethusdc',
+     market: MAINNET.markets.ethusdc,
 })
 ```
 
@@ -126,7 +135,7 @@ client.getOrderBook({
 
 ```ts
 client.getRecentTrades({
-    market: 'ethusdc',
+    market: MAINNET.markets.ethusdc,
 })
 ```
 
@@ -183,7 +192,7 @@ Create Nonce Body
 
 ```ts
 const nonceBody: CreateOrderNonceBody = {
-    market: 'btcusdt',
+    market: MAINNET.markets.ethusdc,
     ord_type: 'market',
     price: 29580.51,
     side: 'buy',
@@ -197,15 +206,29 @@ createOrderNonce: `POST /sapi/v1/orders/nonce/`
 createNewOrder: `POST /sapi/v1/orders/create/`
 
 ```ts
+const order = await client.createCompleteOrder(nonceBody, ethPrivateKey) 
+//calls below functions internally, we recommend using createCompleteOrder for ease of use
+
+// or
 import { signMsgHash } from 'brine-connector'
 
 const orderNonce = await client.createOrderNonce(nonceBody)
 const signedBody = signMsgHash(orderNonce.payload, ethPrivateKey)
 const order = await client.createNewOrder(signedBody)
 
-// or
 
-const order = await client.createCompleteOrder(nonceBody, ethPrivateKey) //calls above functions internally
+// or
+import {
+  createUserSignature,
+  getKeyPairFromSignature,
+  SignOrderWithStarkKeys,
+} from 'brine-connector'
+
+const orderNonce = await client.createOrderNonce(nonceBody)
+const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
+const keyPair = getKeyPairFromSignature(userSignature.signature)
+const signedBody = SignOrderWithStarkKeys(keyPair, orderNonce.payload)
+const order = await client.createNewOrder(signedBody)
 ```
 
 #### Get Order (Private 🔒)
