@@ -276,7 +276,7 @@ Create a new instance
 ```ts
 const wsClient = new WsClient('public')
 // or
-const wsClient = new WsClient('public', null, 'testnet') // or 'mainnet'
+const wsClient = new WsClient('public', 'testnet') // or 'mainnet'
 // or
 const loginRes = await client.completeLogin(ethAddress, ethPrivateKey)
 const wsClient = new WsClient('private', loginRes.token.access)
