@@ -11,7 +11,7 @@ export class WsClient {
   ) {
     let connection = ''
     const baseUrl =
-      option === 'testnet' ? 'wss://api-testnet.brine.fi' : 'wss://api.trade.fi'
+      option === 'testnet' ? 'wss://api-testnet.brine.fi' : 'wss://api.brine.fi'
     if (type === 'public') connection = `${baseUrl}/public`
     else {
       if (!jwt)

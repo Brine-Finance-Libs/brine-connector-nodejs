@@ -11,7 +11,7 @@ const main = async () => {
     const client = new Client()
     if (privateKey && ethAddress) {
       // create a public websocket instance
-      const wsClient = new WsClient('public')
+      const wsClient = new WsClient('public', null, 'mainnet')
       // check to see if connected
       await wsClient.connect()
       // subscribe to streams

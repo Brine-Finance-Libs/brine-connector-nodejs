@@ -208,3 +208,12 @@ export type ProfitAndLossPayload = {
   average_balance_price: string
   total_balance_value: string
 }[]
+
+export interface Sign {
+  message: string
+  messageHash?: string
+  v: string
+  r: string
+  s: string
+  signature: string
+}
