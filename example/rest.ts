@@ -1,8 +1,14 @@
 import { AxiosError } from 'axios'
 import * as dotenv from 'dotenv'
-import { CreateOrderNonceBody, Response } from '../src/types'
+import { CreateOrderNonceBody, MAINNET, Response, TESTNET } from '../src/types'
 import { Client } from '../src/client'
 import { isAuthenticationError } from '../src/error'
+import {
+  createUserSignature,
+  getKeyPairFromSignature,
+  SignOrderNonceWithSignature,
+  SignOrderWithStarkKeys,
+} from '../src'
 dotenv.config()
 
 const main = async () => {
@@ -14,7 +20,7 @@ const main = async () => {
     // handle in try catch block
     try {
       // create a rest client instance (you can pass option)
-      const client = new Client('mainnet')
+      const client = new Client('testnet')
 
       //you can use public endpoints right away
       const test = await client.testConnection()
@@ -28,7 +34,7 @@ const main = async () => {
 
       // create an order nonce
       const nonceBody: CreateOrderNonceBody = {
-        market: 'btcusdt',
+        market: TESTNET.markets.btcusdc,
         ord_type: 'market',
         price: 29580.51,
         side: 'buy',
@@ -37,7 +43,14 @@ const main = async () => {
 
       // create order (private)
       // const order = await client.createCompleteOrder(nonceBody, privateKey)
-      // console.log(order)
+
+      const orderNonce = await client.createOrderNonce(nonceBody)
+      const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
+      const keyPair = getKeyPairFromSignature(userSignature.signature)
+      const signedBody = SignOrderWithStarkKeys(keyPair, orderNonce.payload)
+      const order = await client.createNewOrder(signedBody)
+
+      console.log(order)
       // const orders = await client.listOrders()
       // console.log(orders.payload[0])
 

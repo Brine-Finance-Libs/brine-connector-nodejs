@@ -1,3 +1,4 @@
+import { ec } from 'elliptic'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
 import { CreateNewOrderBody, CreateOrderNoncePayload, Sign } from './types'
@@ -5,15 +6,15 @@ import { CreateNewOrderBody, CreateOrderNoncePayload, Sign } from './types'
 export const signMsgHash = (
   nonce: CreateOrderNoncePayload,
   privateKey: string,
-  option: 'testnet' | 'mainnet' = 'testnet',
+  option: 'testnet' | 'mainnet',
 ): CreateNewOrderBody => {
   const userSignature = createUserSignature(privateKey, option)
-  return SignOrderWithStarkKeys(userSignature, nonce)
+  return SignOrderNonceWithSignature(userSignature, nonce)
 }
 
 export const createUserSignature = (
   privateKey: string,
-  option: 'testnet' | 'mainnet' = 'testnet',
+  option: 'testnet' | 'mainnet',
 ): Sign => {
   const msgToBeSigned =
     option === 'testnet'
@@ -23,11 +24,17 @@ export const createUserSignature = (
   return userSignature
 }
 
-export const SignOrderWithStarkKeys = (
+export const SignOrderNonceWithSignature = (
   userSignature: Sign,
   nonce: CreateOrderNoncePayload,
 ): CreateNewOrderBody => {
   const keyPair = getKeyPairFromSignature(userSignature.signature)
+  return SignOrderWithStarkKeys(keyPair, nonce)
+}
+export const SignOrderWithStarkKeys = (
+  keyPair: ec.KeyPair,
+  nonce: CreateOrderNoncePayload,
+): CreateNewOrderBody => {
   const msg = sign(keyPair, nonce.msg_hash.replace('0x', ''))
   const createOrderBody: CreateNewOrderBody = {
     msg_hash: nonce.msg_hash,
