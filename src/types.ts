@@ -1,4 +1,20 @@
 export type Market = 'ethusdc' | 'ethusdt' | 'btcusdc' | 'btcusdt'
+
+export const MAINNET = {
+  markets: {
+    ethusdc: 'ethusdc',
+    btcusdc: 'btcusdc',
+  },
+} as const
+export const TESTNET = {
+  markets: {
+    ethusdc: 'ethusdc',
+    btcusdc: 'btcusdc',
+    ethusdt: 'ethusdt',
+    btcusdt: 'btcusdt',
+  },
+} as const
+
 export type Side = 'buy' | 'sell'
 export type OrdType = 'market' | 'limit'
 export type State = 'pending' | 'wait' | 'done' | 'cancel'
@@ -208,3 +224,12 @@ export type ProfitAndLossPayload = {
   average_balance_price: string
   total_balance_value: string
 }[]
+
+export interface Sign {
+  message: string
+  messageHash?: string
+  v: string
+  r: string
+  s: string
+  signature: string
+}
