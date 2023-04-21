@@ -6,7 +6,7 @@ export class WsClient {
 
   constructor(
     type: 'public' | 'private',
-    option: 'mainnet' | 'testnet' = 'testnet',
+    option: 'mainnet' | 'testnet' = 'mainnet',
     jwt?: string | null,
   ) {
     let connection = ''
