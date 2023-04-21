@@ -6,7 +6,7 @@ import { CreateNewOrderBody, CreateOrderNoncePayload, Sign } from './types'
 export const signMsgHash = (
   nonce: CreateOrderNoncePayload,
   privateKey: string,
-  option: 'testnet' | 'mainnet',
+  option: 'mainnet' | 'testnet' = 'mainnet',
 ): CreateNewOrderBody => {
   const userSignature = createUserSignature(privateKey, option)
   return SignOrderNonceWithSignature(userSignature, nonce)
@@ -14,7 +14,7 @@ export const signMsgHash = (
 
 export const createUserSignature = (
   privateKey: string,
-  option: 'testnet' | 'mainnet',
+  option: 'mainnet' | 'testnet' = 'mainnet',
 ): Sign => {
   const msgToBeSigned =
     option === 'testnet'

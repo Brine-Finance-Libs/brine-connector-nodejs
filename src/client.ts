@@ -36,7 +36,7 @@ export class Client {
   private userSignature?: string
   option: 'testnet' | 'mainnet'
 
-  constructor(option: 'testnet' | 'mainnet' = 'testnet') {
+  constructor(option: 'mainnet' | 'testnet' = 'mainnet') {
     const baseURL =
       option === 'testnet'
         ? 'https://api-testnet.brine.fi'

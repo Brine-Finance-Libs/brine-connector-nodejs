@@ -52,7 +52,7 @@ npm link /path/to/local_repository # the path to brine-connector-nodejs reposito
 
 ## Getting Started
 
-The default base url for mainnet is https://api.brine.fi and testnet is https://api-testnet.brine.fi. You can choose between mainnet and testnet by providing it through the constructor. All REST apis, WebSockets are handled by Client, WsClient classes respectively. All operations must be handled in a try-catch block.
+The default base url for mainnet is https://api.brine.fi and testnet is https://api-testnet.brine.fi. You can choose between mainnet and testnet by providing it through the constructor. The default is mainnet. All REST apis, WebSockets are handled by Client, WsClient classes respectively. All operations must be handled in a try-catch block.
 
 ### Workflow
 
@@ -79,7 +79,7 @@ Choose between mainnet or testnet
 ```ts
 const client = new Client()
 // or
-const client = new Client('mainnet') //'mainnet' or 'testnet'
+const client = new Client('testnet') // default mainnet
 ```
 
 ### General Endpoints
@@ -225,7 +225,7 @@ import {
 } from 'brine-connector'
 
 const orderNonce = await client.createOrderNonce(nonceBody)
-const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
+const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself; default mainnet
 const keyPair = getKeyPairFromSignature(userSignature.signature)
 const signedBody = SignOrderWithStarkKeys(keyPair, orderNonce.payload)
 const order = await client.createNewOrder(signedBody)
@@ -276,7 +276,7 @@ Create a new instance
 ```ts
 const wsClient = new WsClient('public')
 // or
-const wsClient = new WsClient('public', 'testnet') // or 'mainnet'
+const wsClient = new WsClient('public', 'testnet') // default is 'mainnet'
 // or
 const loginRes = await client.completeLogin(ethAddress, ethPrivateKey)
 const wsClient = new WsClient('private', 'testnet', loginRes.token.access)

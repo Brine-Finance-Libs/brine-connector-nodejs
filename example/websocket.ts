@@ -11,7 +11,7 @@ const main = async () => {
     const client = new Client()
     if (privateKey && ethAddress) {
       // create a public websocket instance
-      const wsClient = new WsClient('public', null, 'mainnet')
+      const wsClient = new WsClient('public')
       // check to see if connected
       await wsClient.connect()
       // subscribe to streams
@@ -31,7 +31,11 @@ const main = async () => {
       // login to get jwt access token
       const loginRes = await client.completeLogin(ethAddress, privateKey)
       // create a private websocket instance
-      const wsClientPrivate = new WsClient('private', loginRes.token.access)
+      const wsClientPrivate = new WsClient(
+        'private',
+        'mainnet',
+        loginRes.token.access,
+      )
       // check if connected
       await wsClientPrivate.connect()
       // subscribe to streams
