@@ -9,7 +9,7 @@ export const signMsgHash = (
   option: 'mainnet' | 'testnet' = 'mainnet',
 ): CreateNewOrderBody => {
   const userSignature = createUserSignature(privateKey, option)
-  return SignOrderNonceWithSignature(userSignature, nonce)
+  return signOrderNonceWithSignature(userSignature, nonce)
 }
 
 export const createUserSignature = (
@@ -24,14 +24,14 @@ export const createUserSignature = (
   return userSignature
 }
 
-export const SignOrderNonceWithSignature = (
+export const signOrderNonceWithSignature = (
   userSignature: Sign,
   nonce: CreateOrderNoncePayload,
 ): CreateNewOrderBody => {
   const keyPair = getKeyPairFromSignature(userSignature.signature)
-  return SignOrderWithStarkKeys(keyPair, nonce)
+  return signOrderWithStarkKeys(keyPair, nonce)
 }
-export const SignOrderWithStarkKeys = (
+export const signOrderWithStarkKeys = (
   keyPair: ec.KeyPair,
   nonce: CreateOrderNoncePayload,
 ): CreateNewOrderBody => {
