@@ -6,8 +6,9 @@ import { getKeyPairFromSignature } from './bin/signature'
 import {
   signMsgHash,
   createUserSignature,
-  SignOrderNonceWithSignature,
-  SignOrderWithStarkKeys,
+  signOrderNonceWithSignature,
+  signOrderWithStarkKeys,
+  generateKeyPairFromEthPrivateKey,
 } from './utils'
 
 export {
@@ -17,9 +18,10 @@ export {
   signMsg,
   signMsgHash,
   createUserSignature,
-  SignOrderNonceWithSignature,
+  signOrderNonceWithSignature,
   getKeyPairFromSignature,
-  SignOrderWithStarkKeys,
+  signOrderWithStarkKeys,
+  generateKeyPairFromEthPrivateKey,
 }
 export * from './types'
 
@@ -30,7 +32,8 @@ export default {
   signMsg,
   signMsgHash,
   createUserSignature,
-  SignOrderNonceWithSignature,
+  signOrderNonceWithSignature,
   getKeyPairFromSignature,
-  SignOrderWithStarkKeys,
+  signOrderWithStarkKeys,
+  generateKeyPairFromEthPrivateKey,
 }

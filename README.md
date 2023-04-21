@@ -2,12 +2,6 @@
 
 ## _A NodeJS Connector for the Brine API_
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://brine-assets-public.s3.ap-southeast-1.amazonaws.com/img/logo-white.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://brine-assets-public.s3.ap-southeast-1.amazonaws.com/img/krypto-logo-dark.png">
-  <img alt="Shows an illustrated sun in light mode and a moon with stars in dark mode." src="https://www.brine.finance/img/brine-logo-dark.png" width="300">
-</picture>
-
 Brine Connector is a NodeJS connector/wrapper for the [Brine API](https://docs.brine.fi/api-documentation).
 
 ## Features
@@ -26,29 +20,10 @@ Brine Connector includes utility/connector functions which can be used to intera
 
 First go to the [Brine Website](https://www.brine.finance/) and create an account with your wallet.
 
-Clone the repo
-
+Install from npm
 ```sh
-git clone https://github.com/brine-finance/brine-connector-nodejs.git
-cd brine-connector-nodejs
+npm i @brine-fi/brine-connector
 ```
-
-Install dependencies
-```sh
-npm i
-```
-
-To use library in other projects  
-Run inside cloned repository to generate dist folder
-```sh
-npm run build
-```
-
-Go to your main nodejs project
-```sh
-npm link /path/to/local_repository # the path to brine-connector-nodejs repository you just cloned
-```
-
 
 ## Getting Started
 
@@ -70,7 +45,7 @@ npm run start:ws
 Import the REST Client
 
 ```ts
-import { Client } from 'brine-connector'
+import { Client } from '@brine-fi/brine-connector'
 ```
 
 Create a new instance.  
@@ -89,7 +64,7 @@ const client = new Client('testnet') // default mainnet
 Get available markets on Mainnet and Testnet
 
 ```ts
-import { MAINNET, TESTNET } from 'brine-connector'
+import { MAINNET, TESTNET } from '@brine-fi/brine-connector'
 ```
 
 #### Test connectivity
@@ -147,7 +122,7 @@ getNonce: `POST /sapi/v1/auth/nonce/`
 login: `POST /sapi/v1/auth/login/`
 
 ```ts
-import { signMsg } from 'brine-connector'
+import { signMsg } from '@brine-fi/brine-connector'
 
 const nonce = await client.getNonce(ethAddress)
 const signedMsg = signMsg(nonce.payload, ethPrivateKey)
@@ -210,7 +185,7 @@ const order = await client.createCompleteOrder(nonceBody, ethPrivateKey)
 //calls below functions internally, we recommend using createCompleteOrder for ease of use
 
 // or
-import { signMsgHash } from 'brine-connector'
+import { signMsgHash } from '@brine-fi/brine-connector'
 
 const orderNonce = await client.createOrderNonce(nonceBody)
 const signedBody = signMsgHash(orderNonce.payload, ethPrivateKey)
@@ -221,13 +196,13 @@ const order = await client.createNewOrder(signedBody)
 import {
   createUserSignature,
   getKeyPairFromSignature,
-  SignOrderWithStarkKeys,
-} from 'brine-connector'
+  signOrderWithStarkKeys,
+} from '@brine-fi/brine-connector'
 
 const orderNonce = await client.createOrderNonce(nonceBody)
 const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself; default mainnet
 const keyPair = getKeyPairFromSignature(userSignature.signature)
-const signedBody = SignOrderWithStarkKeys(keyPair, orderNonce.payload)
+const signedBody = signOrderWithStarkKeys(keyPair, orderNonce.payload)
 const order = await client.createNewOrder(signedBody)
 ```
 
@@ -268,7 +243,7 @@ client.listTrades()
 Import the WebSocket Client
 
 ```ts
-import { WsClient } from 'brine-connector'
+import { WsClient } from '@brine-fi/brine-connector'
 ```
 
 Create a new instance
@@ -342,7 +317,7 @@ Errors thrown are of types `AuthenticationError | AxiosError`.
 Example
 
 ```ts
-import { isAuthenticationError } from 'brine-connector'
+import { isAuthenticationError } from '@brine-fi/brine-connector'
 try{
   // async operations
 } catch (e) {
@@ -354,3 +329,11 @@ try{
 }
 ```
 
+#### Create Stark Key Pairs
+
+You can create your own stark key pairs using the utility functions below
+
+```ts
+import { generateKeyPairFromEthPrivateKey } from '@brine-fi/brine-connector'
+const keypair = generateKeyPairFromEthPrivateKey(ethPrivateKey)
+```
