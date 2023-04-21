@@ -46,3 +46,11 @@ export const SignOrderWithStarkKeys = (
   }
   return createOrderBody
 }
+
+export const generateKeyPairFromEthPrivateKey = (
+  ethPrivateKey: string,
+  option: 'mainnet' | 'testnet' = 'mainnet',
+) => {
+  const signature = createUserSignature(ethPrivateKey, option)
+  return getKeyPairFromSignature(signature.signature)
+}

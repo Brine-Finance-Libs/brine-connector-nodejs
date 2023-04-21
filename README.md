@@ -329,3 +329,10 @@ try{
 }
 ```
 
+#### Create Stark Key Pairs
+
+You can create your own stark key pairs using the utility functions below
+
+```ts
+const keypair = generateKeyPairFromEthPrivateKey(ethPrivateKey)
+```

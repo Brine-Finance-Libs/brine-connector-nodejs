@@ -8,6 +8,7 @@ import {
   createUserSignature,
   SignOrderNonceWithSignature,
   SignOrderWithStarkKeys,
+  generateKeyPairFromEthPrivateKey,
 } from './utils'
 
 export {
@@ -20,6 +21,7 @@ export {
   SignOrderNonceWithSignature,
   getKeyPairFromSignature,
   SignOrderWithStarkKeys,
+  generateKeyPairFromEthPrivateKey,
 }
 export * from './types'
 
@@ -33,4 +35,5 @@ export default {
   SignOrderNonceWithSignature,
   getKeyPairFromSignature,
   SignOrderWithStarkKeys,
+  generateKeyPairFromEthPrivateKey,
 }
