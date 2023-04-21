@@ -196,13 +196,13 @@ const order = await client.createNewOrder(signedBody)
 import {
   createUserSignature,
   getKeyPairFromSignature,
-  SignOrderWithStarkKeys,
+  signOrderWithStarkKeys,
 } from '@brine-fi/brine-connector'
 
 const orderNonce = await client.createOrderNonce(nonceBody)
 const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself; default mainnet
 const keyPair = getKeyPairFromSignature(userSignature.signature)
-const signedBody = SignOrderWithStarkKeys(keyPair, orderNonce.payload)
+const signedBody = signOrderWithStarkKeys(keyPair, orderNonce.payload)
 const order = await client.createNewOrder(signedBody)
 ```
 
