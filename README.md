@@ -200,7 +200,7 @@ import {
 } from '@brine-fi/brine-connector'
 
 const orderNonce = await client.createOrderNonce(nonceBody)
-const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself; default mainnet
+const userSignature = createUserSignature(ethPrivateKey, 'testnet') // or sign it yourself; default mainnet
 const keyPair = getKeyPairFromSignature(userSignature.signature)
 const signedBody = signOrderWithStarkKeys(keyPair, orderNonce.payload)
 const order = await client.createNewOrder(signedBody)
@@ -329,11 +329,11 @@ try{
 }
 ```
 
-#### Create Stark Key Pairs
+#### Create L2 Key Pair
 
 You can create your own stark key pairs using the utility functions below
 
 ```ts
 import { generateKeyPairFromEthPrivateKey } from '@brine-fi/brine-connector'
-const keypair = generateKeyPairFromEthPrivateKey(ethPrivateKey)
+const keypair = generateKeyPairFromEthPrivateKey(ethPrivateKey, 'testnet') // default is mainnet
 ```
