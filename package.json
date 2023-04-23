@@ -14,8 +14,8 @@
     "url": "https://github.com/brine-finance/brine-connector-nodejs"
   },
   "homepage": "https://github.com/brine-finance/brine-connector-nodejs",
-  "author": "Brine",
-  "license": "ISC",
+  "author": "Brine Fi",
+  "license": "MIT",
   "scripts": {
     "build": "tsup ./src/index.ts --format cjs,esm --dts",
     "start": "ts-node ./example/rest.ts",
