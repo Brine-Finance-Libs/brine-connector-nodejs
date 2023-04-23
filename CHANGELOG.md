@@ -1,5 +1,11 @@
 # brine-connector
 
+## 1.0.3
+
+### Patch Changes
+
+- Adds MIT License and Updates README
+
 ## 1.0.2
 
 ### Patch Changes
