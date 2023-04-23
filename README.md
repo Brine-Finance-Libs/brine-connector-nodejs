@@ -335,5 +335,10 @@ You can create your own stark key pairs using the utility functions below
 
 ```ts
 import { generateKeyPairFromEthPrivateKey } from '@brine-fi/brine-connector'
-const keypair = generateKeyPairFromEthPrivateKey(ethPrivateKey, 'testnet') // default is mainnet
+
+const keypair = generateKeyPairFromEthPrivateKey(ethPrivateKey, 'testnet'); // default is mainnet
+
+console.log(keypair.getPublic().getX().toString()); // public key
+console.log(keypair.getPrivate().toString()); // privatekey
+
 ```
