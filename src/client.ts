@@ -234,14 +234,14 @@ export class Client {
     return res.data
   }
 
-  getRefreshToken = async (): Promise<
-    Response<LoginResponse['token']> | undefined
-  > => {
-    if (this.refreshToken) {
+  getRefreshToken = async (
+    refreshToken?: string,
+  ): Promise<Response<LoginResponse['token']> | undefined> => {
+    if (refreshToken || this.refreshToken) {
       const res = await this.axiosInstance.post(
         '/sapi/v1/auth/token/refresh/',
         {
-          refresh: this.refreshToken,
+          refresh: refreshToken ?? this.refreshToken,
         },
       )
 
