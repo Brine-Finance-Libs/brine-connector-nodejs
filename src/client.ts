@@ -41,7 +41,7 @@ export class Client {
       option === 'testnet'
         ? 'https://api-testnet.brine.fi'
         : 'https://api.brine.fi'
-    const axios = new AxiosInstance(this.getRefreshToken, baseURL)
+    const axios = new AxiosInstance(this.refreshTokens, baseURL)
     this.axiosInstance = axios.axiosInstance
     this.setAccessToken = axios.setAccessToken
     this.setRefreshToken = (token: string | null) => {
@@ -234,7 +234,7 @@ export class Client {
     return res.data
   }
 
-  getRefreshToken = async (
+  refreshTokens = async (
     refreshToken?: string,
   ): Promise<Response<LoginResponse['token']> | undefined> => {
     if (refreshToken || this.refreshToken) {

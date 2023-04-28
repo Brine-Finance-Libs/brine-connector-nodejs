@@ -143,10 +143,10 @@ client.setRefreshToken(access)
 
 `POST /sapi/v1/auth/token/refresh/`
 
-If refresh token is set (manually or by using login functions), the refresh endpoint is called automatically when access token expires. Optionally, you can call refresh manually by passing in refreshToken (passing it is optional, it'll work if has been set before).
+If refresh token is set (manually or by using login functions), the refresh endpoint is called automatically when access token expires. Optionally, you can call `refreshTokens` manually by passing in refreshToken (passing it is optional, it'll work if has been set before).
 
 ```ts
-const res = await client.getRefreshToken(refreshToken)
+const res = await client.refreshTokens(refreshToken)
 ```
 
 #### Logout
