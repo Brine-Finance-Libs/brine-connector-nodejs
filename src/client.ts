@@ -31,9 +31,9 @@ import { signMsgHash } from './utils'
 export class Client {
   axiosInstance: AxiosInstanceType
   getAuthStatus: () => void
-  setToken: (token: string) => void
-  private ethAddress?: string
-  private userSignature?: string
+  setAccessToken: (token: string | null) => void
+  setRefreshToken: (token: string | null) => void
+  private refreshToken?: string | null
   option: 'testnet' | 'mainnet'
 
   constructor(option: 'mainnet' | 'testnet' = 'mainnet') {
@@ -41,16 +41,15 @@ export class Client {
       option === 'testnet'
         ? 'https://api-testnet.brine.fi'
         : 'https://api.brine.fi'
-    const axios = new AxiosInstance(this.retryLogin, baseURL)
+    const axios = new AxiosInstance(this.getRefreshToken, baseURL)
     this.axiosInstance = axios.axiosInstance
-    this.setToken = axios.setToken
+    this.setAccessToken = axios.setAccessToken
+    this.setRefreshToken = (token: string | null) => {
+      this.refreshToken = token
+      axios.setRefreshToken(token)
+    }
     this.getAuthStatus = axios.getAuthStatus
     this.option = option
-  }
-
-  retryLogin = async (): Promise<LoginResponse | undefined> => {
-    if (this.ethAddress && this.userSignature)
-      return await this.login(this.ethAddress, this.userSignature)
   }
 
   async testConnection(): Promise<Response<string>> {
@@ -122,9 +121,8 @@ export class Client {
         user_signature: userSignature,
       },
     )
-    this.setToken(loginRes.data.token.access)
-    this.ethAddress = ethAddress
-    this.userSignature = userSignature
+    this.setAccessToken(loginRes.data.token.access)
+    this.setRefreshToken(loginRes.data.token.refresh)
 
     loginRes.data.payload.signature = userSignature
 
@@ -234,5 +232,28 @@ export class Client {
       { params: params },
     )
     return res.data
+  }
+
+  getRefreshToken = async (): Promise<
+    Response<LoginResponse['token']> | undefined
+  > => {
+    if (this.refreshToken) {
+      const res = await this.axiosInstance.post(
+        '/sapi/v1/auth/token/refresh/',
+        {
+          refresh: this.refreshToken,
+        },
+      )
+
+      this.setAccessToken(res.data.payload.access)
+      this.setRefreshToken(res.data.payload.refresh)
+
+      return res.data
+    }
+  }
+
+  logOut = () => {
+    this.setAccessToken(null)
+    this.setRefreshToken(null)
   }
 }
