@@ -29,11 +29,9 @@ const main = async () => {
         period: 120,
       })
 
+      // login to use private endpoints
       const loginRes = await client.completeLogin(ethAddress, privateKey)
       // console.log(loginRes.payload)
-
-
-      // login to use private endpoints
 
       // create an order nonce
       const nonceBody: CreateOrderNonceBody = {
