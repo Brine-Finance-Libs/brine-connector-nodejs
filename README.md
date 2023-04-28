@@ -11,7 +11,7 @@ Brine Connector is a NodeJS connector/wrapper for the [Brine API](https://docs.b
 - High level abstraction for ease of use.
 - Easy authentication
 - Automatically sets JWT token internally
-- Auto re-login when JWT expires
+- Calls refresh endpoint when token expires.
 - Typescript Types✨
 
 Brine Connector includes utility/connector functions which can be used to interact with the Brine API. It uses axios internally to handle all requests. It includes interceptors for handling setting JWT and re-login on token expiry.
@@ -116,7 +116,7 @@ client.getRecentTrades({
 
 #### Login
 
-Both login() and completeLogin() sets JWT as Authorization Token. Optionally, setToken() can be used to set JWT token directly, but this will not allow client to auto-relogin on token expiry.
+Both `login` and `completeLogin` sets JWT as Authorization Token. Optionally, `setAccessToken` and `setRefreshToken` can be used to set JWT token directly.
 
 getNonce: `POST /sapi/v1/auth/nonce/`  
 login: `POST /sapi/v1/auth/login/`
@@ -134,7 +134,27 @@ const loginRes = await client.completeLogin(ethAddress, ethPrivateKey) //calls a
 
 // or
 
-client.setToken(jwt)
+client.setAccessToken(access)
+client.setRefreshToken(access)
+// these functions are called internally when you use login or completeLogin
+```
+
+#### Refresh Token
+
+`POST /sapi/v1/auth/token/refresh/`
+
+If refresh token is set (manually or by using login functions), the refresh endpoint is called automatically when access token expires. Optionally, you can call refresh manually by passing in refreshToken (passing it is optional, it'll work if has been set before).
+
+```ts
+const res = await client.getRefreshToken(refreshToken)
+```
+
+#### Logout
+
+Sets tokens to null
+
+```ts
+client.logOut()
 ```
 
 #### Profile Information (Private 🔒)
