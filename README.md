@@ -1,8 +1,16 @@
-# Brine Connector NodeJS
+<h1 align="center">Brine Connector NodeJS</h1>
 
-## _A NodeJS Connector for the Brine API_
+<p align="center">
+  The official NodeJS connector for <a href="https://docs.brine.fi/api-documentation">Brine's API</a> 🚀
+</p>
 
-Brine Connector is a NodeJS connector/wrapper for the [Brine API](https://docs.brine.fi/api-documentation).
+<div align="center">
+
+  [![npm version](https://img.shields.io/npm/v/@brine-fi/brine-connector)](https://www.npmjs.org/package/@brine-fi/brine-connector)
+  [![Build status](https://img.shields.io/github/actions/workflow/status/Brine-Finance-Libs/brine-connector-nodejs/main.yml)](https://github.com/axios/axios/actions/workflows/ci.yml)
+  [![npm bundle size](https://img.shields.io/bundlephobia/minzip/@brine-fi/brine-connector)](https://bundlephobia.com/package/@brine-fi/brine-connector@latest)
+
+</div>
 
 ## Features
 
@@ -14,11 +22,11 @@ Brine Connector is a NodeJS connector/wrapper for the [Brine API](https://docs.b
 - Calls refresh endpoint when token expires.
 - Typescript Types✨
 
-Brine Connector includes utility/connector functions which can be used to interact with the Brine API. It uses axios internally to handle all requests. It includes interceptors for handling setting JWT and re-login on token expiry.
+Brine Connector includes utility/connector functions which can be used to interact with the Brine API. It uses axios internally to handle all requests. It includes interceptors for setting JWT and handling re-login on token expiry.
 
 ## Installation
 
-First go to the [Brine Website](https://www.brine.finance/) and create an account with your wallet.
+First, go to [Brine's Website](https://www.brine.finance/) and create an account with your wallet.
 
 Install from npm
 ```sh
@@ -116,7 +124,7 @@ client.getRecentTrades({
 
 #### Login
 
-Both `login` and `completeLogin` sets JWT as Authorization Token. Optionally, `setAccessToken` and `setRefreshToken` can be used to set JWT token directly.
+Both `login` and `completeLogin` sets JWT as Authorization Token. Optionally, `setAccessToken` and `setRefreshToken` can be used to set tokens directly.
 
 getNonce: `POST /sapi/v1/auth/nonce/`  
 login: `POST /sapi/v1/auth/login/`
@@ -134,8 +142,8 @@ const loginRes = await client.completeLogin(ethAddress, ethPrivateKey) //calls a
 
 // or
 
-client.setAccessToken(access)
-client.setRefreshToken(access)
+client.setAccessToken(access) // same as client.setToken()
+client.setRefreshToken(refresh)
 // these functions are called internally when you use login or completeLogin
 ```
 
@@ -358,7 +366,6 @@ import { generateKeyPairFromEthPrivateKey } from '@brine-fi/brine-connector'
 
 const keypair = generateKeyPairFromEthPrivateKey(ethPrivateKey, 'testnet'); // default is mainnet
 
-console.log(keypair.getPublic().getX().toString()); // public key
-console.log(keypair.getPrivate().toString()); // privatekey
-
+const stark_public_key = keypair.getPublic().getX().toString('hex')
+const stark_private_key = keypair.getPrivate().toString('hex')
 ```

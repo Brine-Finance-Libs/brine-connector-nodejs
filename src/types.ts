@@ -126,7 +126,7 @@ export interface Order {
   uuid: string
   side: Side
   ord_type: OrdType
-  price: string
+  price: string | null
   avg_price: string
   state: State
   market: Market
@@ -159,6 +159,7 @@ export interface ListOrdersParams {
   start_time?: number
   end_time?: number
   side?: Side
+  order_by: 'asc' | 'desc'
 }
 
 export interface TradeParams {

@@ -31,6 +31,7 @@ import { signMsgHash } from './utils'
 export class Client {
   axiosInstance: AxiosInstanceType
   getAuthStatus: () => void
+  setToken: (token: string | null) => void
   setAccessToken: (token: string | null) => void
   setRefreshToken: (token: string | null) => void
   private refreshToken?: string | null
@@ -48,6 +49,7 @@ export class Client {
       this.refreshToken = token
       axios.setRefreshToken(token)
     }
+    this.setToken = axios.setAccessToken
     this.getAuthStatus = axios.getAuthStatus
     this.option = option
   }
@@ -206,11 +208,9 @@ export class Client {
     return res.data
   }
 
-  async listOrders(
-    params?: ListOrdersParams,
-  ): Promise<Response<OrderPayload[]>> {
+  async listOrders(params?: ListOrdersParams): Promise<Response<Order[]>> {
     this.getAuthStatus()
-    const res = await this.axiosInstance.get<Response<OrderPayload[]>>(
+    const res = await this.axiosInstance.get<Response<Order[]>>(
       `/sapi/v1/orders`,
       { params: params },
     )
