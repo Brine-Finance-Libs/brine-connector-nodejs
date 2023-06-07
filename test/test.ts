@@ -192,6 +192,30 @@ describe('Brine Connector', () => {
         expect(res.status).to.eql('success')
       })
 
+      it('Balance details Expired Access Token', async () => {
+        mock1
+          .onGet('/sapi/v1/user/balance/', undefined, {
+            Authorization: `JWT ${responses.login.token.access}`,
+          })
+          .reply(401, responses.accessTokenExpired)
+        mock1
+          .onPost('/sapi/v1/auth/token/refresh/')
+          .reply(200, responses.refreshToken)
+        mock1
+          .onGet('/sapi/v1/user/balance/', undefined, {
+            Authorization: `JWT ${responses.refreshToken.payload.access}`,
+          })
+          .reply(200, responses.balanceDetails)
+        const res = await client.getBalance()
+        expect(res).to.not.be.an('undefined')
+        expect(res).to.have.property('status')
+        expect(res).to.have.property('payload')
+        expect((res as Response<Balance[]>).payload[0]).to.deep.property(
+          'currency',
+        )
+        expect(res.status).to.eql('success')
+      })
+
       it('Profit and Loss Details', async () => {
         mock1.onGet('/sapi/v1/user/pnl/').reply(200, responses.profitAndLoss)
         const res = await client.getProfitAndLoss()

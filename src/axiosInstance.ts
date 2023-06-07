@@ -1,22 +1,33 @@
 import axios, { AxiosInstance as AxiosInstanceType } from 'axios'
-import * as dotenv from 'dotenv'
 import { AuthenticationError } from './error'
-import { LoginResponse } from './types'
-dotenv.config()
+import { LoginResponse, Response } from './types'
 
 export class AxiosInstance {
   axiosInstance: AxiosInstanceType
-  token?: string
-  reLogin: () => Promise<LoginResponse | undefined>
+  accessToken?: string | null
+  refreshToken?: string | null
+  getRefreshToken: () => Promise<Response<LoginResponse['token']> | undefined>
 
   constructor(
-    reLogin: () => Promise<LoginResponse | undefined>,
+    getRefreshToken: () => Promise<
+      Response<LoginResponse['token']> | undefined
+    >,
     baseUrl?: string,
   ) {
-    this.reLogin = reLogin
+    this.getRefreshToken = getRefreshToken
 
     this.axiosInstance = axios.create({
       baseURL: baseUrl ?? 'https://api.brine.fi',
+    })
+
+    this.interceptors()
+  }
+
+  interceptors = () => {
+    this.axiosInstance.interceptors.request.use((config) => {
+      if (this.accessToken)
+        config.headers.Authorization = `JWT ${this.accessToken}`
+      return config
     })
 
     this.axiosInstance.interceptors.response.use(
@@ -28,16 +39,16 @@ export class AxiosInstance {
         if (
           error?.response?.status === 401 &&
           !originalRequest._retry &&
-          this.token
+          this.accessToken &&
+          error.response.data.payload.token_type === 'access'
         ) {
           originalRequest._retry = true
-          const res = await this.reLogin()
 
+          const res = await this.getRefreshToken()
           if (res) {
-            axios.defaults.headers.common[
-              'Authorization'
-            ] = `JWT ${res.token.access}`
-            this.setToken(res.token.access)
+            this.accessToken = res?.payload?.access
+            this.refreshToken = res?.payload?.refresh
+            originalRequest.headers.Authorization = `JWT ${res.payload.access}`
           }
           return this.axiosInstance(originalRequest)
         }
@@ -46,16 +57,16 @@ export class AxiosInstance {
     )
   }
 
-  setToken(token: string) {
-    this.axiosInstance.interceptors.request.use((config) => {
-      config.headers.Authorization = `JWT ${token}`
-      return config
-    })
-    this.token = token
+  setRefreshToken = (token: string | null) => {
+    this.refreshToken = token
   }
 
-  getAuthStatus() {
-    if (!this.token)
+  setAccessToken = (token: string | null) => {
+    this.accessToken = token
+  }
+
+  getAuthStatus = () => {
+    if (!this.accessToken)
       throw new AuthenticationError(
         'This is a private endpoint... Please use login() or completeLogin() first',
       )

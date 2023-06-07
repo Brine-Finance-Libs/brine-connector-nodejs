@@ -6,8 +6,8 @@ import { isAuthenticationError } from '../src/error'
 import {
   createUserSignature,
   getKeyPairFromSignature,
-  SignOrderNonceWithSignature,
-  SignOrderWithStarkKeys,
+  signOrderNonceWithSignature,
+  signOrderWithStarkKeys,
 } from '../src'
 dotenv.config()
 
@@ -31,6 +31,7 @@ const main = async () => {
 
       // login to use private endpoints
       const loginRes = await client.completeLogin(ethAddress, privateKey)
+      // console.log(loginRes.payload)
 
       // create an order nonce
       const nonceBody: CreateOrderNonceBody = {
@@ -44,25 +45,27 @@ const main = async () => {
       // create order (private)
       // const order = await client.createCompleteOrder(nonceBody, privateKey)
 
-      const orderNonce = await client.createOrderNonce(nonceBody)
-      const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
-      const keyPair = getKeyPairFromSignature(userSignature.signature)
-      const signedBody = SignOrderWithStarkKeys(keyPair, orderNonce.payload)
-      const order = await client.createNewOrder(signedBody)
+      // const orderNonce = await client.createOrderNonce(nonceBody)
+      // const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
+      // const keyPair = getKeyPairFromSignature(userSignature.signature)
+      // const signedBody = signOrderWithStarkKeys(keyPair, orderNonce.payload)
+      // const order = await client.createNewOrder(signedBody)
 
-      console.log(order)
+      // console.log(order)
       // const orders = await client.listOrders()
       // console.log(orders.payload[0])
 
       // get profile info (private)
       const profile = await client.getProfileInfo()
       console.log(profile.payload.username)
+
+      const trades = await client.listTrades()
     } catch (e) {
       // Error: AuthenticationError | AxiosError
       if (isAuthenticationError(e)) {
         console.log(e)
       } else {
-        console.log(e as AxiosError<Response<string>>)
+        console.log((e as AxiosError<Response<string>>)?.response?.data)
       }
     }
   }

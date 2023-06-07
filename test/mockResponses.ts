@@ -324,6 +324,24 @@ export const responses = {
       { currency: 'usdc', balance: '0.0', locked: '0.0' },
     ],
   },
+  accessTokenExpired: {
+    status: 'error',
+    message: 'Given token not valid for any token type',
+    payload: {
+      token_class: 'AccessToken',
+      token_type: 'access',
+      message: 'Token is invalid or expired',
+      code: 'token_not_valid',
+    },
+  },
+  refreshToken: {
+    status: 'success',
+    message: '',
+    payload: {
+      access: 'ferasdfklre',
+      refresh: 'fekcjicbd',
+    },
+  },
   profitAndLoss: {
     status: 'success',
     message: 'Retrieval Successful',
