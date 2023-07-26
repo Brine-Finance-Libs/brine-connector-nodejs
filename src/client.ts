@@ -8,6 +8,13 @@ import {
   CreateOrderNonceBody,
   CreateOrderNoncePayload,
   FullDayPricePayload,
+  InternalTransfer,
+  InternalTransferInitiateBody,
+  InternalTransferInitiatePayload,
+  InternalTransferProcessBody,
+  InternalTransferProcessPayload,
+  ListInternalTransferParams,
+  ListInternalTransferPayload,
   ListOrdersParams,
   LoginResponse,
   Market,
@@ -26,7 +33,8 @@ import {
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
-import { signMsgHash } from './utils'
+import { signInternalTxMsgHash, signMsgHash } from './utils'
+import { ec } from 'elliptic'
 
 export class Client {
   axiosInstance: AxiosInstanceType
@@ -230,6 +238,76 @@ export class Client {
     const res = await this.axiosInstance.get<Response<TradePayload[]>>(
       `/sapi/v1/trades/`,
       { params: params },
+    )
+    return res.data
+  }
+
+  async initiateInternalTransfer(
+    body: InternalTransferInitiateBody,
+  ): Promise<Response<InternalTransferInitiatePayload>> {
+    const res = await this.axiosInstance.post<
+      Response<InternalTransferInitiatePayload>
+    >('/sapi/v1/internal_transfers/initiate/', body)
+    return res.data
+  }
+
+  async executeInternalTransfers(
+    body: InternalTransferProcessBody,
+  ): Promise<Response<InternalTransferProcessPayload>> {
+    const res = await this.axiosInstance.post<
+      Response<InternalTransferProcessPayload>
+    >('/sapi/v1/internal_transfers/process/', body)
+    return res.data
+  }
+
+  async initiateAndProcessInternalTransfers(
+    keyPair: ec.KeyPair,
+    organization_key: string,
+    api_key: string,
+    currency: string,
+    amount: number,
+    destination_address: string,
+    client_transfer_id?: string,
+  ): Promise<Response<InternalTransferProcessPayload>> {
+    this.getAuthStatus()
+    const initiateResponse = await this.initiateInternalTransfer({
+      organization_key,
+      api_key,
+      currency,
+      amount,
+      destination_address,
+      client_transfer_id,
+    })
+    const signature = signInternalTxMsgHash(
+      keyPair,
+      initiateResponse.payload.msg_hash,
+    )
+    const executeResponse = await this.executeInternalTransfers({
+      organization_key,
+      api_key,
+      signature,
+      nonce: initiateResponse.payload.nonce,
+      msg_hash: initiateResponse.payload.msg_hash,
+    })
+    return executeResponse
+  }
+
+  async listInternalTransfers(
+    params?: ListInternalTransferParams,
+  ): Promise<Response<ListInternalTransferPayload>> {
+    this.getAuthStatus()
+    const res = await this.axiosInstance.get<
+      Response<ListInternalTransferPayload>
+    >(`/sapi/v1/internal_transfers`, { params: params })
+    return res.data
+  }
+
+  async getInternalTransferByClientId(
+    client_reference_id: string,
+  ): Promise<Response<InternalTransfer>> {
+    this.getAuthStatus()
+    const res = await this.axiosInstance.get<Response<InternalTransfer>>(
+      `/sapi/v1/internal_transfers/${client_reference_id}`,
     )
     return res.data
   }

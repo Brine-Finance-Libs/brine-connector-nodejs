@@ -1,7 +1,12 @@
 import { ec } from 'elliptic'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
-import { CreateNewOrderBody, CreateOrderNoncePayload, Sign } from './types'
+import {
+  CreateNewOrderBody,
+  CreateOrderNoncePayload,
+  Sign,
+  StarkSignature,
+} from './types'
 
 export const signMsgHash = (
   nonce: CreateOrderNoncePayload,
@@ -31,6 +36,7 @@ export const signOrderNonceWithSignature = (
   const keyPair = getKeyPairFromSignature(userSignature.signature)
   return signOrderWithStarkKeys(keyPair, nonce)
 }
+
 export const signOrderWithStarkKeys = (
   keyPair: ec.KeyPair,
   nonce: CreateOrderNoncePayload,
@@ -45,6 +51,18 @@ export const signOrderWithStarkKeys = (
     nonce: nonce.nonce,
   }
   return createOrderBody
+}
+
+export const signInternalTxMsgHash = (
+  keyPair: ec.KeyPair,
+  msgHash: string,
+): StarkSignature => {
+  const msg = sign(keyPair, msgHash.replace('0x', ''))
+  const signature: StarkSignature = {
+    r: `0x${msg.r.toString('hex')}`,
+    s: `0x${msg.s.toString('hex')}`,
+  }
+  return signature
 }
 
 export const generateKeyPairFromEthPrivateKey = (
