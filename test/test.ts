@@ -374,7 +374,7 @@ describe('Brine Connector', () => {
         })
 
         it('Initiate Internal Transfer - 403 Invalid credential', async () => {
-          let clientId = 'random_id'
+          const clientId = 'random_id'
           mock1
             .onPost('/sapi/v1/internal_transfers/initiate/')
             .reply(403, responses.internalTransferResponseInvalidKey)
@@ -391,7 +391,7 @@ describe('Brine Connector', () => {
         })
 
         it('Execute Internal Transfer - 403 Invalid credential', async () => {
-          let clientId = 'random_id'
+          const clientId = 'random_id'
           mock1
             .onPost('/sapi/v1/internal_transfers/process/')
             .reply(403, responses.internalTransferResponseInvalidKey)
@@ -408,7 +408,7 @@ describe('Brine Connector', () => {
         })
 
         it('Initiate Internal Transfer - 401 Invalid JWT', async () => {
-          let clientId = 'random_id'
+          const clientId = 'random_id'
           mock1
             .onPost('/sapi/v1/internal_transfers/initiate/')
             .reply(403, responses.internalTransferResponseInvalidKey)
@@ -425,7 +425,7 @@ describe('Brine Connector', () => {
         })
 
         it('Execute Internal Transfer - 401 Invalid JWT', async () => {
-          let clientId = 'random_id'
+          const clientId = 'random_id'
           mock1
             .onPost('/sapi/v1/internal_transfers/process/')
             .reply(403, responses.internalTransferResponseInvalidKey)
@@ -455,7 +455,7 @@ describe('Brine Connector', () => {
           )
         })
         it('Get Internal Transfer By Client Id  - 200', async () => {
-          let clientId = '6883122327947226'
+          const clientId = '6883122327947226'
           mock1
             .onGet(`/sapi/v1/internal_transfers/${clientId}`)
             .reply(200, responses.getInternalTransfersById)
@@ -466,7 +466,7 @@ describe('Brine Connector', () => {
           expect(res.payload).to.have.property('client_reference_id')
         })
         it('Transfer does not exist with the given ID - 404', async () => {
-          let clientId = 'random_id'
+          const clientId = 'random_id'
           mock1
             .onGet('/sapi/v1/market/kline/')
             .reply(404, responses.getInternalTransfersByIdNotExist)
