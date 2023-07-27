@@ -12,7 +12,6 @@ import {
   InternalTransferInitiateBody,
   InternalTransferInitiatePayload,
   InternalTransferProcessBody,
-  InternalTransferProcessPayload,
   ListInternalTransferParams,
   ListInternalTransferPayload,
   ListOrdersParams,
@@ -253,10 +252,11 @@ export class Client {
 
   async executeInternalTransfers(
     body: InternalTransferProcessBody,
-  ): Promise<Response<InternalTransferProcessPayload>> {
-    const res = await this.axiosInstance.post<
-      Response<InternalTransferProcessPayload>
-    >('/sapi/v1/internal_transfers/process/', body)
+  ): Promise<Response<InternalTransfer>> {
+    const res = await this.axiosInstance.post<Response<InternalTransfer>>(
+      '/sapi/v1/internal_transfers/process/',
+      body,
+    )
     return res.data
   }
 
@@ -268,7 +268,7 @@ export class Client {
     amount: number,
     destination_address: string,
     client_transfer_id?: string,
-  ): Promise<Response<InternalTransferProcessPayload>> {
+  ): Promise<Response<InternalTransfer>> {
     this.getAuthStatus()
     const initiateResponse = await this.initiateInternalTransfer({
       organization_key,

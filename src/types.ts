@@ -174,8 +174,6 @@ export interface InternalTransfer {
   updated_at: string
 }
 
-export interface InternalTransferProcessPayload extends InternalTransfer {}
-
 export interface ListInternalTransferPayload {
   internal_transfers: InternalTransfer[]
   total_count: number
