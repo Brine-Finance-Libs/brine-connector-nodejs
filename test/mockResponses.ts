@@ -465,4 +465,87 @@ export const responses = {
       },
     ],
   },
+  initiateInternalTransferResponse: {
+    status: 'success',
+    message: 'Please sign the message, to complete the transaction',
+    payload: {
+      nonce: 797982128,
+      msg_hash:
+        '0x2af4af1aa1e47a8b4d71a111a0b5a0649d80d586090548f7bb5a7ba74c287d3',
+    },
+  },
+  internalTransferResponseInvalidKey: {
+    status: 'error',
+    message: 'Invalid organization key',
+    payload: '',
+  },
+  internalTransferResponseInvalidJWT: {
+    status: 'error',
+    message: 'Authentication credentials were not provided.',
+    payload: '',
+  },
+  executeInternalTransferResponse: {
+    status: 'success',
+    message: 'Internal transfer processed successfully',
+    payload: {
+      client_reference_id: '6462569061361987',
+      amount: '1.0000000000000000',
+      currency: 'usdc',
+      from_address: '0x6c875514E42F14B891399A6a8438E6AA8F77B178',
+      destination_address: '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+      status: 'success',
+      created_at: '2023-07-26T06:28:52.350343Z',
+      updated_at: '2023-07-26T06:28:52.902831Z',
+    },
+  },
+  listInternalTransfers: {
+    status: 'success',
+    message: 'Fetched internal transfers successfully',
+    payload: {
+      internal_transfers: [
+        {
+          client_reference_id: '3845010178310545',
+          amount: '1.0000000000000000',
+          currency: 'usdc',
+          from_address: '0x6c875514E42F14B891399A6a8438E6AA8F77B178',
+          destination_address: '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+          status: 'success',
+          created_at: '2023-07-26T05:11:47.285117Z',
+          updated_at: '2023-07-26T05:11:47.698994Z',
+        },
+        {
+          client_reference_id: '4645497856683096',
+          amount: '1.0000000000000000',
+          currency: 'usdc',
+          from_address: '0x6c875514E42F14B891399A6a8438E6AA8F77B178',
+          destination_address: '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+          status: 'success',
+          created_at: '2023-07-26T05:11:13.502647Z',
+          updated_at: '2023-07-26T05:11:14.047787Z',
+        },
+      ],
+      total_count: 26,
+      limit: 2,
+      offset: 0,
+    },
+  },
+  getInternalTransfersById: {
+    status: 'success',
+    message: 'Fetched internal transfer successfully',
+    payload: {
+      client_reference_id: '6883122327947226',
+      amount: '1.0000000000000000',
+      currency: 'usdc',
+      from_address: '0x6c875514E42F14B891399A6a8438E6AA8F77B178',
+      destination_address: '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+      status: 'success',
+      created_at: '2023-07-26T05:16:31.557629Z',
+      updated_at: '2023-07-26T05:16:32.047285Z',
+    },
+  },
+  getInternalTransfersByIdNotExist: {
+    status: 'error',
+    message: 'Transfer does not exist',
+    payload: '',
+  },
 }

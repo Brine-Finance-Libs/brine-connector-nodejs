@@ -5,6 +5,10 @@ import { Balance, CreateOrderNonceBody, Response } from '../src/types'
 import { AuthenticationError } from '../src/error'
 import MockAdapter from 'axios-mock-adapter'
 import { responses } from './mockResponses'
+
+const brineOrganizationKey = process.env.BRINE_ORGANIZATION_KEY
+const brineApiKey = process.env.BRINE_API_KEY
+
 describe('Brine Connector', () => {
   describe('REST Client', () => {
     let client: Client
@@ -326,6 +330,157 @@ describe('Brine Connector', () => {
         expect(res.status).to.eql('success')
         expect(res).to.have.property('payload')
         expect(res.payload[0]).to.have.property('id')
+      })
+    })
+    describe('Internal Transfers', () => {
+      describe('Initiate and Process Internal Transfers', () => {
+        it('Initiate Internal Transfer - 200', async () => {
+          mock1
+            .onPost('/sapi/v1/internal_transfers/initiate/')
+            .reply(200, responses.initiateInternalTransferResponse)
+          const res = await client.initiateInternalTransfer({
+            organization_key: brineOrganizationKey as string,
+            api_key: brineApiKey as string,
+            currency: 'usdc',
+            amount: 1,
+            destination_address: '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+          })
+          expect(res).to.have.property('status')
+          expect(res.status).to.eql('success')
+          expect(res).to.have.property('payload')
+          expect(res.payload).to.have.property('nonce')
+        })
+
+        it('Execute Internal Transfer - 200', async () => {
+          mock1
+            .onPost('/sapi/v1/internal_transfers/process/')
+            .reply(200, responses.executeInternalTransferResponse)
+          const res = await client.executeInternalTransfers({
+            organization_key: brineOrganizationKey as string,
+            api_key: brineApiKey as string,
+            signature: {
+              r: '0x12b9d57b59c621bb5de8e0803d1477a1697e66679811d51249038c17ac9d8ca',
+              s: '0x4a5ff201e1c35fb59a0dc750eb1c2b7e0d57234e0e946698343c1d78c4277a',
+            },
+            nonce: 14214931,
+            msg_hash:
+              '0xda073d81fcf11f1312f2a722e1ff190f7ddb4c26f33adcc688726bce28b30d',
+          })
+          expect(res).to.have.property('status')
+          expect(res.status).to.eql('success')
+          expect(res).to.have.property('payload')
+          expect(res.payload).to.have.property('client_reference_id')
+          expect(res.payload).to.have.property('amount')
+        })
+
+        it('Initiate Internal Transfer - 403 Invalid credential', async () => {
+          const clientId = 'random_id'
+          mock1
+            .onPost('/sapi/v1/internal_transfers/initiate/')
+            .reply(403, responses.internalTransferResponseInvalidKey)
+          try {
+            const res = await client.getInternalTransferByClientId(clientId)
+          } catch (e: unknown) {
+            const data = (e as AxiosError<Response<string>>)?.response?.data
+            if (data) {
+              expect(data).to.have.property('status')
+              expect(data.status).to.eql('error')
+              expect(data.message).to.include('Invalid organization')
+            }
+          }
+        })
+
+        it('Execute Internal Transfer - 403 Invalid credential', async () => {
+          const clientId = 'random_id'
+          mock1
+            .onPost('/sapi/v1/internal_transfers/process/')
+            .reply(403, responses.internalTransferResponseInvalidKey)
+          try {
+            const res = await client.getInternalTransferByClientId(clientId)
+          } catch (e: unknown) {
+            const data = (e as AxiosError<Response<string>>)?.response?.data
+            if (data) {
+              expect(data).to.have.property('status')
+              expect(data.status).to.eql('error')
+              expect(data.message).to.include('Invalid organization')
+            }
+          }
+        })
+
+        it('Initiate Internal Transfer - 401 Invalid JWT', async () => {
+          const clientId = 'random_id'
+          mock1
+            .onPost('/sapi/v1/internal_transfers/initiate/')
+            .reply(403, responses.internalTransferResponseInvalidKey)
+          try {
+            const res = await client.getInternalTransferByClientId(clientId)
+          } catch (e: unknown) {
+            const data = (e as AxiosError<Response<string>>)?.response?.data
+            if (data) {
+              expect(data).to.have.property('status')
+              expect(data.status).to.eql('error')
+              expect(data.message).to.include('Invalid organization')
+            }
+          }
+        })
+
+        it('Execute Internal Transfer - 401 Invalid JWT', async () => {
+          const clientId = 'random_id'
+          mock1
+            .onPost('/sapi/v1/internal_transfers/process/')
+            .reply(403, responses.internalTransferResponseInvalidKey)
+          try {
+            const res = await client.getInternalTransferByClientId(clientId)
+          } catch (e: unknown) {
+            const data = (e as AxiosError<Response<string>>)?.response?.data
+            if (data) {
+              expect(data).to.have.property('status')
+              expect(data.status).to.eql('error')
+              expect(data.message).to.include('Invalid organization')
+            }
+          }
+        })
+      })
+      describe('List & Get By Client ID', () => {
+        it('List Internal Transfers - 200', async () => {
+          mock1
+            .onGet('/sapi/v1/internal_transfers')
+            .reply(200, responses.listInternalTransfers)
+          const res = await client.listInternalTransfers()
+          expect(res).to.have.property('status')
+          expect(res.status).to.eql('success')
+          expect(res).to.have.property('payload')
+          expect(res.payload.internal_transfers[0]).to.have.property(
+            'client_reference_id',
+          )
+        })
+        it('Get Internal Transfer By Client Id  - 200', async () => {
+          const clientId = '6883122327947226'
+          mock1
+            .onGet(`/sapi/v1/internal_transfers/${clientId}`)
+            .reply(200, responses.getInternalTransfersById)
+          const res = await client.getInternalTransferByClientId(clientId)
+          expect(res).to.have.property('status')
+          expect(res.status).to.eql('success')
+          expect(res).to.have.property('payload')
+          expect(res.payload).to.have.property('client_reference_id')
+        })
+        it('Transfer does not exist with the given ID - 404', async () => {
+          const clientId = 'random_id'
+          mock1
+            .onGet('/sapi/v1/market/kline/')
+            .reply(404, responses.getInternalTransfersByIdNotExist)
+          try {
+            const res = await client.getInternalTransferByClientId(clientId)
+          } catch (e: unknown) {
+            const data = (e as AxiosError<Response<string>>)?.response?.data
+            if (data) {
+              expect(data).to.have.property('status')
+              expect(data.status).to.eql('error')
+              expect(data.message).to.include('transfer does not exist')
+            }
+          }
+        })
       })
     })
   })

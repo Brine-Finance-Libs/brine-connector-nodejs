@@ -140,6 +140,58 @@ export interface Order {
   trades_count: number
 }
 
+export interface StarkSignature {
+  r: string
+  s: string
+  recoveryParam?: string
+}
+
+export interface InternalTransferKey {
+  organization_key: string
+  api_key: string
+}
+
+export interface InternalTransferInitiatePayload {
+  msg_hash: string
+  nonce: number
+}
+
+export interface InternalTransferInitiateBody extends InternalTransferKey {
+  client_transfer_id?: string
+  currency: string
+  amount: number
+  destination_address: string
+}
+
+export interface InternalTransfer {
+  client_reference_id: string
+  amount: string
+  currency: string
+  from_address: string
+  destination_address: string
+  status: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ListInternalTransferPayload {
+  internal_transfers: InternalTransfer[]
+  total_count: number
+  limit: number
+  offset: number
+}
+
+export interface InternalTransferProcessBody extends InternalTransferKey {
+  signature: StarkSignature
+  nonce: number
+  msg_hash: string
+}
+
+export interface ListInternalTransferParams {
+  limit?: number
+  offset?: number
+}
+
 export interface OrderPayload extends Order {
   trades?: []
 }

@@ -5,16 +5,20 @@ import { Client } from '../src/client'
 import { isAuthenticationError } from '../src/error'
 import {
   createUserSignature,
+  generateKeyPairFromEthPrivateKey,
   getKeyPairFromSignature,
   signOrderNonceWithSignature,
   signOrderWithStarkKeys,
 } from '../src'
+
 dotenv.config()
 
 const main = async () => {
   // load your privateKey and walletAddress
   const privateKey = process.env.PRIVATE_KEY
   const ethAddress = process.env.ETH_ADDRESS
+  const brineOrganizationKey = process.env.BRINE_ORGANIZATION_KEY
+  const brineApiKey = process.env.BRINE_API_KEY
 
   if (privateKey && ethAddress) {
     // handle in try catch block
@@ -31,7 +35,7 @@ const main = async () => {
 
       // login to use private endpoints
       const loginRes = await client.completeLogin(ethAddress, privateKey)
-      // console.log(loginRes.payload)
+      console.log(loginRes.payload)
 
       // create an order nonce
       const nonceBody: CreateOrderNonceBody = {
@@ -59,7 +63,34 @@ const main = async () => {
       const profile = await client.getProfileInfo()
       console.log(profile.payload.username)
 
-      const trades = await client.listTrades()
+      // Getting the L2 keypair
+      const keypair = generateKeyPairFromEthPrivateKey(privateKey, 'testnet') // default is mainnet
+
+      // Executing the internalTransfer
+      const internalTransferResponse =
+        await client.initiateAndProcessInternalTransfers(
+          keypair,
+          brineOrganizationKey as string,
+          brineApiKey as string,
+          'usdc',
+          1,
+          '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+        )
+
+      console.log(internalTransferResponse.payload)
+
+      // Listing the internalTransfers
+      const internalTransferList = await client.listInternalTransfers()
+      console.log(internalTransferList.payload)
+
+      if (internalTransferList.payload.internal_transfers.length) {
+        // Get the internal transfer by client ID
+        const internalTransferById = await client.getInternalTransferByClientId(
+          internalTransferList.payload.internal_transfers[0]
+            .client_reference_id,
+        )
+        console.log(internalTransferById.payload)
+      }
     } catch (e) {
       // Error: AuthenticationError | AxiosError
       if (isAuthenticationError(e)) {
