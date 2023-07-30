@@ -1,5 +1,11 @@
 # brine-connector
 
+## 1.2.0
+
+### Minor Changes
+
+- Add Internal Transfer functionality
+
 ## 1.1.0
 
 ### Minor Changes
