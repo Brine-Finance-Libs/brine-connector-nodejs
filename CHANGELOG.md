@@ -1,5 +1,11 @@
 # brine-connector
 
+## 1.2.1
+
+### Patch Changes
+
+- Add organization_key and api_key in trade interface
+
 ## 1.2.0
 
 ### Minor Changes
