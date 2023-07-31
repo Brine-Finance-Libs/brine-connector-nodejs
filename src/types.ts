@@ -107,6 +107,8 @@ export interface CreateOrderNonceBody {
   price: number
   side: Side
   volume: number
+  organization_key?: string
+  api_key?: string
 }
 
 export interface CreateOrderNoncePayload {
@@ -119,6 +121,8 @@ export interface CreateNewOrderBody extends CreateOrderNoncePayload {
     r: string
     s: string
   }
+  organization_key?: string
+  api_key?: string
 }
 
 export interface Order {
