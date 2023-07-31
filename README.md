@@ -201,6 +201,8 @@ const nonceBody: CreateOrderNonceBody = {
   price: 29580.51,
   side: 'buy',
   volume: 0.0001,
+  organization_key: '', // This is an optional field. The organization’s key shared by Brine organization.
+  api_key: '', // This is an optional field. The organization’s API key shared by Brine organization.
 }
 ```
 
@@ -218,7 +220,11 @@ import { signMsgHash } from '@brine-fi/brine-connector'
 
 const orderNonce = await client.createOrderNonce(nonceBody)
 const signedBody = signMsgHash(orderNonce.payload, ethPrivateKey)
-const order = await client.createNewOrder(signedBody)
+const order = await client.createNewOrder({
+  ...signedBody,
+  organization_key: '', // This is an optional field. The organization’s key shared by Brine organization.
+  api_key: '',
+}) // This is an optional field. The organization’s API key shared by Brine organization. })
 
 // or
 import {

@@ -47,25 +47,52 @@ const main = async () => {
       }
 
       // create order (private)
-      // const order = await client.createCompleteOrder(nonceBody, privateKey)
+      const order = await client.createCompleteOrder(nonceBody, privateKey)
 
       // const orderNonce = await client.createOrderNonce(nonceBody)
       // const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
       // const keyPair = getKeyPairFromSignature(userSignature.signature)
       // const signedBody = signOrderWithStarkKeys(keyPair, orderNonce.payload)
-      // const order = await client.createNewOrder(signedBody)
+      // const order = await client.createNewOrder({ ...signedBody })
 
-      // console.log(order)
-      // const orders = await client.listOrders()
-      // console.log(orders.payload[0])
+      console.log(order)
+      const orders = await client.listOrders()
+      console.log(orders.payload[0])
 
       // get profile info (private)
       const profile = await client.getProfileInfo()
       console.log(profile.payload.username)
+    } catch (e) {
+      // Error: AuthenticationError | AxiosError
+      if (isAuthenticationError(e)) {
+        console.log(e)
+      } else {
+        console.log((e as AxiosError<Response<string>>)?.response?.data)
+      }
+    }
+  }
+}
+
+main()
+
+const internalTransfers = async () => {
+  // load your privateKey and walletAddress
+  const privateKey = process.env.PRIVATE_KEY
+  const ethAddress = process.env.ETH_ADDRESS
+  const brineOrganizationKey = process.env.BRINE_ORGANIZATION_KEY
+  const brineApiKey = process.env.BRINE_API_KEY
+
+  if (privateKey && ethAddress) {
+    // handle in try catch block
+    try {
+      // create a rest client instance (you can pass option)
+      const client = new Client('testnet')
+      // login to use private endpoints
+      const loginRes = await client.completeLogin(ethAddress, privateKey)
+      console.log(loginRes.payload)
 
       // Getting the L2 keypair
       const keypair = generateKeyPairFromEthPrivateKey(privateKey, 'testnet') // default is mainnet
-
       // Executing the internalTransfer
       const internalTransferResponse =
         await client.initiateAndProcessInternalTransfers(
@@ -76,9 +103,6 @@ const main = async () => {
           1,
           '0xF5F467c3D86760A4Ff6262880727E854428a4996',
         )
-
-      console.log(internalTransferResponse.payload)
-
       // Listing the internalTransfers
       const internalTransferList = await client.listInternalTransfers()
       console.log(internalTransferList.payload)
@@ -102,4 +126,4 @@ const main = async () => {
   }
 }
 
-main()
+// internalTransfers()
