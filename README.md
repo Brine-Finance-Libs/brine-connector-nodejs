@@ -201,14 +201,26 @@ const nonceBody: CreateOrderNonceBody = {
   price: 29580.51,
   side: 'buy',
   volume: 0.0001,
-  organization_key: '', // This is an optional field. The organization’s key shared by Brine organization.
-  api_key: '', // This is an optional field. The organization’s API key shared by Brine organization.
 }
 ```
 
+> If you are affiliated with the Brine organization, please ensure that you add the organization_key and api_key to the request body in both the nonce and create endpoints. This field is entirely optional. To obtain these keys, please reach out to Brine at support@brine.fi.
+>
+> ```ts
+> const nonceBody: CreateOrderNonceBody = {
+>   market: MAINNET.markets.ethusdc,
+>   ord_type: 'market',
+>   price: 29580.51,
+>   side: 'buy',
+>   volume: 0.0001,
+>   organization_key: 'YOUR_ORGANIZATION_KEY', // This is an > optional field. The organization’s key shared by Brine organization.
+>   api_key: 'YOUR_API_KEY', // This is an optional field. The organization’s API key shared by Brine organization.
+> }
+> ```
+
 Create Order
 
-createOrderNonce: `POST /sapi/v1/orders/nonce/`  
+createOrderNonce: `POST /sapi/v1/orders/nonce/`
 createNewOrder: `POST /sapi/v1/orders/create/`
 
 ```ts
