@@ -68,7 +68,6 @@ describe('Brine Connector', () => {
           .reply(400, responses.klineInvalidMarketError)
         try {
           const res = await client.getCandlestick({
-            // @ts-expect-error: javascript use-case
             market: 'test',
             period: 120,
           })

@@ -68,14 +68,6 @@ const client = new Client('testnet') // default mainnet
 
 ### General Endpoints
 
-#### Utils
-
-Get available markets on Mainnet and Testnet
-
-```ts
-import { MAINNET, TESTNET } from '@brine-fi/brine-connector'
-```
-
 #### Test connectivity
 
 `GET /sapi/v1/health/`
@@ -89,7 +81,7 @@ client.testConnection()
 `GET /sapi/v1/market/tickers/`
 
 ```ts
-client.get24hPrice({ market: MAINNET.markets.ethusdc })
+client.get24hPrice({ market: 'ethusdc' })
 ```
 
 #### Kline/Candlestick Data
@@ -98,7 +90,7 @@ client.get24hPrice({ market: MAINNET.markets.ethusdc })
 
 ```ts
 client.getCandlestick({
-  market: MAINNET.markets.ethusdc,
+  market: 'ethusdc',
   period: 120,
 })
 ```
@@ -109,7 +101,7 @@ client.getCandlestick({
 
 ```ts
 client.getOrderBook({
-  market: MAINNET.markets.ethusdc,
+  market: 'ethusdc',
 })
 ```
 
@@ -119,7 +111,7 @@ client.getOrderBook({
 
 ```ts
 client.getRecentTrades({
-  market: MAINNET.markets.ethusdc,
+  market: 'ethusdc',
 })
 ```
 
@@ -196,7 +188,7 @@ Create Nonce Body
 
 ```ts
 const nonceBody: CreateOrderNonceBody = {
-  market: MAINNET.markets.ethusdc,
+  market: 'ethusdc',
   ord_type: 'market',
   price: 29580.51,
   side: 'buy',
@@ -208,7 +200,7 @@ const nonceBody: CreateOrderNonceBody = {
 >
 > ```ts
 > const nonceBody: CreateOrderNonceBody = {
->   market: MAINNET.markets.ethusdc,
+>   market: 'ethusdc',
 >   ord_type: 'market',
 >   price: 29580.51,
 >   side: 'buy',

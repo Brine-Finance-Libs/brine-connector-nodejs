@@ -1,5 +1,11 @@
 # brine-connector
 
+## 1.2.2
+
+### Patch Changes
+
+- Remove market type
+
 ## 1.2.1
 
 ### Patch Changes
