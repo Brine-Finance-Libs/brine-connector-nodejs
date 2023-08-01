@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import * as dotenv from 'dotenv'
-import { CreateOrderNonceBody, MAINNET, Response, TESTNET } from '../src/types'
+import { CreateOrderNonceBody, Response } from '../src/types'
 import { Client } from '../src/client'
 import { isAuthenticationError } from '../src/error'
 import {
@@ -39,7 +39,7 @@ const main = async () => {
 
       // create an order nonce
       const nonceBody: CreateOrderNonceBody = {
-        market: TESTNET.markets.btcusdc,
+        market: 'btcusdc',
         ord_type: 'market',
         price: 29580.51,
         side: 'buy',

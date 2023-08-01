@@ -26,7 +26,7 @@ export interface Response<T> {
 }
 
 export type FullDayPricePayload = {
-  [market in Market]: {
+  [market:string]: {
     at: string
     ticker: {
       at: string
@@ -43,7 +43,7 @@ export type FullDayPricePayload = {
 }
 
 export interface CandleStickParams {
-  market: Market
+  market: string
   limit?: number
   period?: 1 | 5 | 15 | 30 | 60 | 120 | 240 | 360 | 720 | 1440 | 4320 | 10080
   start_time?: number
@@ -62,7 +62,7 @@ export interface AskBid {
   price: string | null
   avg_price: string
   state: State
-  market: Market
+  market: string
   created_at: string
   updated_at: string
   origin_volume: string
@@ -79,7 +79,7 @@ export interface OrderBookPayload {
 }
 
 export interface OrderBookParams {
-  market: Market
+  market: string
   asks_limit?: number
   bids_limit?: number
 }
@@ -89,20 +89,20 @@ export interface RecentTradesPayload {
   price: number
   amount: number
   total: number
-  market: Market
+  market: string
   created_at: number
   taker_type: string
 }
 
 export interface RecentTradesParams {
-  market: Market
+  market: string
   limit?: number
   timestamp?: number
   order_by?: 'asc' | 'desc'
 }
 
 export interface CreateOrderNonceBody {
-  market: Market
+  market: string
   ord_type: OrdType
   price: number
   side: Side
@@ -133,7 +133,7 @@ export interface Order {
   price: string | null
   avg_price: string
   state: State
-  market: Market
+  market: string
   created_at: string
   updated_at: string
   origin_volume: string
@@ -207,7 +207,7 @@ export interface CancelOrder extends Omit<OrderPayload, 'id'> {
 export interface ListOrdersParams {
   limit?: number
   page?: number
-  market?: Market
+  market?: string
   ord_type?: OrdType
   state?: State
   base_unit?: string
@@ -221,7 +221,7 @@ export interface ListOrdersParams {
 export interface TradeParams {
   limit?: number
   page?: number
-  market?: Market
+  market?: string
   start_time?: number
   end_time?: number
   order_by?: 'asc' | 'desc'
@@ -235,7 +235,7 @@ export interface TradePayload {
   fee_currency: string
   fee: string
   fee_amount: string
-  market: Market
+  market: string
   created_at: string
   taker_type: string
   side: Side
