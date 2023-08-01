@@ -26,7 +26,7 @@ export interface Response<T> {
 }
 
 export type FullDayPricePayload = {
-  [market:string]: {
+  [market: string]: {
     at: string
     ticker: {
       at: string
