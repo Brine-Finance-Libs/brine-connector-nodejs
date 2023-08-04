@@ -74,7 +74,7 @@ export const signWithdrawalTxMsgHash = (
   keyPair: ec.KeyPair,
   msgHash: string,
 ): StarkSignature => {
-  let msgHex = BigNumber.from(msgHash).toHexString()
+  const msgHex = BigNumber.from(msgHash).toHexString()
   const msg = sign(keyPair, removeHexPrefix(msgHex))
 
   const signature: StarkSignature = {
