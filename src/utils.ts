@@ -2,11 +2,16 @@ import { ec } from 'elliptic'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
 import {
+  CoinStat,
   CreateNewOrderBody,
   CreateOrderNoncePayload,
-  Sign,
+  Response,
   StarkSignature,
+  Sign,
 } from './types'
+import { Wallet, ethers } from 'ethers'
+import { CONFIG, MAX_INT_ALLOWANCE } from './constants'
+import { CoinNotFoundError } from './error'
 
 export const signMsgHash = (
   nonce: CreateOrderNoncePayload,
@@ -71,4 +76,69 @@ export const generateKeyPairFromEthPrivateKey = (
 ) => {
   const signature = createUserSignature(ethPrivateKey, option)
   return getKeyPairFromSignature(signature.signature)
+}
+
+export const getNonce = (
+  signer: Wallet,
+  provider: ethers.providers.Provider,
+) => {
+  const baseNonce = provider.getTransactionCount(signer.getAddress())
+  let nonceOffset = 0
+  return baseNonce.then((nonce: number) => nonce + nonceOffset++)
+}
+
+export const dequantize = (number: number, decimals: number) => {
+  const factor = 10 ** decimals
+  return number / factor
+}
+
+export const get0X0to0X = (address: string) => {
+  if (
+    address?.substring(0, 3) === '0x0' ||
+    address?.substring(0, 3) === '0X0'
+  ) {
+    return address.replace('0x0', '0x')
+  } else {
+    return address
+  }
+}
+
+export const getAllowance = async (
+  userAddress: string,
+  starkContract: string,
+  tokenContract: string,
+  decimal: number,
+  provider: ethers.providers.Provider,
+) => {
+  const contract = new ethers.Contract(
+    tokenContract,
+    CONFIG.ERC20_ABI,
+    provider,
+  )
+  const allowance = await contract.allowance(userAddress, starkContract)
+  return dequantize(Number(allowance), decimal)
+}
+
+export const approveUnlimitedAllowanceUtil = async (
+  starkContract: string,
+  tokenContract: string,
+  signer: ethers.Signer,
+) => {
+  const contract = new ethers.Contract(tokenContract, CONFIG.ERC20_ABI, signer)
+  const amount = ethers.BigNumber.from(MAX_INT_ALLOWANCE)
+  console.log({ amount: amount.toString() })
+  const approval = await contract.approve(starkContract, amount)
+  return approval
+}
+
+export const filterCurrentCoin = (coinStatsPayload: CoinStat, coin: string) => {
+  const currentCoin = Object.keys(coinStatsPayload)
+    .map((coinName) => {
+      if (coinStatsPayload[coinName].symbol === coin) {
+        return coinStatsPayload[coinName]
+      }
+    })
+    .filter((c) => c !== undefined)[0]
+  if (!currentCoin) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  return currentCoin
 }

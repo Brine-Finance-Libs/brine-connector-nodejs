@@ -10,7 +10,8 @@ import {
   signOrderNonceWithSignature,
   signOrderWithStarkKeys,
 } from '../src'
-
+import { Wallet, ethers } from 'ethers'
+import { TESTNET } from '../src/constants'
 dotenv.config()
 
 const main = async () => {
@@ -28,11 +29,7 @@ const main = async () => {
 
       //you can use public endpoints right away
       const test = await client.testConnection()
-      const candleStick = await client.getCandlestick({
-        market: 'ethusdc',
-        period: 120,
-      })
-
+      const candleStick = await client.get24hPrice()
       // login to use private endpoints
       const loginRes = await client.completeLogin(ethAddress, privateKey)
       console.log(loginRes.payload)
@@ -47,26 +44,49 @@ const main = async () => {
       }
 
       // create order (private)
-      const order = await client.createCompleteOrder(nonceBody, privateKey)
+      // const order = await client.createCompleteOrder(nonceBody, privateKey)
 
       // const orderNonce = await client.createOrderNonce(nonceBody)
-      // const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
+      const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
+      const keyPair = getKeyPairFromSignature(userSignature.signature)
+      const stark_public_key = keyPair.getPublic().getX().toString('hex')
+      const stark_private_key = keyPair.getPrivate().toString('hex')
+      const provider = new ethers.providers.JsonRpcProvider(
+        process.env.RPC_PROVIDER,
+      )
+      const signer = new Wallet(privateKey, provider)
+
+      const res = await client.deposit(
+        signer,
+        provider,
+        `0x${stark_public_key}`,
+        '0.00001',
+        'eth',
+      )
+      // const res = await client.getTokenBalance(provider, ethAddress, 'btc')
+      console.log(res)
+      // console.log({
+      //   stark_private_key,
+      //   stark_public_key,
+      // })
       // const keyPair = getKeyPairFromSignature(userSignature.signature)
       // const signedBody = signOrderWithStarkKeys(keyPair, orderNonce.payload)
       // const order = await client.createNewOrder({ ...signedBody })
 
-      console.log(order)
-      const orders = await client.listOrders()
-      console.log(orders.payload[0])
+      // console.log(order)
+      // const orders = await client.listOrders()
+      // console.log(orders.payload[0])
 
-      // get profile info (private)
-      const profile = await client.getProfileInfo()
-      console.log(profile.payload.username)
+      // // get profile info (private)
+      // const profile = await client.getProfileInfo()
+      // console.log(profile.payload.username)
     } catch (e) {
       // Error: AuthenticationError | AxiosError
       if (isAuthenticationError(e)) {
         console.log(e)
       } else {
+        console.log(e)
+
         console.log((e as AxiosError<Response<string>>)?.response?.data)
       }
     }

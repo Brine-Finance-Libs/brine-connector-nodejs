@@ -1,20 +1,5 @@
 export type Market = 'ethusdc' | 'ethusdt' | 'btcusdc' | 'btcusdt'
 
-export const MAINNET = {
-  markets: {
-    ethusdc: 'ethusdc',
-    btcusdc: 'btcusdc',
-  },
-} as const
-export const TESTNET = {
-  markets: {
-    ethusdc: 'ethusdc',
-    btcusdc: 'btcusdc',
-    ethusdt: 'ethusdt',
-    btcusdt: 'btcusdt',
-  },
-} as const
-
 export type Side = 'buy' | 'sell'
 export type OrdType = 'market' | 'limit'
 export type State = 'pending' | 'wait' | 'done' | 'cancel'
@@ -215,7 +200,7 @@ export interface ListOrdersParams {
   start_time?: number
   end_time?: number
   side?: Side
-  order_by: 'asc' | 'desc'
+  order_by?: 'asc' | 'desc'
 }
 
 export interface TradeParams {
@@ -289,4 +274,14 @@ export interface Sign {
   r: string
   s: string
   signature: string
+}
+
+export interface CoinStat {
+  [coinName: string]: {
+    stark_asset_id: string
+    quanitization: string
+    token_contract: string
+    decimal: string
+    symbol: string
+  }
 }

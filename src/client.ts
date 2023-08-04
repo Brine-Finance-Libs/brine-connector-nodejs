@@ -1,9 +1,10 @@
-import { AxiosInstance as AxiosInstanceType } from 'axios'
+import axios, { AxiosInstance as AxiosInstanceType } from 'axios'
 import {
   Balance,
   CancelOrder,
   CandleStickParams,
   CandleStickPayload,
+  CoinStat,
   CreateNewOrderBody,
   CreateOrderNonceBody,
   CreateOrderNoncePayload,
@@ -32,8 +33,24 @@ import {
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
-import { signInternalTxMsgHash, signMsgHash } from './utils'
+import { signInternalTxMsgHash } from './utils'
 import { ec } from 'elliptic'
+import {
+  approveUnlimitedAllowanceUtil,
+  dequantize,
+  filterCurrentCoin,
+  get0X0to0X,
+  getAllowance,
+  getNonce,
+  signMsgHash,
+} from './utils'
+import { Wallet, ethers } from 'ethers'
+import { CONFIG } from './constants'
+import {
+  AllowanceTooLowError,
+  BalanceTooLowError,
+  CoinNotFoundError,
+} from './error'
 
 export class Client {
   axiosInstance: AxiosInstanceType
@@ -42,6 +59,7 @@ export class Client {
   setAccessToken: (token: string | null) => void
   setRefreshToken: (token: string | null) => void
   private refreshToken?: string | null
+  private accessToken?: string | null
   option: 'testnet' | 'mainnet'
 
   constructor(option: 'mainnet' | 'testnet' = 'mainnet') {
@@ -51,7 +69,10 @@ export class Client {
         : 'https://api.brine.fi'
     const axios = new AxiosInstance(this.refreshTokens, baseURL)
     this.axiosInstance = axios.axiosInstance
-    this.setAccessToken = axios.setAccessToken
+    this.setAccessToken = (token: string | null) => {
+      this.accessToken = token
+      axios.setAccessToken(token)
+    }
     this.setRefreshToken = (token: string | null) => {
       this.refreshToken = token
       axios.setRefreshToken(token)
@@ -143,10 +164,182 @@ export class Client {
     privateKey: string,
   ): Promise<LoginResponse> {
     const nonce = await this.getNonce(ethAddress)
-    const signedMsg = signMsg(nonce.payload!, privateKey)
+    const signedMsg = signMsg(nonce.payload, privateKey)
     const loginRes = await this.login(ethAddress, signedMsg.signature)
 
     return loginRes
+  }
+
+  async getVaultId(coin: string) {
+    this.getAuthStatus()
+    const res = await this.axiosInstance.post(`main/user/create_vault/`, {
+      coin: coin,
+    })
+    return res.data
+  }
+
+  async getCoinStatus(): Promise<Response<CoinStat>> {
+    const res = await this.axiosInstance.post(`/main/stat/v2/coins/`)
+    return res.data
+  }
+
+  async approveUnlimitedAllowance(coin: string, signer: Wallet) {
+    const { payload: coinStats } = await this.getCoinStatus()
+    const currentCoin = filterCurrentCoin(coinStats, coin)
+    const { token_contract: tokenContract } = currentCoin
+    const starkContract =
+      this.option === 'mainnet'
+        ? CONFIG.STARK_CONTRACT_MAINNET
+        : CONFIG.STARK_CONTRACT_GOERLI
+
+    const res = await approveUnlimitedAllowanceUtil(
+      starkContract,
+      tokenContract,
+      signer,
+    )
+
+    return res
+  }
+
+  async getTokenBalance(
+    provider: ethers.providers.Provider,
+    ethAddress: string,
+    coin: string,
+  ): Promise<number> {
+    if (coin === 'eth') {
+      const res = await provider.getBalance(ethAddress)
+      return +ethers.utils.formatEther(res)
+    }
+
+    const { payload: coinStats } = await this.getCoinStatus()
+    const currentCoin = filterCurrentCoin(coinStats, coin)
+    const { token_contract: tokenContract, decimal } = currentCoin
+    const contract = new ethers.Contract(
+      tokenContract,
+      CONFIG.ERC20_ABI,
+      provider,
+    )
+    const balance = (await contract.balanceOf(ethAddress)).toString()
+    const normalBalance = balance / Math.pow(10, +decimal)
+    return normalBalance
+  }
+
+  async deposit(
+    signer: Wallet,
+    provider: ethers.providers.Provider,
+    starkPublicKey: string,
+    amount: string,
+    coin: string,
+  ) {
+    this.getAuthStatus()
+    const { payload: coinStats } = await this.getCoinStatus()
+    const currentCoin = filterCurrentCoin(coinStats, coin)
+
+    const {
+      quanitization,
+      decimal,
+      token_contract: tokenContract,
+      stark_asset_id: starkAssetId,
+    } = currentCoin
+
+    console.log({
+      quanitization,
+      decimal,
+      token_contract: tokenContract,
+      stark_asset_id: starkAssetId,
+    })
+
+    const quantizedAmount = ethers.utils.parseUnits(
+      amount?.toString(),
+      Number(quanitization),
+    )
+
+    const vault = await this.getVaultId(coin)
+    const starkContract =
+      this.option === 'mainnet'
+        ? CONFIG.STARK_CONTRACT_MAINNET
+        : CONFIG.STARK_CONTRACT_GOERLI
+    const contract = new ethers.Contract(
+      starkContract,
+      CONFIG.ABI_FILE_TESTNET,
+      signer,
+    )
+    const parsedAmount = ethers.utils.parseEther(amount)
+    const gwei = ethers.utils.formatUnits(parsedAmount, 'gwei')
+
+    const overrides = {
+      value: parsedAmount,
+      nonce: await getNonce(signer, provider),
+    }
+
+    const balance = await this.getTokenBalance(provider, signer.address, coin)
+
+    if (balance < +amount) {
+      throw new BalanceTooLowError(
+        `Current Balance (${balance}) for '${coin}' is too low, please add balance before deposit`,
+      )
+    }
+
+    let depositResponse
+    if (coin === 'eth') {
+      depositResponse = await contract.depositEth(
+        starkPublicKey,
+        starkAssetId,
+        vault.payload.id,
+        overrides,
+      )
+    } else {
+      const allowance = await getAllowance(
+        signer.address,
+        starkContract,
+        tokenContract,
+        +decimal,
+        provider,
+      )
+      console.log({ allowance, amount })
+      if (allowance < +amount) {
+        throw new AllowanceTooLowError(
+          `Current Allowance (${allowance}) is too low, please use Client.approveUnlimitedAllowance()`,
+        )
+      }
+
+      depositResponse = await contract.depositERC20(
+        starkPublicKey,
+        starkAssetId,
+        vault.payload.id,
+        quantizedAmount,
+      )
+    }
+
+    const res = await this.cryptoDepositStart(
+      coin === 'eth' ? +gwei * 10 : quantizedAmount.toString(),
+      get0X0to0X(starkAssetId),
+      get0X0to0X(starkPublicKey),
+      depositResponse['hash'],
+      depositResponse['nonce'],
+      vault.payload.id,
+    )
+
+    return res
+  }
+
+  async cryptoDepositStart(
+    amount: number | bigint | string,
+    starkAssetId: string,
+    starkPublicKey: string,
+    depositBlockchainHash: string,
+    depositBlockchainNonce: string,
+    vaultId: number,
+  ) {
+    const res = await this.axiosInstance.post(`/main/payment/stark/start/`, {
+      amount,
+      token_id: starkAssetId,
+      stark_key: starkPublicKey,
+      deposit_blockchain_hash: depositBlockchainHash,
+      deposit_blockchain_nonce: depositBlockchainNonce,
+      vault_id: vaultId,
+    })
+    return res.data
   }
 
   async getProfileInfo(): Promise<Response<ProfileInformationPayload>> {
