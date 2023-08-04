@@ -350,7 +350,7 @@ export class Client {
 
     const contract = new ethers.Contract(starkContract, starkABI, signer)
 
-    let balance = await contract.getWithdrawalBalance(
+    const balance = await contract.getWithdrawalBalance(
       ethers.BigNumber.from(userPublicEthAddress),
       ethers.BigNumber.from(starkAssetId),
     )
@@ -408,8 +408,8 @@ export class Client {
   ): Promise<Response<ProcessFastWithdrawalResponse>> {
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
-    let _ = filterCurrentCoin(coinStats, coinSymbol)
-    let initiateResponse = await this.startFastWithdrawal({
+    const _ = filterCurrentCoin(coinStats, coinSymbol)
+    const initiateResponse = await this.startFastWithdrawal({
       amount: Number(amount),
       symbol: coinSymbol,
     })
@@ -417,7 +417,7 @@ export class Client {
       keyPair,
       initiateResponse.payload.msg_hash,
     )
-    let validateResponse = await this.processFastWithdrawal({
+    const validateResponse = await this.processFastWithdrawal({
       msg_hash: initiateResponse.payload.msg_hash,
       signature: signature,
       fastwithdrawal_withdrawal_id:
@@ -435,8 +435,8 @@ export class Client {
   ): Promise<Response<ValidateNormalWithdrawalResponse>> {
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
-    let _ = filterCurrentCoin(coinStats, coinSymbol)
-    let initiateResponse = await this.startNormalWithdrawal({
+    const _ = filterCurrentCoin(coinStats, coinSymbol)
+    const initiateResponse = await this.startNormalWithdrawal({
       amount: Number(amount),
       symbol: coinSymbol,
     })
@@ -444,10 +444,10 @@ export class Client {
       keyPair,
       initiateResponse.payload.msg_hash,
     )
-    let msgHex = ethers.BigNumber.from(
+    const msgHex = ethers.BigNumber.from(
       initiateResponse.payload.msg_hash,
     ).toHexString()
-    let validateResponse = await this.validateNormalWithdrawal({
+    const validateResponse = await this.validateNormalWithdrawal({
       msg_hash: removeHexPrefix(msgHex, true),
       signature: signature,
       nonce: initiateResponse.payload.nonce,
