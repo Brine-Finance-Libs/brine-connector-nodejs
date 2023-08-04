@@ -9,6 +9,8 @@ import {
   CreateOrderNonceBody,
   CreateOrderNoncePayload,
   FullDayPricePayload,
+  InitiateWithdrawalPayload,
+  InitiateNormalWithdrawalResponse,
   InternalTransfer,
   InternalTransferInitiateBody,
   InternalTransferInitiatePayload,
@@ -29,11 +31,22 @@ import {
   Response,
   TradeParams,
   TradePayload,
+  ValidateNormalWithdrawalPayload,
+  ValidateNormalWithdrawalResponse,
+  ProcessFastWithdrawalPayload,
+  InitiateFastWithdrawalResponse,
+  ProcessFastWithdrawalResponse,
+  ListDepositParams,
+  DepositResponse,
+  Pagination,
+  NormalResponse,
+  ListWithdrawalParams,
+  FastWithdrawalResponse,
 } from './types'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
-import { signInternalTxMsgHash } from './utils'
+import { signInternalTxMsgHash, signWithdrawalTxMsgHash } from './utils'
 import { ec } from 'elliptic'
 import {
   approveUnlimitedAllowanceUtil,
@@ -43,6 +56,8 @@ import {
   getAllowance,
   getNonce,
   signMsgHash,
+  formatWithdrawalAmount,
+  removeHexPrefix,
 } from './utils'
 import { Wallet, ethers } from 'ethers'
 import { CONFIG } from './constants'
@@ -187,10 +202,7 @@ export class Client {
     const { payload: coinStats } = await this.getCoinStatus()
     const currentCoin = filterCurrentCoin(coinStats, coin)
     const { token_contract: tokenContract } = currentCoin
-    const starkContract =
-      this.option === 'mainnet'
-        ? CONFIG.STARK_CONTRACT_MAINNET
-        : CONFIG.STARK_CONTRACT_GOERLI
+    const starkContract = CONFIG.STARK_CONTRACT[this.option]
 
     const res = await approveUnlimitedAllowanceUtil(
       starkContract,
@@ -255,15 +267,10 @@ export class Client {
     )
 
     const vault = await this.getVaultId(coin)
-    const starkContract =
-      this.option === 'mainnet'
-        ? CONFIG.STARK_CONTRACT_MAINNET
-        : CONFIG.STARK_CONTRACT_GOERLI
-    const contract = new ethers.Contract(
-      starkContract,
-      CONFIG.ABI_FILE_TESTNET,
-      signer,
-    )
+    const starkContract = CONFIG.STARK_CONTRACT[this.option]
+    const starkABI = CONFIG.STARK_ABI[this.option]
+
+    const contract = new ethers.Contract(starkContract, starkABI, signer)
     const parsedAmount = ethers.utils.parseEther(amount)
     const gwei = ethers.utils.formatUnits(parsedAmount, 'gwei')
 
@@ -281,6 +288,7 @@ export class Client {
     }
 
     let depositResponse
+
     if (coin === 'eth') {
       depositResponse = await contract.depositEth(
         starkPublicKey,
@@ -319,8 +327,184 @@ export class Client {
       depositResponse['nonce'],
       vault.payload.id,
     )
+    // Instead of getting the payload as "", we can send the solidity res (response) that we received from the "depositEth | depositERC20". This way, it's easy to check the transaction hash.
+    res.payload = { ...depositResponse }
 
     return res
+  }
+
+  async getPendingNormalWithdrawalAmountByCoin(
+    coinSymbol: string,
+    userPublicEthAddress: string,
+    signer: Wallet,
+  ) {
+    this.getAuthStatus()
+    const { payload: coinStats } = await this.getCoinStatus()
+    const currentCoin = filterCurrentCoin(coinStats, coinSymbol)
+    const {
+      stark_asset_id: starkAssetId,
+      blockchain_decimal: blockchainDecimal,
+    } = currentCoin
+    const starkContract = CONFIG.STARK_CONTRACT[this.option]
+    const starkABI = CONFIG.STARK_ABI[this.option]
+
+    const contract = new ethers.Contract(starkContract, starkABI, signer)
+
+    let balance = await contract.getWithdrawalBalance(
+      ethers.BigNumber.from(userPublicEthAddress),
+      ethers.BigNumber.from(starkAssetId),
+    )
+
+    return formatWithdrawalAmount(
+      balance,
+      Number(blockchainDecimal),
+      coinSymbol,
+    )
+  }
+
+  // Normal withdrawal 'initiate' and 'validate'
+  private async startNormalWithdrawal(body: InitiateWithdrawalPayload) {
+    const res = await this.axiosInstance.post<
+      Response<InitiateNormalWithdrawalResponse>
+    >(`/sapi/v1/payment/withdrawals/v1/initiate/`, {
+      amount: body.amount,
+      token_id: body.symbol,
+    })
+    return res.data
+  }
+
+  private async validateNormalWithdrawal(
+    body: ValidateNormalWithdrawalPayload,
+  ) {
+    const res = await this.axiosInstance.post<
+      Response<ValidateNormalWithdrawalResponse>
+    >(`/sapi/v1/payment/withdrawals/v1/validate/`, body)
+    return res.data
+  }
+
+  // Fast withdrawal  'initiate' and 'process'
+  private async startFastWithdrawal(body: InitiateWithdrawalPayload) {
+    const res = await this.axiosInstance.post<
+      Response<InitiateFastWithdrawalResponse>
+    >(`/sapi/v1/payment/fast-withdrawals/v2/initiate/`, {
+      amount: body.amount,
+      token_id: body.symbol,
+    })
+    return res.data
+  }
+
+  private async processFastWithdrawal(body: ProcessFastWithdrawalPayload) {
+    const res = await this.axiosInstance.post<
+      Response<ProcessFastWithdrawalResponse>
+    >(`/sapi/v1/payment/fast-withdrawals/v2/process/`, body)
+    return res.data
+  }
+
+  // Fast Withdrawal public function
+  async fastWithdrawal(
+    keyPair: ec.KeyPair,
+    amount: number | string,
+    coinSymbol: string,
+  ): Promise<Response<ProcessFastWithdrawalResponse>> {
+    this.getAuthStatus()
+    const { payload: coinStats } = await this.getCoinStatus()
+    let _ = filterCurrentCoin(coinStats, coinSymbol)
+    let initiateResponse = await this.startFastWithdrawal({
+      amount: Number(amount),
+      symbol: coinSymbol,
+    })
+    const signature = signWithdrawalTxMsgHash(
+      keyPair,
+      initiateResponse.payload.msg_hash,
+    )
+    let validateResponse = await this.processFastWithdrawal({
+      msg_hash: initiateResponse.payload.msg_hash,
+      signature: signature,
+      fastwithdrawal_withdrawal_id:
+        initiateResponse.payload.fastwithdrawal_withdrawal_id,
+    })
+    return validateResponse
+  }
+
+  // Normal Withdrawal public function
+  // first step
+  async initiateNormalWithdrawal(
+    keyPair: ec.KeyPair,
+    amount: number | string,
+    coinSymbol: string,
+  ): Promise<Response<ValidateNormalWithdrawalResponse>> {
+    this.getAuthStatus()
+    const { payload: coinStats } = await this.getCoinStatus()
+    let _ = filterCurrentCoin(coinStats, coinSymbol)
+    let initiateResponse = await this.startNormalWithdrawal({
+      amount: Number(amount),
+      symbol: coinSymbol,
+    })
+    const signature = signWithdrawalTxMsgHash(
+      keyPair,
+      initiateResponse.payload.msg_hash,
+    )
+    let msgHex = ethers.BigNumber.from(
+      initiateResponse.payload.msg_hash,
+    ).toHexString()
+    let validateResponse = await this.validateNormalWithdrawal({
+      msg_hash: removeHexPrefix(msgHex, true),
+      signature: signature,
+      nonce: initiateResponse.payload.nonce,
+    })
+    return validateResponse
+  }
+
+  // last step
+  async completeNormalWithdrawal(
+    coinSymbol: string,
+    userPublicEthAddress: string,
+    signer: Wallet,
+  ): Promise<ethers.providers.TransactionResponse> {
+    this.getAuthStatus()
+    const { payload: coinStats } = await this.getCoinStatus()
+    const currentCoin = filterCurrentCoin(coinStats, coinSymbol)
+    const { stark_asset_id: starkAssetId } = currentCoin
+    const starkContract = CONFIG.STARK_CONTRACT[this.option]
+    const starkABI = CONFIG.STARK_ABI[this.option]
+    const contract = new ethers.Contract(starkContract, starkABI, signer)
+
+    const res = await contract.withdraw(userPublicEthAddress, starkAssetId)
+    return res
+  }
+
+  async listDeposits(
+    params?: ListDepositParams,
+  ): Promise<Response<DepositResponse>> {
+    this.getAuthStatus()
+    const res = await this.axiosInstance.post<Response<DepositResponse>>(
+      `/sapi/v1/payment/stark/list/`,
+      {},
+      { params: params },
+    )
+    return res.data
+  }
+
+  async listNormalWithdrawals(
+    params?: ListWithdrawalParams,
+  ): Promise<Response<NormalResponse>> {
+    this.getAuthStatus()
+    const res = await this.axiosInstance.get<Response<NormalResponse>>(
+      `/sapi/v1/payment/withdrawals/`,
+      { params: params },
+    )
+    return res.data
+  }
+
+  async listFastWithdrawals(
+    params?: ListWithdrawalParams,
+  ): Promise<Response<FastWithdrawalResponse>> {
+    this.getAuthStatus()
+    const res = await this.axiosInstance.get<Response<FastWithdrawalResponse>>(
+      `/sapi/v1/payment/fast-withdrawals/`,
+      { params: params },
+    )
+    return res.data
   }
 
   async cryptoDepositStart(

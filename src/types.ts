@@ -203,6 +203,15 @@ export interface ListOrdersParams {
   order_by?: 'asc' | 'desc'
 }
 
+export interface ListDepositParams {
+  limit?: number
+  page?: number
+}
+
+export interface ListWithdrawalParams {
+  page?: number
+}
+
 export interface TradeParams {
   limit?: number
   page?: number
@@ -283,5 +292,94 @@ export interface CoinStat {
     token_contract: string
     decimal: string
     symbol: string
+    blockchain_decimal: string
   }
 }
+
+// Withdrawal types
+export interface InitiateNormalWithdrawalResponse {
+  nonce: string
+  msg_hash: string
+}
+
+export interface InitiateFastWithdrawalResponse {
+  fastwithdrawal_withdrawal_id: string
+  msg_hash: string
+}
+
+export interface ValidateNormalWithdrawalResponse {
+  id: string
+  amount: string
+  token_id: string
+  created_at: string
+  transaction_status: string
+  extras?: any
+}
+
+export interface ProcessFastWithdrawalResponse {
+  id: string
+  amount: string
+  fee_amount: string
+  token_id: string
+  created_at: string
+  l1_withdrawal_blockchain_hash: string
+  transaction_status: string
+  extras?: any
+}
+
+export interface InitiateWithdrawalPayload {
+  amount: number
+  symbol: string
+}
+
+export interface ValidateNormalWithdrawalPayload {
+  msg_hash: string
+  signature: StarkSignature
+  nonce: string
+}
+
+export interface ProcessFastWithdrawalPayload {
+  msg_hash: string
+  signature: StarkSignature
+  fastwithdrawal_withdrawal_id?: string
+}
+
+interface Deposit {
+  token_id: string
+  blockchain_deposit_status: string
+  brine_deposit_status: string
+  deposit_blockchain_hash: string
+  amount: string
+  created_at: string
+}
+
+interface NormalWithdrawal {
+  id: number
+  amount: string
+  token_id: string
+  created_at: string
+  transaction_status: string
+  extras?: any
+}
+
+interface FastWithdrawal {
+  id: number
+  amount: string
+  fee_amount: string
+  token_id: string
+  created_at: string
+  l1_withdrawal_blockchain_hash: string
+  transaction_status: string
+  extras?: any
+}
+
+export interface Pagination<T> {
+  count: number
+  next: string | null
+  previous: string | null
+  results: T[]
+}
+
+export interface DepositResponse extends Pagination<Deposit> {}
+export interface NormalResponse extends Pagination<NormalWithdrawal> {}
+export interface FastWithdrawalResponse extends Pagination<FastWithdrawal> {}

@@ -24,10 +24,14 @@ export const CONFIG = {
   ALLOWED_NETWORK_ID_GOERLI: 5,
   ALLOWED_CHAIN_ID_MAINNET: '0x1',
   ALLOWED_CHAIN_ID_GOERLI: '0x5',
-  STARK_CONTRACT_MAINNET: '0x1390f521A79BaBE99b69B37154D63D431da27A07',
-  STARK_CONTRACT_GOERLI: '0x87eB0b1B5958c7fD034966925Ea026ad8Bf3d6dD',
-  ABI_FILE_MAINNET: starkex_abi_main,
-  ABI_FILE_TESTNET: starkex_abi_test,
+  STARK_CONTRACT: {
+    mainnet: '0x1390f521A79BaBE99b69B37154D63D431da27A07',
+    testnet: '0x87eB0b1B5958c7fD034966925Ea026ad8Bf3d6dD',
+  },
+  STARK_ABI: {
+    mainnet: starkex_abi_main,
+    testnet: starkex_abi_test,
+  },
   ERC20_ABI: erc20Abi,
 }
 

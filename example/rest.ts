@@ -11,15 +11,15 @@ import {
   signOrderWithStarkKeys,
 } from '../src'
 import { Wallet, ethers } from 'ethers'
-import { TESTNET } from '../src/constants'
+
 dotenv.config()
 
 const main = async () => {
   // load your privateKey and walletAddress
   const privateKey = process.env.PRIVATE_KEY
   const ethAddress = process.env.ETH_ADDRESS
-  const brineOrganizationKey = process.env.BRINE_ORGANIZATION_KEY
-  const brineApiKey = process.env.BRINE_API_KEY
+  // const brineOrganizationKey = process.env.BRINE_ORGANIZATION_KEY
+  // const brineApiKey = process.env.BRINE_API_KEY
 
   if (privateKey && ethAddress) {
     // handle in try catch block
@@ -56,15 +56,36 @@ const main = async () => {
       )
       const signer = new Wallet(privateKey, provider)
 
-      const res = await client.deposit(
-        signer,
-        provider,
-        `0x${stark_public_key}`,
-        '0.00001',
-        'eth',
-      )
+      const res = await client.listFastWithdrawals({ page: 2 })
+      console.log(res.payload)
+
+      // console.log(res.payload)
+      // const res = await client.deposit(
+      //   signer,
+      //   provider,
+      //   `0x${stark_public_key}`,
+      //   '0.0000001',
+      //   'eth',
+      // )
+      // "Getting the normal withdrawal balance by coin symbol."
+      // const balance = await client.getPendingNormalWithdrawalAmountByCoin(
+      //   'btc',
+      //   ethAddress,
+      //   signer,
+      // )
+
+      // final step of a normal withdrawal is to withdraw your cumulative value from the 'getPendingNormalWithdrawalAmountByCoin' function.
+      // const res = await client.completeNormalWithdrawal(
+      //   'btc',
+      //   ethAddress,
+      //   signer,
+      // )
+
+      // console.log(res)
       // const res = await client.getTokenBalance(provider, ethAddress, 'btc')
-      console.log(res)
+      // console.log(res)
+      // const res = await client.getTokenBalance(provider, ethAddress, 'btc')
+      // console.log(balance)
       // console.log({
       //   stark_private_key,
       //   stark_public_key,

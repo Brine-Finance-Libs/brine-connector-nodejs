@@ -5,13 +5,13 @@ import {
   CoinStat,
   CreateNewOrderBody,
   CreateOrderNoncePayload,
-  Response,
   StarkSignature,
   Sign,
 } from './types'
 import { Wallet, ethers } from 'ethers'
 import { CONFIG, MAX_INT_ALLOWANCE } from './constants'
 import { CoinNotFoundError } from './error'
+import { BigNumber } from 'ethers'
 
 export const signMsgHash = (
   nonce: CreateOrderNoncePayload,
@@ -67,6 +67,22 @@ export const signInternalTxMsgHash = (
     r: `0x${msg.r.toString('hex')}`,
     s: `0x${msg.s.toString('hex')}`,
   }
+  return signature
+}
+
+export const signWithdrawalTxMsgHash = (
+  keyPair: ec.KeyPair,
+  msgHash: string,
+): StarkSignature => {
+  let msgHex = BigNumber.from(msgHash).toHexString()
+  const msg = sign(keyPair, removeHexPrefix(msgHex))
+
+  const signature: StarkSignature = {
+    r: `0x${msg.r.toString('hex')}`,
+    s: `0x${msg.s.toString('hex')}`,
+    recoveryParam: msg.recoveryParam,
+  }
+
   return signature
 }
 
@@ -141,4 +157,25 @@ export const filterCurrentCoin = (coinStatsPayload: CoinStat, coin: string) => {
     .filter((c) => c !== undefined)[0]
   if (!currentCoin) throw new CoinNotFoundError(`Coin '${coin}' not found`)
   return currentCoin
+}
+
+export const formatWithdrawalAmount = (
+  amount: number,
+  decimals: number,
+  symbol: string,
+) => {
+  if (symbol === 'eth') {
+    return amount ? String(ethers.utils.formatEther(amount)) : '0'
+  } else {
+    return String(dequantize(amount, decimals))
+  }
+}
+
+export const removeHexPrefix = (str: string, removeOx0 = false) => {
+  // Use a regular expression to remove "0x0" and "0x" from the beginning of the string
+  if (removeOx0) {
+    return str.replace(/^(0x0|0x)/, '')
+  } else {
+    return str.replace(/^0x/, '')
+  }
 }
