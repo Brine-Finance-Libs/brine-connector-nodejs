@@ -37,11 +37,11 @@ import {
   InitiateFastWithdrawalResponse,
   ProcessFastWithdrawalResponse,
   ListDepositParams,
-  DepositResponse,
   Pagination,
-  NormalResponse,
   ListWithdrawalParams,
-  FastWithdrawalResponse,
+  Deposit,
+  NormalWithdrawal,
+  FastWithdrawal,
 } from './types'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
@@ -475,9 +475,9 @@ export class Client {
 
   async listDeposits(
     params?: ListDepositParams,
-  ): Promise<Response<DepositResponse>> {
+  ): Promise<Response<Pagination<Deposit>>> {
     this.getAuthStatus()
-    const res = await this.axiosInstance.post<Response<DepositResponse>>(
+    const res = await this.axiosInstance.post<Response<Pagination<Deposit>>>(
       `/sapi/v1/payment/stark/list/`,
       {},
       { params: params },
@@ -487,23 +487,21 @@ export class Client {
 
   async listNormalWithdrawals(
     params?: ListWithdrawalParams,
-  ): Promise<Response<NormalResponse>> {
+  ): Promise<Response<Pagination<NormalWithdrawal>>> {
     this.getAuthStatus()
-    const res = await this.axiosInstance.get<Response<NormalResponse>>(
-      `/sapi/v1/payment/withdrawals/`,
-      { params: params },
-    )
+    const res = await this.axiosInstance.get<
+      Response<Pagination<NormalWithdrawal>>
+    >(`/sapi/v1/payment/withdrawals/`, { params: params })
     return res.data
   }
 
   async listFastWithdrawals(
     params?: ListWithdrawalParams,
-  ): Promise<Response<FastWithdrawalResponse>> {
+  ): Promise<Response<Pagination<FastWithdrawal>>> {
     this.getAuthStatus()
-    const res = await this.axiosInstance.get<Response<FastWithdrawalResponse>>(
-      `/sapi/v1/payment/fast-withdrawals/`,
-      { params: params },
-    )
+    const res = await this.axiosInstance.get<
+      Response<Pagination<FastWithdrawal>>
+    >(`/sapi/v1/payment/fast-withdrawals/`, { params: params })
     return res.data
   }
 

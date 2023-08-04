@@ -344,7 +344,7 @@ export interface ProcessFastWithdrawalPayload {
   fastwithdrawal_withdrawal_id?: string
 }
 
-interface Deposit {
+export interface Deposit {
   token_id: string
   blockchain_deposit_status: string
   brine_deposit_status: string
@@ -353,7 +353,7 @@ interface Deposit {
   created_at: string
 }
 
-interface NormalWithdrawal {
+export interface NormalWithdrawal {
   id: number
   amount: string
   token_id: string
@@ -362,7 +362,7 @@ interface NormalWithdrawal {
   extras?: any
 }
 
-interface FastWithdrawal {
+export interface FastWithdrawal {
   id: number
   amount: string
   fee_amount: string
@@ -380,6 +380,6 @@ export interface Pagination<T> {
   results: T[]
 }
 
-export interface DepositResponse extends Pagination<Deposit> {}
-export interface NormalResponse extends Pagination<NormalWithdrawal> {}
-export interface FastWithdrawalResponse extends Pagination<FastWithdrawal> {}
+// export interface DepositResponse extends {}
+// export interface NormalResponse extends {}
+// export interface FastWithdrawalResponse extends Pagination<FastWithdrawal> {}
