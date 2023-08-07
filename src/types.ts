@@ -3,6 +3,7 @@ export type Market = 'ethusdc' | 'ethusdt' | 'btcusdc' | 'btcusdt'
 export type Side = 'buy' | 'sell'
 export type OrdType = 'market' | 'limit'
 export type State = 'pending' | 'wait' | 'done' | 'cancel'
+export type Network = 'mainnet' | 'testnet'
 
 export interface Response<T> {
   status: string

@@ -42,11 +42,16 @@ import {
   Deposit,
   NormalWithdrawal,
   FastWithdrawal,
+  Network,
 } from './types'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
-import { signInternalTxMsgHash, signWithdrawalTxMsgHash } from './utils'
+import {
+  createUserSignature,
+  signInternalTxMsgHash,
+  signWithdrawalTxMsgHash,
+} from './utils'
 import { ec } from 'elliptic'
 import {
   approveUnlimitedAllowanceUtil,
@@ -236,11 +241,11 @@ export class Client {
     return normalBalance
   }
 
-  async deposit(
+  async depositWithStarkKey(
     signer: Wallet,
     provider: ethers.providers.Provider,
     starkPublicKey: string,
-    amount: string,
+    amount: string | number,
     coin: string,
   ) {
     this.getAuthStatus()
@@ -271,7 +276,7 @@ export class Client {
     const starkABI = CONFIG.STARK_ABI[this.option]
 
     const contract = new ethers.Contract(starkContract, starkABI, signer)
-    const parsedAmount = ethers.utils.parseEther(amount)
+    const parsedAmount = ethers.utils.parseEther(String(amount))
     const gwei = ethers.utils.formatUnits(parsedAmount, 'gwei')
 
     const overrides = {
@@ -304,7 +309,6 @@ export class Client {
         +decimal,
         provider,
       )
-      console.log({ allowance, amount })
       if (allowance < +amount) {
         throw new AllowanceTooLowError(
           `Current Allowance (${allowance}) is too low, please use Client.approveUnlimitedAllowance()`,
@@ -331,6 +335,28 @@ export class Client {
     res.payload = { transaction_hash: depositResponse.hash }
 
     return res
+  }
+
+  async deposit(
+    rpcURL: string,
+    ethPrivateKey: string,
+    network: Network,
+    currency: string,
+    amount: string | number,
+  ) {
+    this.getAuthStatus()
+    const userSignature = createUserSignature(ethPrivateKey, network) // or sign it yourself
+    const keyPair = getKeyPairFromSignature(userSignature.signature)
+    const stark_public_key = keyPair.getPublic().getX().toString('hex')
+    const provider = new ethers.providers.JsonRpcProvider(rpcURL)
+    const signer = new Wallet(ethPrivateKey, provider)
+    return this.depositWithStarkKey(
+      signer,
+      provider,
+      `0x${stark_public_key}`,
+      String(amount),
+      currency,
+    )
   }
 
   async getPendingNormalWithdrawalAmountByCoin(

@@ -120,15 +120,23 @@ const depositAndWithdrawal = async () => {
       )
       const signer = new Wallet(privateKey, provider)
 
-      // Deposit
+      //  deposit with eth private key
       const depositRes = await client.deposit(
+        process.env.RPC_PROVIDER as string,
+        privateKey,
+        'testnet',
+        'eth',
+        0.00001,
+      )
+      //  or
+      //  deposit with L2 Key
+      const depositStarkKeyRes = await client.depositWithStarkKey(
         signer,
         provider,
         `0x${stark_public_key}`,
-        '0.0000001',
+        0.0001,
         'eth',
       )
-
       // Withdrawals
       // Normal withdrawal
       // 1. Initiate your withdrawal request by calling "initiateNormalWithdrawal".
@@ -166,6 +174,7 @@ const depositAndWithdrawal = async () => {
 
       console.log({
         depositRes,
+        depositStarkKeyRes,
         withdrawalRes,
         pendingBalance,
         completeNWRes,
