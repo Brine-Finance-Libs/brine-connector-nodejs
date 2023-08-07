@@ -59,28 +59,6 @@ const main = async () => {
       const res = await client.listFastWithdrawals({ page: 2 })
       console.log(res.payload)
 
-      // console.log(res.payload)
-      // const res = await client.deposit(
-      //   signer,
-      //   provider,
-      //   `0x${stark_public_key}`,
-      //   '0.0000001',
-      //   'eth',
-      // )
-      // "Getting the normal withdrawal balance by coin symbol."
-      // const balance = await client.getPendingNormalWithdrawalAmountByCoin(
-      //   'btc',
-      //   ethAddress,
-      //   signer,
-      // )
-
-      // final step of a normal withdrawal is to withdraw your cumulative value from the 'getPendingNormalWithdrawalAmountByCoin' function.
-      // const res = await client.completeNormalWithdrawal(
-      //   'btc',
-      //   ethAddress,
-      //   signer,
-      // )
-
       // console.log(res)
       // const res = await client.getTokenBalance(provider, ethAddress, 'btc')
       // console.log(res)
@@ -114,7 +92,101 @@ const main = async () => {
   }
 }
 
-main()
+// main()
+
+const depositAndWithdrawal = async () => {
+  // load your privateKey and walletAddress
+  const privateKey = process.env.PRIVATE_KEY
+  const ethAddress = process.env.ETH_ADDRESS
+  // const brineOrganizationKey = process.env.BRINE_ORGANIZATION_KEY
+  // const brineApiKey = process.env.BRINE_API_KEY
+
+  if (privateKey && ethAddress) {
+    // handle in try catch block
+    try {
+      // create a rest client instance (you can pass option)
+      const client = new Client('testnet')
+
+      // login to use private endpoints
+      const loginRes = await client.completeLogin(ethAddress, privateKey)
+      console.log(loginRes.payload)
+
+      const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
+      const keyPair = getKeyPairFromSignature(userSignature.signature)
+      const stark_public_key = keyPair.getPublic().getX().toString('hex')
+      // const stark_private_key = keyPair.getPrivate().toString('hex')
+      const provider = new ethers.providers.JsonRpcProvider(
+        process.env.RPC_PROVIDER,
+      )
+      const signer = new Wallet(privateKey, provider)
+
+      // Deposit
+      const depositRes = await client.deposit(
+        signer,
+        provider,
+        `0x${stark_public_key}`,
+        '0.0000001',
+        'eth',
+      )
+
+      // Withdrawals
+      // Normal withdrawal
+      // 1. Initiate your withdrawal request by calling "initiateNormalWithdrawal".
+      const withdrawalRes = await client.initiateNormalWithdrawal(
+        keyPair,
+        0.0001,
+        'usdc',
+      )
+      // 2. WAIT for up to 24 hours.
+      // 3. Call the function "getPendingNormalWithdrawalAmountByCoin" by passing the required parameter to check whether the withdrawn balance is pending.
+      const pendingBalance =
+        await client.getPendingNormalWithdrawalAmountByCoin(
+          'eth',
+          ethAddress,
+          signer,
+        )
+      // 4. Final step - if you find the balance is more than 0, you can call "completeNormalWithdrawal" to withdraw the cumulative amount to your ETH wallet.
+      const completeNWRes = await client.completeNormalWithdrawal(
+        'eth',
+        ethAddress,
+        signer,
+      )
+
+      // Fast withdrawal
+      const fastWithdrawalRes = await client.fastWithdrawal(keyPair, 10, 'usdc')
+
+      //Get a list of deposit
+      const depositsList = await client.listDeposits({ page: 2, limit: 1 })
+
+      //Get a list of withdrawals
+      const withdrawalsList = await client.listNormalWithdrawals()
+
+      //Get a list of fast withdrawals
+      const fastwithdrawalsList = await client.listFastWithdrawals()
+
+      console.log({
+        depositRes,
+        withdrawalRes,
+        pendingBalance,
+        completeNWRes,
+        fastWithdrawalRes,
+        depositsList,
+        withdrawalsList,
+        fastwithdrawalsList,
+      })
+    } catch (e) {
+      // Error: AuthenticationError | AxiosError
+      if (isAuthenticationError(e)) {
+        console.log(e)
+      } else {
+        console.log(e)
+        console.log((e as AxiosError<Response<string>>)?.response?.data)
+      }
+    }
+  }
+}
+
+depositAndWithdrawal()
 
 const internalTransfers = async () => {
   // load your privateKey and walletAddress

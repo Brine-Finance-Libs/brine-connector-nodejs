@@ -132,7 +132,7 @@ export interface Order {
 export interface StarkSignature {
   r: string
   s: string
-  recoveryParam?: string
+  recoveryParam?: string | number
 }
 
 export interface InternalTransferKey {
@@ -335,13 +335,13 @@ export interface InitiateWithdrawalPayload {
 export interface ValidateNormalWithdrawalPayload {
   msg_hash: string
   signature: StarkSignature
-  nonce: string
+  nonce: string | number
 }
 
 export interface ProcessFastWithdrawalPayload {
   msg_hash: string
   signature: StarkSignature
-  fastwithdrawal_withdrawal_id?: string
+  fastwithdrawal_withdrawal_id?: string | number
 }
 
 export interface Deposit {

@@ -363,7 +363,7 @@ export class Client {
   }
 
   // Normal withdrawal 'initiate' and 'validate'
-  private async startNormalWithdrawal(body: InitiateWithdrawalPayload) {
+  async startNormalWithdrawal(body: InitiateWithdrawalPayload) {
     const res = await this.axiosInstance.post<
       Response<InitiateNormalWithdrawalResponse>
     >(`/sapi/v1/payment/withdrawals/v1/initiate/`, {
@@ -373,9 +373,7 @@ export class Client {
     return res.data
   }
 
-  private async validateNormalWithdrawal(
-    body: ValidateNormalWithdrawalPayload,
-  ) {
+  async validateNormalWithdrawal(body: ValidateNormalWithdrawalPayload) {
     const res = await this.axiosInstance.post<
       Response<ValidateNormalWithdrawalResponse>
     >(`/sapi/v1/payment/withdrawals/v1/validate/`, body)
@@ -383,7 +381,7 @@ export class Client {
   }
 
   // Fast withdrawal  'initiate' and 'process'
-  private async startFastWithdrawal(body: InitiateWithdrawalPayload) {
+  async startFastWithdrawal(body: InitiateWithdrawalPayload) {
     const res = await this.axiosInstance.post<
       Response<InitiateFastWithdrawalResponse>
     >(`/sapi/v1/payment/fast-withdrawals/v2/initiate/`, {
@@ -393,7 +391,7 @@ export class Client {
     return res.data
   }
 
-  private async processFastWithdrawal(body: ProcessFastWithdrawalPayload) {
+  async processFastWithdrawal(body: ProcessFastWithdrawalPayload) {
     const res = await this.axiosInstance.post<
       Response<ProcessFastWithdrawalResponse>
     >(`/sapi/v1/payment/fast-withdrawals/v2/process/`, body)
@@ -513,7 +511,7 @@ export class Client {
     depositBlockchainNonce: string,
     vaultId: number,
   ) {
-    const res = await this.axiosInstance.post(`/main/payment/stark/start/`, {
+    const res = await this.axiosInstance.post(`/sapi/v1/payment/stark/start/`, {
       amount,
       token_id: starkAssetId,
       stark_key: starkPublicKey,
