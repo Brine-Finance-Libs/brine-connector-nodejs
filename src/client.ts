@@ -327,8 +327,8 @@ export class Client {
       depositResponse['nonce'],
       vault.payload.id,
     )
-    // Instead of getting the payload as "", we can send the solidity res (response) that we received from the "depositEth | depositERC20". This way, it's easy to check the transaction hash.
-    res.payload = { ...depositResponse }
+    // Instead of getting the payload as "", we can send the solidity transaction_hash (response) that we received from the "depositEth | depositERC20". This way, it's easy to check the transaction.
+    res.payload = { transaction_hash: depositResponse.hash }
 
     return res
   }

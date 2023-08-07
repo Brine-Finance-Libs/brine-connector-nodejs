@@ -205,7 +205,7 @@ const nonceBody: CreateOrderNonceBody = {
 >   price: 29580.51,
 >   side: 'buy',
 >   volume: 0.0001,
->   organization_key: 'YOUR_ORGANIZATION_KEY', // This is an > optional field. The organization’s key shared by Brine organization.
+>   organization_key: 'YOUR_ORGANIZATION_KEY', // This is an optional field. The organization’s key shared by Brine organization.
 >   api_key: 'YOUR_API_KEY', // This is an optional field. The organization’s API key shared by Brine organization.
 > }
 > ```
@@ -228,7 +228,7 @@ const order = await client.createNewOrder({
   ...signedBody,
   organization_key: '', // This is an optional field. The organization’s key shared by Brine organization.
   api_key: '',
-}) // This is an optional field. The organization’s API key shared by Brine organization. })
+}) // This is an optional field. The organization’s API key shared by Brine organization.
 
 // or
 import {
