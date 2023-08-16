@@ -669,6 +669,140 @@ export const responses = {
       ],
     },
   },
+  depositPolygonStartResponse: {
+    status: 'success',
+    message: 'Success! Awaiting Blockchain Confirmation',
+    payload: {
+      transaction_hash: '',
+    },
+  },
+  depositPolygonStartMissingParameters: {
+    status: 'error',
+    message: 'Essential parameters are missing',
+    payload: '',
+  },
+  listPolygonDeposits: {
+    status: 'success',
+    message: '',
+    payload: {
+      count: 23,
+      next: 'http://api-testnet.brine.fi/sapi/v1/deposits/?limit=1&network=POLYGON&page=3',
+      previous:
+        'http://api-testnet.brine.fi/sapi/v1/deposits/?limit=1&network=POLYGON',
+      results: [
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x2a868c8884b6b5f0f3b44c2ec6f4278b56652d33ad98bbb51cd45656e8bfc65e',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:53:31.761603Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x54c3505c612797ce01d11b73e7bb1238f4be292be6771cf2ea38cfb48353052c',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:53:20.098033Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x0edc159590c62769631ab92bae0fd1a20754444f471704fa40106226bc430a7e',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:37:40.229312Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x561122a3fefa8aa2e9cacd60874e3ee5cea58bbf562dc23f95c3f3f05727bdee',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:29:18.100068Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x539ba8330580add2723c76af88386f1d31e3b93315839b4eae7a174c5e59c2ed',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:28:21.778246Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0xe032d2c9115b83d77d981cb77fac88207631bcf23cee0574b1ffbbe40685cada',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:01:51.446800Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0xbb08968f78b81143066e13b995a588587dfafee9b1040f942858fd3e37080f4a',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-11T10:24:54.095723Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0xe72d32666acf7aa3f1ade0bea4440ada3457a99b5d617f20e075ea06c49d6263',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-11T10:21:43.632555Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0xf9a8ab38af7ccc694078b7622761e392964c1f32e76c44d723451cf27b90fcf7',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-11T10:19:43.389197Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x42e414638908dc566ee5fee6f3a5c8413da9ee5276ab33cfbd1fb4659a63ffab',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-11T10:18:43.681993Z',
+        },
+      ],
+    },
+  },
   initiateWithdrawalResponse: {
     status: 'success',
     message: 'successfully initiated withdrawal',

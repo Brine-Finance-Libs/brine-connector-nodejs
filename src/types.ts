@@ -207,6 +207,7 @@ export interface ListOrdersParams {
 export interface ListDepositParams {
   limit?: number
   page?: number
+  network?: string
 }
 
 export interface ListWithdrawalParams {
@@ -293,6 +294,25 @@ export interface CoinStat {
     token_contract: string
     decimal: string
     symbol: string
+    blockchain_decimal: string
+  }
+}
+
+export interface NetworkStat {
+  [networkName: string]: {
+    deposit_contract: string
+    tokens: {
+      [coinName: string]: {
+        token_contract: string
+        blockchain_decimal: string
+      }
+    }
+  }
+}
+
+export interface NetworkCoinStat {
+  [coinName: string]: {
+    token_contract: string
     blockchain_decimal: string
   }
 }

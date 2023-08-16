@@ -7,6 +7,7 @@ import {
   CreateOrderNoncePayload,
   StarkSignature,
   Sign,
+  NetworkCoinStat,
 } from './types'
 import { Wallet, ethers } from 'ethers'
 import { CONFIG, MAX_INT_ALLOWANCE } from './constants'
@@ -152,6 +153,21 @@ export const filterCurrentCoin = (coinStatsPayload: CoinStat, coin: string) => {
     .map((coinName) => {
       if (coinStatsPayload[coinName].symbol === coin) {
         return coinStatsPayload[coinName]
+      }
+    })
+    .filter((c) => c !== undefined)[0]
+  if (!currentCoin) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  return currentCoin
+}
+
+export const filterAllowedCoin = (
+  allowedTokens: NetworkCoinStat,
+  coin: string,
+) => {
+  const currentCoin = Object.keys(allowedTokens)
+    .map((coinName) => {
+      if (coinName === coin) {
+        return allowedTokens[coinName]
       }
     })
     .filter((c) => c !== undefined)[0]

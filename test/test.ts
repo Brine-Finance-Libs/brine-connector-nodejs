@@ -526,9 +526,57 @@ describe('Brine Connector', () => {
 
       it('List Deposit - 200', async () => {
         mock1
-          .onPost('/sapi/v1/payment/stark/list/')
+          .onPost('/sapi/v1/deposits')
           .reply(200, responses.listDepositsResponse)
-        const res = await client.listDeposits()
+        const res = await client.listDeposits({ network: 'ETHEREUM' })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+    })
+    describe('Polygon Deposits', () => {
+      it('Start Polygon Deposit - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits/crosschain/create/')
+          .reply(200, responses.depositPolygonStartResponse)
+        const res = await client.crossChainDepositStart(
+          '100000',
+          '0x27..',
+          '0x67..',
+          '930',
+        )
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+
+      it('Start Polygon Deposit - 400', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits/crosschain/create/')
+          .reply(400, responses.depositPolygonStartMissingParameters)
+
+        try {
+          const res = await client.crossChainDepositStart(
+            '100000',
+            '0x27..',
+            '0x67..',
+            '930',
+          )
+        } catch (e: unknown) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('Essential parameters')
+          }
+        }
+      })
+
+      it('List Polygon Deposit - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits')
+          .reply(200, responses.listPolygonDeposits)
+        const res = await client.listDeposits({ network: 'POLYGON' })
         expect(res).to.have.property('status')
         expect(res.status).to.eql('success')
         expect(res).to.have.property('payload')

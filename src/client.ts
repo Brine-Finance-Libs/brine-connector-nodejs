@@ -43,12 +43,14 @@ import {
   NormalWithdrawal,
   FastWithdrawal,
   Network,
+  NetworkStat,
 } from './types'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
 import {
   createUserSignature,
+  filterAllowedCoin,
   signInternalTxMsgHash,
   signWithdrawalTxMsgHash,
 } from './utils'
@@ -203,6 +205,28 @@ export class Client {
     return res.data
   }
 
+  async getNetworkConfig(): Promise<NetworkStat> {
+    const res = await this.axiosInstance.post(`/main/stat/v2/app-and-markets/`)
+    return res.data.payload.network_config
+  }
+
+  // async getCoinInfo(network: string, coin: string) {
+  //   let coindata
+  //   if (network === 'ETHERIUM') {
+  //     const { payload: coinStats } = await this.getCoinStatus()
+  //     coindata = filterCurrentCoin(coinStats, coin)
+  //   }
+  //   if (network === 'POLYGON') {
+  //     const { payload } = await this.getNetworkConfig()
+  //     const polygonConfig = payload.network_config['POLYGON']
+  //     const allowedTokens = polygonConfig.tokens
+  //     const contractAddress = polygonConfig.deposit_contract
+  //     const currentCoin = filterAllowedCoin(allowedTokens, coin)
+  //     coindata = { ...currentCoin, contractAddress }
+  //   }
+  //   return coindata;
+  // }
+
   async approveUnlimitedAllowance(coin: string, signer: Wallet) {
     const { payload: coinStats } = await this.getCoinStatus()
     const currentCoin = filterCurrentCoin(coinStats, coin)
@@ -218,19 +242,64 @@ export class Client {
     return res
   }
 
+  async approveUnlimitedAllowancePolygon(coin: string, signer: Wallet) {
+    const network_config = await this.getNetworkConfig()
+    const polygonConfig = network_config['POLYGON']
+    const allowedTokens = polygonConfig.tokens
+    const contractAddress = polygonConfig.deposit_contract
+
+    const currentCoin = filterAllowedCoin(allowedTokens, coin)
+    const { token_contract: tokenContract } = currentCoin
+
+    const res = await approveUnlimitedAllowanceUtil(
+      contractAddress,
+      tokenContract,
+      signer,
+    )
+
+    return res
+  }
+
   async getTokenBalance(
     provider: ethers.providers.Provider,
     ethAddress: string,
-    coin: string,
+    currency: string,
   ): Promise<number> {
-    if (coin === 'eth') {
+    if (currency === 'eth') {
       const res = await provider.getBalance(ethAddress)
       return +ethers.utils.formatEther(res)
     }
 
     const { payload: coinStats } = await this.getCoinStatus()
-    const currentCoin = filterCurrentCoin(coinStats, coin)
+    const currentCoin = filterCurrentCoin(coinStats, currency)
     const { token_contract: tokenContract, decimal } = currentCoin
+    const contract = new ethers.Contract(
+      tokenContract,
+      CONFIG.ERC20_ABI,
+      provider,
+    )
+    const balance = (await contract.balanceOf(ethAddress)).toString()
+    const normalBalance = balance / Math.pow(10, +decimal)
+    return normalBalance
+  }
+
+  async getPolygonTokenBalance(
+    provider: ethers.providers.Provider,
+    ethAddress: string,
+    currency: string,
+  ) {
+    if (currency === 'matic') {
+      const res = await provider.getBalance(ethAddress)
+      return +ethers.utils.formatEther(res)
+    }
+    const network_config = await this.getNetworkConfig()
+    const polygonConfig = network_config['POLYGON']
+    const allowedTokens = polygonConfig.tokens
+
+    const currentCoin = filterAllowedCoin(allowedTokens, currency)
+
+    const { blockchain_decimal: decimal, token_contract: tokenContract } =
+      currentCoin
     const contract = new ethers.Contract(
       tokenContract,
       CONFIG.ERC20_ABI,
@@ -246,11 +315,11 @@ export class Client {
     provider: ethers.providers.Provider,
     starkPublicKey: string,
     amount: string | number,
-    coin: string,
+    currency: string,
   ) {
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
-    const currentCoin = filterCurrentCoin(coinStats, coin)
+    const currentCoin = filterCurrentCoin(coinStats, currency)
 
     const {
       quanitization,
@@ -271,7 +340,7 @@ export class Client {
       Number(quanitization),
     )
 
-    const vault = await this.getVaultId(coin)
+    const vault = await this.getVaultId(currency)
     const starkContract = CONFIG.STARK_CONTRACT[this.option]
     const starkABI = CONFIG.STARK_ABI[this.option]
 
@@ -284,17 +353,20 @@ export class Client {
       nonce: await getNonce(signer, provider),
     }
 
-    const balance = await this.getTokenBalance(provider, signer.address, coin)
+    const balance = await this.getTokenBalance(
+      provider,
+      signer.address,
+      currency,
+    )
 
     if (balance < +amount) {
       throw new BalanceTooLowError(
-        `Current Balance (${balance}) for '${coin}' is too low, please add balance before deposit`,
+        `Current Balance (${balance}) for '${currency}' is too low, please add balance before deposit`,
       )
     }
 
     let depositResponse
-
-    if (coin === 'eth') {
+    if (currency === 'eth') {
       depositResponse = await contract.depositEth(
         starkPublicKey,
         starkAssetId,
@@ -324,7 +396,7 @@ export class Client {
     }
 
     const res = await this.cryptoDepositStart(
-      coin === 'eth' ? +gwei * 10 : quantizedAmount.toString(),
+      currency === 'eth' ? +gwei * 10 : quantizedAmount.toString(),
       get0X0to0X(starkAssetId),
       get0X0to0X(starkPublicKey),
       depositResponse['hash'],
@@ -356,6 +428,108 @@ export class Client {
       `0x${stark_public_key}`,
       String(amount),
       currency,
+    )
+  }
+
+  async depositPolygonWithSigner(
+    signer: Wallet,
+    provider: ethers.providers.Provider,
+    currency: string,
+    amount: string | number,
+  ) {
+    this.getAuthStatus()
+    const network_config = await this.getNetworkConfig()
+    const polygonConfig = network_config['POLYGON']
+    const allowedTokens = polygonConfig.tokens
+    const contractAddress = polygonConfig.deposit_contract
+
+    const currentCoin = filterAllowedCoin(allowedTokens, currency)
+
+    const { blockchain_decimal: decimal, token_contract: tokenContract } =
+      currentCoin
+
+    const quantizedAmount = ethers.utils.parseUnits(
+      amount?.toString(),
+      Number(decimal),
+    )
+
+    let polygonContract = new ethers.Contract(
+      contractAddress,
+      CONFIG.POLYGON_ABI.abi,
+      signer,
+    )
+
+    const parsedAmount = ethers.utils.parseEther(String(amount))
+    const gwei = ethers.utils.formatUnits(parsedAmount, 'gwei')
+
+    const params = {
+      value: parsedAmount,
+      from: signer.address,
+    }
+
+    const balance = await this.getPolygonTokenBalance(
+      provider,
+      signer.address,
+      currency,
+    )
+
+    if (balance < +amount) {
+      throw new BalanceTooLowError(
+        `Current Balance (${balance}) for '${currency}' is too low, please add balance before deposit`,
+      )
+    }
+
+    let depositResponse
+
+    if (currency === 'matic') {
+      depositResponse = await polygonContract.depositEth(params)
+    } else {
+      const allowance = await getAllowance(
+        signer.address,
+        contractAddress,
+        tokenContract,
+        +decimal,
+        provider,
+      )
+      if (allowance < +amount) {
+        throw new AllowanceTooLowError(
+          `Current Allowance (${allowance}) is too low, please use Client.approveUnlimitedAllowancePolygon()`,
+        )
+      }
+      depositResponse = await polygonContract.deposit(
+        tokenContract,
+        quantizedAmount,
+        { from: signer.address },
+      )
+    }
+
+    const res = await this.crossChainDepositStart(
+      amount,
+      currency,
+      depositResponse['hash'],
+      depositResponse['nonce'],
+    )
+    // Instead of getting the payload as "", we can send the solidity transaction_hash (response) that we received from the "depositEth | depositERC20". This way, it's easy to check the transaction.
+    res.payload = { transaction_hash: depositResponse.hash }
+
+    return res
+  }
+
+  async depositPolygon(
+    rpcURL: string,
+    ethPrivateKey: string,
+    // network: Network,
+    currency: string,
+    amount: string | number,
+  ) {
+    this.getAuthStatus()
+    const provider = new ethers.providers.JsonRpcProvider(rpcURL)
+    const signer = new Wallet(ethPrivateKey, provider)
+    return this.depositPolygonWithSigner(
+      signer,
+      provider,
+      currency,
+      String(amount),
     )
   }
 
@@ -502,7 +676,7 @@ export class Client {
   ): Promise<Response<Pagination<Deposit>>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.post<Response<Pagination<Deposit>>>(
-      `/sapi/v1/payment/stark/list/`,
+      `/sapi/v1/deposits`,
       {},
       { params: params },
     )
@@ -545,6 +719,25 @@ export class Client {
       deposit_blockchain_nonce: depositBlockchainNonce,
       vault_id: vaultId,
     })
+    return res.data
+  }
+
+  async crossChainDepositStart(
+    amount: number | bigint | string,
+    currency: string,
+    depositBlockchainHash: string,
+    depositBlockchainNonce: string,
+  ) {
+    const res = await this.axiosInstance.post(
+      `/sapi/v1/deposits/crosschain/create/`,
+      {
+        amount,
+        currency,
+        network: 'POLYGON',
+        deposit_blockchain_hash: depositBlockchainHash,
+        deposit_blockchain_nonce: depositBlockchainNonce,
+      },
+    )
     return res.data
   }
 
