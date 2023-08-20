@@ -161,7 +161,7 @@ export interface InternalTransferInitiatePayload {
 }
 
 export interface InternalTransferInitiateBody extends InternalTransferKey {
-  client_transfer_id?: string
+  client_reference_id?: string
   currency: string
   amount: number
   destination_address: string
@@ -194,6 +194,15 @@ export interface InternalTransferProcessBody extends InternalTransferKey {
 export interface ListInternalTransferParams {
   limit?: number
   offset?: number
+}
+
+export interface CheckUserExistsBody extends InternalTransferKey {
+  destination_address: string
+}
+
+export interface CheckUserExistsPayload {
+  destination_address: string
+  exists: boolean
 }
 
 export interface OrderPayload extends Order {

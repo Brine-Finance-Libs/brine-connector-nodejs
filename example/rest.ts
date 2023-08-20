@@ -73,7 +73,7 @@ const main = async () => {
   }
 }
 
-main()
+// main()
 
 const internalTransfers = async () => {
   // load your privateKey and walletAddress
@@ -93,6 +93,7 @@ const internalTransfers = async () => {
 
       // Getting the L2 keypair
       const keypair = generateKeyPairFromEthPrivateKey(privateKey, 'testnet') // default is mainnet
+
       // Executing the internalTransfer
       const internalTransferResponse =
         await client.initiateAndProcessInternalTransfers(
@@ -103,9 +104,13 @@ const internalTransfers = async () => {
           1,
           '0xF5F467c3D86760A4Ff6262880727E854428a4996',
         )
+      console.log({ internalTransferResponse })
+
       // Listing the internalTransfers
-      const internalTransferList = await client.listInternalTransfers()
-      console.log(internalTransferList.payload)
+      const internalTransferList = await client.listInternalTransfers({
+        limit: 10,
+        offset: 10,
+      })
 
       if (internalTransferList.payload.internal_transfers.length) {
         // Get the internal transfer by client ID
@@ -115,7 +120,14 @@ const internalTransfers = async () => {
         )
         console.log(internalTransferById.payload)
       }
+      // Check if a user exists by their destination address.
+      const checkUserRes = await client.checkInternalTransferUserExists(
+        brineOrganizationKey as string,
+        brineApiKey as string,
+        '0xF5F467c3D86760A4Ff6262880727E844428a4996',
+      )
     } catch (e) {
+      console.log({ e })
       // Error: AuthenticationError | AxiosError
       if (isAuthenticationError(e)) {
         console.log(e)
@@ -126,4 +138,4 @@ const internalTransfers = async () => {
   }
 }
 
-// internalTransfers()
+internalTransfers()
