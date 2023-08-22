@@ -451,6 +451,7 @@ To get the deposit history, you can use the following code:
 
 ```javascript
 const depositsList = await client.listDeposits({
+  network: 'ETHEREUM', // Network for which you want to list the deposit history.
   page: 2, // This is an optional field
   limit: 1, // This is an optional field
 })
@@ -508,5 +509,54 @@ const fastWithdrawalRes = await client.fastWithdrawal(
 //Get a list of fast withdrawals
 const fastwithdrawalsList = await client.listFastWithdrawals({
   page: 2, // This is an optional field
+})
+```
+
+### Poylgon Deposit
+
+To make a polygon deposit, two methods are available:
+
+#### 1. Using ETH Private Key and RPC URL:
+
+In this method, you are utilizing an ETH private key and an RPC URL to execute a polygon deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
+
+```javascript
+  const depositPolygonRes = await client.depositPolygon(
+    process.env.RPC_PROVIDER as string, // Use 'Polygon Mumbai' for the testnet and 'Polygon mainnet' for the mainnet.
+    privateKey, // Your ETH private key.
+    'btc', // Enter the coin symbol.
+    0.00001, // Enter the amount you want to deposit.
+  );
+```
+
+#### 2. Using Custom Provider and Signer:
+
+This method involves using a custom provider and signer, which can be created using the ethers.js library. Here's the code snippet for this method:
+
+```javascript
+// Note: Please use ethers version 5.5.3.
+import { Wallet, ethers } from 'ethers'
+
+const provider = new ethers.providers.JsonRpcProvider(
+  process.env.RPC_PROVIDER, // Use 'Polygon Mumbai' for the testnet and 'Polygon mainnet' for the mainnet.
+)
+
+const signer = new Wallet(privateKey, provider)
+
+const depositPolygonRes = await client.depositPolygonWithSigner(
+  signer, // The signer created above.
+  provider, // The provider created above.
+  'btc', // Enter the coin symbol.
+  0.00001, // Enter the amount you want to deposit.
+)
+```
+
+To get the polygon deposit history, you can use the following code:
+
+```javascript
+const depositsList = await client.listDeposits({
+  network: 'POLYGON', // Network for which you want to list the deposit history.
+  page: 2, // This is an optional field
+  limit: 1, // This is an optional field
 })
 ```
