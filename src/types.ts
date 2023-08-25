@@ -212,6 +212,7 @@ export interface ListDepositParams {
 
 export interface ListWithdrawalParams {
   page?: number
+  network?: string
 }
 
 export interface TradeParams {
@@ -351,6 +352,7 @@ export interface ProcessFastWithdrawalResponse {
 export interface InitiateWithdrawalPayload {
   amount: number
   symbol: string
+  network?: string
 }
 
 export interface ValidateNormalWithdrawalPayload {

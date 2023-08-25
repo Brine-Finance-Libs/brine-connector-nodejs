@@ -648,13 +648,27 @@ describe('Brine Connector', () => {
       })
     })
     describe('Fast Withdrawals', () => {
-      it('Initiate Fast Withdrawals - 200', async () => {
+      it('Initiate Fast Withdrawals Ethereum - 200', async () => {
         mock1
           .onPost('/sapi/v1/payment/fast-withdrawals/v2/initiate/')
           .reply(200, responses.initiateWithdrawalResponse)
         const res = await client.startFastWithdrawal({
           amount: 0.00001,
           symbol: 'eth',
+          network: 'ETHEREUM',
+        })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+      it('Initiate Fast Withdrawals Polygon - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/fast-withdrawals/v2/initiate/')
+          .reply(200, responses.initiateWithdrawalResponse)
+        const res = await client.startFastWithdrawal({
+          amount: 0.00001,
+          symbol: 'eth',
+          network: 'ETHEREUM',
         })
         expect(res).to.have.property('status')
         expect(res.status).to.eql('success')

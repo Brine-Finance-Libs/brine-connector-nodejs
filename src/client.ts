@@ -473,6 +473,8 @@ export class Client {
       currency,
     )
 
+    console.log({ balance })
+
     if (balance < +amount) {
       throw new BalanceTooLowError(
         `Current Balance (${balance}) for '${currency}' is too low, please add balance before deposit`,
@@ -587,6 +589,7 @@ export class Client {
     >(`/sapi/v1/payment/fast-withdrawals/v2/initiate/`, {
       amount: body.amount,
       token_id: body.symbol,
+      network: body.network,
     })
     return res.data
   }
@@ -603,6 +606,7 @@ export class Client {
     keyPair: ec.KeyPair,
     amount: number | string,
     coinSymbol: string,
+    network: string,
   ): Promise<Response<ProcessFastWithdrawalResponse>> {
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
@@ -610,11 +614,13 @@ export class Client {
     const initiateResponse = await this.startFastWithdrawal({
       amount: Number(amount),
       symbol: coinSymbol,
+      network: network,
     })
     const signature = signWithdrawalTxMsgHash(
       keyPair,
       initiateResponse.payload.msg_hash,
     )
+
     const validateResponse = await this.processFastWithdrawal({
       msg_hash: initiateResponse.payload.msg_hash,
       signature: signature,

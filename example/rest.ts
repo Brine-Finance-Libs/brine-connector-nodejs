@@ -161,7 +161,12 @@ const depositAndWithdrawal = async () => {
       )
 
       // Fast withdrawal
-      const fastWithdrawalRes = await client.fastWithdrawal(keyPair, 10, 'usdc')
+      const fastWithdrawalRes = await client.fastWithdrawal(
+        keyPair,
+        10,
+        'usdc',
+        'ETHEREUM',
+      )
 
       //Get a list of deposit
       const depositsList = await client.listDeposits({
@@ -216,6 +221,9 @@ const polygonDeposit = async () => {
       const loginRes = await client.completeLogin(ethAddress, privateKey)
       console.log(loginRes.payload)
 
+      const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
+      const keyPair = getKeyPairFromSignature(userSignature.signature)
+
       const provider = new ethers.providers.JsonRpcProvider(
         process.env.RPC_PROVIDER,
       )
@@ -233,7 +241,7 @@ const polygonDeposit = async () => {
         signer,
         provider,
         'btc',
-        0.000001,
+        0.0001,
       )
 
       const depositsList = await client.listDeposits({
@@ -242,10 +250,24 @@ const polygonDeposit = async () => {
         network: 'POLYGON',
       })
 
+      // Fast withdrawal
+      const fastWithdrawalRes = await client.fastWithdrawal(
+        keyPair,
+        0.001,
+        'btc',
+        'POLYGON',
+      )
+
+      // const fastwithdrawalsList = await client.listFastWithdrawals({
+      //   page: 2, // This is an optional field
+      //   network: 'POLYGON',
+      // })
+
       console.log({
         depositPolygon,
         depositWithSigner,
         depositsList,
+        fastWithdrawalRes,
       })
     } catch (e) {
       // Error: AuthenticationError | AxiosError
