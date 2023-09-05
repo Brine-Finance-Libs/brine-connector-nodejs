@@ -50,7 +50,7 @@ import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
 import {
   createUserSignature,
-  filterAllowedCoin,
+  filterCrossChainCoin,
   signInternalTxMsgHash,
   signWithdrawalTxMsgHash,
 } from './utils'
@@ -58,7 +58,7 @@ import { ec } from 'elliptic'
 import {
   approveUnlimitedAllowanceUtil,
   dequantize,
-  filterCurrentCoin,
+  filterEthereumCoin,
   get0X0to0X,
   getAllowance,
   getNonce,
@@ -210,26 +210,9 @@ export class Client {
     return res.data.payload.network_config
   }
 
-  // async getCoinInfo(network: string, coin: string) {
-  //   let coindata
-  //   if (network === 'ETHERIUM') {
-  //     const { payload: coinStats } = await this.getCoinStatus()
-  //     coindata = filterCurrentCoin(coinStats, coin)
-  //   }
-  //   if (network === 'POLYGON') {
-  //     const { payload } = await this.getNetworkConfig()
-  //     const polygonConfig = payload.network_config['POLYGON']
-  //     const allowedTokens = polygonConfig.tokens
-  //     const contractAddress = polygonConfig.deposit_contract
-  //     const currentCoin = filterAllowedCoin(allowedTokens, coin)
-  //     coindata = { ...currentCoin, contractAddress }
-  //   }
-  //   return coindata;
-  // }
-
-  async approveUnlimitedAllowance(coin: string, signer: Wallet) {
+  async approveUnlimitedAllowanceEthereumNetwork(coin: string, signer: Wallet) {
     const { payload: coinStats } = await this.getCoinStatus()
-    const currentCoin = filterCurrentCoin(coinStats, coin)
+    const currentCoin = filterEthereumCoin(coinStats, coin)
     const { token_contract: tokenContract } = currentCoin
     const starkContract = CONFIG.STARK_CONTRACT[this.option]
 
@@ -242,13 +225,13 @@ export class Client {
     return res
   }
 
-  async approveUnlimitedAllowancePolygon(coin: string, signer: Wallet) {
+  async approveUnlimitedAllowancePolygonNetwork(coin: string, signer: Wallet) {
     const network_config = await this.getNetworkConfig()
     const polygonConfig = network_config['POLYGON']
     const allowedTokens = polygonConfig.tokens
     const contractAddress = polygonConfig.deposit_contract
 
-    const currentCoin = filterAllowedCoin(allowedTokens, coin)
+    const currentCoin = filterCrossChainCoin(allowedTokens, coin)
     const { token_contract: tokenContract } = currentCoin
 
     const res = await approveUnlimitedAllowanceUtil(
@@ -271,7 +254,7 @@ export class Client {
     }
 
     const { payload: coinStats } = await this.getCoinStatus()
-    const currentCoin = filterCurrentCoin(coinStats, currency)
+    const currentCoin = filterEthereumCoin(coinStats, currency)
     const { token_contract: tokenContract, decimal } = currentCoin
     const contract = new ethers.Contract(
       tokenContract,
@@ -296,7 +279,7 @@ export class Client {
     const polygonConfig = network_config['POLYGON']
     const allowedTokens = polygonConfig.tokens
 
-    const currentCoin = filterAllowedCoin(allowedTokens, currency)
+    const currentCoin = filterCrossChainCoin(allowedTokens, currency)
 
     const { blockchain_decimal: decimal, token_contract: tokenContract } =
       currentCoin
@@ -310,7 +293,7 @@ export class Client {
     return normalBalance
   }
 
-  async depositWithStarkKey(
+  async depositFromEthereumNetworkWithStarkKey(
     signer: Wallet,
     provider: ethers.providers.Provider,
     starkPublicKey: string,
@@ -319,7 +302,7 @@ export class Client {
   ) {
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
-    const currentCoin = filterCurrentCoin(coinStats, currency)
+    const currentCoin = filterEthereumCoin(coinStats, currency)
 
     const {
       quanitization,
@@ -359,6 +342,8 @@ export class Client {
       currency,
     )
 
+    console.log({ overrides })
+
     if (balance < +amount) {
       throw new BalanceTooLowError(
         `Current Balance (${balance}) for '${currency}' is too low, please add balance before deposit`,
@@ -383,7 +368,7 @@ export class Client {
       )
       if (allowance < +amount) {
         throw new AllowanceTooLowError(
-          `Current Allowance (${allowance}) is too low, please use Client.approveUnlimitedAllowance()`,
+          `Current Allowance (${allowance}) is too low, please use Client.approveUnlimitedAllowanceEthereumNetwork()`,
         )
       }
 
@@ -409,7 +394,7 @@ export class Client {
     return res
   }
 
-  async deposit(
+  async depositFromEthereumNetwork(
     rpcURL: string,
     ethPrivateKey: string,
     network: Network,
@@ -422,7 +407,7 @@ export class Client {
     const stark_public_key = keyPair.getPublic().getX().toString('hex')
     const provider = new ethers.providers.JsonRpcProvider(rpcURL)
     const signer = new Wallet(ethPrivateKey, provider)
-    return this.depositWithStarkKey(
+    return this.depositFromEthereumNetworkWithStarkKey(
       signer,
       provider,
       `0x${stark_public_key}`,
@@ -431,7 +416,7 @@ export class Client {
     )
   }
 
-  async depositPolygonWithSigner(
+  async depositFromPolygonNetworkWithSigner(
     signer: Wallet,
     provider: ethers.providers.Provider,
     currency: string,
@@ -443,7 +428,7 @@ export class Client {
     const allowedTokens = polygonConfig.tokens
     const contractAddress = polygonConfig.deposit_contract
 
-    const currentCoin = filterAllowedCoin(allowedTokens, currency)
+    const currentCoin = filterCrossChainCoin(allowedTokens, currency)
 
     const { blockchain_decimal: decimal, token_contract: tokenContract } =
       currentCoin
@@ -495,7 +480,7 @@ export class Client {
       )
       if (allowance < +amount) {
         throw new AllowanceTooLowError(
-          `Current Allowance (${allowance}) is too low, please use Client.approveUnlimitedAllowancePolygon()`,
+          `Current Allowance (${allowance}) is too low, please use Client.approveUnlimitedAllowancePolygonNetwork()`,
         )
       }
       depositResponse = await polygonContract.deposit(
@@ -517,7 +502,7 @@ export class Client {
     return res
   }
 
-  async depositPolygon(
+  async depositFromPolygonNetwork(
     rpcURL: string,
     ethPrivateKey: string,
     // network: Network,
@@ -527,7 +512,7 @@ export class Client {
     this.getAuthStatus()
     const provider = new ethers.providers.JsonRpcProvider(rpcURL)
     const signer = new Wallet(ethPrivateKey, provider)
-    return this.depositPolygonWithSigner(
+    return this.depositFromPolygonNetworkWithSigner(
       signer,
       provider,
       currency,
@@ -542,7 +527,7 @@ export class Client {
   ) {
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
-    const currentCoin = filterCurrentCoin(coinStats, coinSymbol)
+    const currentCoin = filterEthereumCoin(coinStats, coinSymbol)
     const {
       stark_asset_id: starkAssetId,
       blockchain_decimal: blockchainDecimal,
@@ -610,7 +595,7 @@ export class Client {
   ): Promise<Response<ProcessFastWithdrawalResponse>> {
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
-    const _ = filterCurrentCoin(coinStats, coinSymbol)
+    const _ = filterEthereumCoin(coinStats, coinSymbol)
     const initiateResponse = await this.startFastWithdrawal({
       amount: Number(amount),
       symbol: coinSymbol,
@@ -639,7 +624,7 @@ export class Client {
   ): Promise<Response<ValidateNormalWithdrawalResponse>> {
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
-    const _ = filterCurrentCoin(coinStats, coinSymbol)
+    const _ = filterEthereumCoin(coinStats, coinSymbol)
     const initiateResponse = await this.startNormalWithdrawal({
       amount: Number(amount),
       symbol: coinSymbol,
@@ -667,7 +652,7 @@ export class Client {
   ): Promise<ethers.providers.TransactionResponse> {
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
-    const currentCoin = filterCurrentCoin(coinStats, coinSymbol)
+    const currentCoin = filterEthereumCoin(coinStats, coinSymbol)
     const { stark_asset_id: starkAssetId } = currentCoin
     const starkContract = CONFIG.STARK_CONTRACT[this.option]
     const starkABI = CONFIG.STARK_ABI[this.option]
@@ -717,8 +702,9 @@ export class Client {
     depositBlockchainNonce: string,
     vaultId: number,
   ) {
+    const amountTostring = amount.toString()
     const res = await this.axiosInstance.post(`/sapi/v1/payment/stark/start/`, {
-      amount,
+      amount: amountTostring,
       token_id: starkAssetId,
       stark_key: starkPublicKey,
       deposit_blockchain_hash: depositBlockchainHash,
@@ -734,10 +720,11 @@ export class Client {
     depositBlockchainHash: string,
     depositBlockchainNonce: string,
   ) {
+    const amountTostring = amount.toString()
     const res = await this.axiosInstance.post(
       `/sapi/v1/deposits/crosschain/create/`,
       {
-        amount,
+        amount: amountTostring,
         currency,
         network: 'POLYGON',
         deposit_blockchain_hash: depositBlockchainHash,

@@ -121,7 +121,7 @@ const depositAndWithdrawal = async () => {
       const signer = new Wallet(privateKey, provider)
 
       //  deposit with eth private key
-      const depositRes = await client.deposit(
+      const depositRes = await client.depositFromEthereumNetwork(
         process.env.RPC_PROVIDER as string,
         privateKey,
         'testnet',
@@ -130,13 +130,14 @@ const depositAndWithdrawal = async () => {
       )
       //  or
       //  deposit with L2 Key
-      const depositStarkKeyRes = await client.depositWithStarkKey(
-        signer,
-        provider,
-        `0x${stark_public_key}`,
-        0.0001,
-        'eth',
-      )
+      // const depositStarkKeyRes =
+      //   await client.depositFromEthereumNetworkWithStarkKey(
+      //     signer,
+      //     provider,
+      //     `0x${stark_public_key}`,
+      //     0.0001,
+      //     'eth',
+      //   )
       // Withdrawals
       // Normal withdrawal
       // 1. Initiate your withdrawal request by calling "initiateNormalWithdrawal".
@@ -183,7 +184,7 @@ const depositAndWithdrawal = async () => {
 
       console.log({
         depositRes,
-        depositStarkKeyRes,
+        // depositStarkKeyRes,
         withdrawalRes,
         pendingBalance,
         completeNWRes,
@@ -230,19 +231,20 @@ const polygonDeposit = async () => {
       const signer = new Wallet(privateKey, provider)
 
       // //  deposit with eth private key
-      const depositPolygon = await client.depositPolygon(
+      const deposit = await client.depositFromPolygonNetwork(
         process.env.RPC_PROVIDER as string,
         privateKey,
         'btc',
         0.000001,
       )
 
-      const depositWithSigner = await client.depositPolygonWithSigner(
-        signer,
-        provider,
-        'btc',
-        0.0001,
-      )
+      const depositWithSigner =
+        await client.depositFromPolygonNetworkWithSigner(
+          signer,
+          provider,
+          'btc',
+          0.0001,
+        )
 
       const depositsList = await client.listDeposits({
         page: 2,
@@ -264,7 +266,7 @@ const polygonDeposit = async () => {
       // })
 
       console.log({
-        depositPolygon,
+        depositFromPolygon: deposit,
         depositWithSigner,
         depositsList,
         fastWithdrawalRes,
@@ -280,8 +282,8 @@ const polygonDeposit = async () => {
   }
 }
 
-polygonDeposit()
-// depositAndWithdrawal()
+// polygonDeposit()
+depositAndWithdrawal()
 
 const internalTransfers = async () => {
   // load your privateKey and walletAddress

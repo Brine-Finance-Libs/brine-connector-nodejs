@@ -486,7 +486,7 @@ describe('Brine Connector', () => {
       it('Start Deposit - 200', async () => {
         mock1
           .onPost('/sapi/v1/payment/stark/start/')
-          .reply(200, responses.depositStartResponse)
+          .reply(200, responses.depositFromEthereumNetworkStartResponse)
         const res = await client.cryptoDepositStart(
           '100000',
           '0x27..',
@@ -503,7 +503,10 @@ describe('Brine Connector', () => {
       it('Start Deposit - 400', async () => {
         mock1
           .onPost('/main/payment/stark/start/')
-          .reply(400, responses.depositStartMissingParameters)
+          .reply(
+            400,
+            responses.depositFromEthereumNetworkStartMissingParameters,
+          )
 
         try {
           const res = await client.cryptoDepositStart(
@@ -538,7 +541,7 @@ describe('Brine Connector', () => {
       it('Start Polygon Deposit - 200', async () => {
         mock1
           .onPost('/sapi/v1/deposits/crosschain/create/')
-          .reply(200, responses.depositPolygonStartResponse)
+          .reply(200, responses.depositFromPolygonNetworkStartResponse)
         const res = await client.crossChainDepositStart(
           '100000',
           '0x27..',
@@ -553,7 +556,7 @@ describe('Brine Connector', () => {
       it('Start Polygon Deposit - 400', async () => {
         mock1
           .onPost('/sapi/v1/deposits/crosschain/create/')
-          .reply(400, responses.depositPolygonStartMissingParameters)
+          .reply(400, responses.depositFromPolygonNetworkStartMissingParameters)
 
         try {
           const res = await client.crossChainDepositStart(

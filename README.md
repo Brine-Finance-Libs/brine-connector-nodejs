@@ -417,7 +417,7 @@ There are two ways to make a deposit on the Ethereum network:
 In this method, you will use an ETH private key and an RPC URL to execute a deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
 
 ```javascript
-  const res = await client.deposit(
+  const res = await client.depositFromEthereumNetwork(
     process.env.RPC_PROVIDER as string, // Use 'goerli' for the testnet and 'ethereum mainnet' for the mainnet.
     privateKey, // Your ETH private key.
     'testnet', // Network allowed values are 'testnet' or 'mainnet'.
@@ -440,7 +440,7 @@ const provider = new ethers.providers.JsonRpcProvider(
 
 const signer = new Wallet(privateKey, provider)
 
-const depositRes = await client.depositWithStarkKey(
+const depositRes = await client.depositFromEthereumNetworkWithStarkKey(
   signer, // The signer created above.
   provider, // The provider created above.
   `0x${stark_public_key}`, // The stark_public_key created above.
@@ -458,7 +458,7 @@ There are two ways to make a deposit on the Polygon network:
 In this method, you will use an ETH private key and an RPC URL to execute a Polygon deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
 
 ```javascript
-  const depositPolygonRes = await client.depositPolygon(
+  const depositRes = await client.depositFromPolygonNetwork(
     process.env.RPC_PROVIDER as string, // Use 'Polygon Mumbai' for the testnet and 'Polygon mainnet' for the mainnet.
     privateKey, // Your ETH private key.
     'btc', // Enter the coin symbol.
@@ -480,7 +480,7 @@ const provider = new ethers.providers.JsonRpcProvider(
 
 const signer = new Wallet(privateKey, provider)
 
-const depositPolygonRes = await client.depositPolygonWithSigner(
+const depositPolygonRes = await client.depositFromPolygonNetworkWithSigner(
   signer, // The signer created above.
   provider, // The provider created above.
   'btc', // Enter the coin symbol.

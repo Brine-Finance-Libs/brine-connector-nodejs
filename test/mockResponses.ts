@@ -548,12 +548,12 @@ export const responses = {
     message: 'Transfer does not exist',
     payload: '',
   },
-  depositStartResponse: {
+  depositFromEthereumNetworkStartResponse: {
     status: 'success',
     message: 'Success! Awaiting Blockchain Confirmation',
     payload: '',
   },
-  depositStartMissingParameters: {
+  depositFromEthereumNetworkStartMissingParameters: {
     status: 'error',
     message: 'Essential parameters are missing',
     payload: '',
@@ -669,14 +669,14 @@ export const responses = {
       ],
     },
   },
-  depositPolygonStartResponse: {
+  depositFromPolygonNetworkStartResponse: {
     status: 'success',
     message: 'Success! Awaiting Blockchain Confirmation',
     payload: {
       transaction_hash: '',
     },
   },
-  depositPolygonStartMissingParameters: {
+  depositFromPolygonNetworkStartMissingParameters: {
     status: 'error',
     message: 'Essential parameters are missing',
     payload: '',

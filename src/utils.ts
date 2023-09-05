@@ -148,7 +148,10 @@ export const approveUnlimitedAllowanceUtil = async (
   return approval
 }
 
-export const filterCurrentCoin = (coinStatsPayload: CoinStat, coin: string) => {
+export const filterEthereumCoin = (
+  coinStatsPayload: CoinStat,
+  coin: string,
+) => {
   const currentCoin = Object.keys(coinStatsPayload)
     .map((coinName) => {
       if (coinStatsPayload[coinName].symbol === coin) {
@@ -160,7 +163,7 @@ export const filterCurrentCoin = (coinStatsPayload: CoinStat, coin: string) => {
   return currentCoin
 }
 
-export const filterAllowedCoin = (
+export const filterCrossChainCoin = (
   allowedTokens: NetworkCoinStat,
   coin: string,
 ) => {
