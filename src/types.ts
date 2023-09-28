@@ -207,10 +207,12 @@ export interface ListOrdersParams {
 export interface ListDepositParams {
   limit?: number
   page?: number
+  network?: string
 }
 
 export interface ListWithdrawalParams {
   page?: number
+  network?: string
 }
 
 export interface TradeParams {
@@ -297,6 +299,32 @@ export interface CoinStat {
   }
 }
 
+export interface NetworkStat {
+  [networkName: string]: {
+    deposit_contract: string
+    tokens: {
+      [coinName: string]: {
+        token_contract: string
+        blockchain_decimal: string
+      }
+    }
+    allowed_tokens_for_deposit: string[]
+    allowed_tokens_for_fast_wd: string[]
+  }
+}
+
+export interface NetworkCoinStat {
+  deposit_contract: string
+  allowed_tokens_for_deposit: string[]
+  allowed_tokens_for_fast_wd: string[]
+  tokens: {
+    [coinName: string]: {
+      token_contract: string
+      blockchain_decimal: string
+    }
+  }
+}
+
 // Withdrawal types
 export interface InitiateNormalWithdrawalResponse {
   nonce: string
@@ -331,6 +359,7 @@ export interface ProcessFastWithdrawalResponse {
 export interface InitiateWithdrawalPayload {
   amount: number
   symbol: string
+  network?: string
 }
 
 export interface ValidateNormalWithdrawalPayload {

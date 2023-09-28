@@ -1,6 +1,7 @@
 import starkex_abi_main from './bin/starkex_abi_main.json'
 import starkex_abi_test from './bin/starkex_abi_test.json'
 import erc20Abi from './bin/erc20_abi.json'
+import polygon_deposit_abi from './bin/polygon_deposit.json'
 
 export const MAINNET = {
   markets: {
@@ -32,6 +33,7 @@ export const CONFIG = {
     mainnet: starkex_abi_main,
     testnet: starkex_abi_test,
   },
+  POLYGON_ABI: polygon_deposit_abi,
   ERC20_ABI: erc20Abi,
 }
 

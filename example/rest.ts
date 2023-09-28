@@ -121,7 +121,7 @@ const depositAndWithdrawal = async () => {
       const signer = new Wallet(privateKey, provider)
 
       //  deposit with eth private key
-      const depositRes = await client.deposit(
+      const depositRes = await client.depositFromEthereumNetwork(
         process.env.RPC_PROVIDER as string,
         privateKey,
         'testnet',
@@ -130,13 +130,14 @@ const depositAndWithdrawal = async () => {
       )
       //  or
       //  deposit with L2 Key
-      const depositStarkKeyRes = await client.depositWithStarkKey(
-        signer,
-        provider,
-        `0x${stark_public_key}`,
-        0.0001,
-        'eth',
-      )
+      // const depositStarkKeyRes =
+      //   await client.depositFromEthereumNetworkWithStarkKey(
+      //     signer,
+      //     provider,
+      //     `0x${stark_public_key}`,
+      //     0.0001,
+      //     'eth',
+      //   )
       // Withdrawals
       // Normal withdrawal
       // 1. Initiate your withdrawal request by calling "initiateNormalWithdrawal".
@@ -161,10 +162,19 @@ const depositAndWithdrawal = async () => {
       )
 
       // Fast withdrawal
-      const fastWithdrawalRes = await client.fastWithdrawal(keyPair, 10, 'usdc')
+      const fastWithdrawalRes = await client.fastWithdrawal(
+        keyPair,
+        10,
+        'usdc',
+        'ETHEREUM',
+      )
 
       //Get a list of deposit
-      const depositsList = await client.listDeposits({ page: 2, limit: 1 })
+      const depositsList = await client.listDeposits({
+        page: 2,
+        limit: 1,
+        network: 'ETHEREUM',
+      })
 
       //Get a list of withdrawals
       const withdrawalsList = await client.listNormalWithdrawals()
@@ -174,7 +184,7 @@ const depositAndWithdrawal = async () => {
 
       console.log({
         depositRes,
-        depositStarkKeyRes,
+        // depositStarkKeyRes,
         withdrawalRes,
         pendingBalance,
         completeNWRes,
@@ -195,7 +205,84 @@ const depositAndWithdrawal = async () => {
   }
 }
 
-depositAndWithdrawal()
+const polygonDeposit = async () => {
+  // load your privateKey and walletAddress
+  const privateKey = process.env.PRIVATE_KEY
+  const ethAddress = process.env.ETH_ADDRESS
+  // const brineOrganizationKey = process.env.BRINE_ORGANIZATION_KEY
+  // const brineApiKey = process.env.BRINE_API_KEY
+
+  if (privateKey && ethAddress) {
+    // handle in try catch block
+    try {
+      // create a rest client instance (you can pass option)
+      const client = new Client('testnet')
+
+      // login to use private endpoints
+      const loginRes = await client.completeLogin(ethAddress, privateKey)
+      console.log(loginRes.payload)
+
+      const userSignature = createUserSignature(privateKey, 'testnet') // or sign it yourself
+      const keyPair = getKeyPairFromSignature(userSignature.signature)
+
+      const provider = new ethers.providers.JsonRpcProvider(
+        process.env.RPC_PROVIDER,
+      )
+      const signer = new Wallet(privateKey, provider)
+
+      // deposit with eth private key
+      const deposit = await client.depositFromPolygonNetwork(
+        process.env.RPC_PROVIDER as string,
+        privateKey,
+        'matic',
+        0.000001,
+      )
+
+      // const depositWithSigner =
+      //   await client.depositFromPolygonNetworkWithSigner(
+      //     signer,
+      //     provider,
+      //     'matic',
+      //     0.0001,
+      //   )
+
+      const depositsList = await client.listDeposits({
+        page: 2,
+        limit: 1,
+        network: 'POLYGON',
+      })
+
+      // // Fast withdrawal
+      const fastWithdrawalRes = await client.fastWithdrawal(
+        keyPair,
+        0.001,
+        'btc',
+        'POLYGON',
+      )
+
+      // const fastwithdrawalsList = await client.listFastWithdrawals({
+      //   page: 2, // This is an optional field
+      //   network: 'POLYGON',
+      // })
+
+      console.log({
+        depositFromPolygon: deposit,
+        depositsList,
+        fastWithdrawalRes,
+      })
+    } catch (e) {
+      // Error: AuthenticationError | AxiosError
+      if (isAuthenticationError(e)) {
+        console.log(e)
+      } else {
+        console.log(e)
+      }
+    }
+  }
+}
+
+polygonDeposit()
+// depositAndWithdrawal()
 
 const internalTransfers = async () => {
   // load your privateKey and walletAddress

@@ -486,7 +486,7 @@ describe('Brine Connector', () => {
       it('Start Deposit - 200', async () => {
         mock1
           .onPost('/sapi/v1/payment/stark/start/')
-          .reply(200, responses.depositStartResponse)
+          .reply(200, responses.depositFromEthereumNetworkStartResponse)
         const res = await client.cryptoDepositStart(
           '100000',
           '0x27..',
@@ -503,7 +503,10 @@ describe('Brine Connector', () => {
       it('Start Deposit - 400', async () => {
         mock1
           .onPost('/main/payment/stark/start/')
-          .reply(400, responses.depositStartMissingParameters)
+          .reply(
+            400,
+            responses.depositFromEthereumNetworkStartMissingParameters,
+          )
 
         try {
           const res = await client.cryptoDepositStart(
@@ -526,9 +529,57 @@ describe('Brine Connector', () => {
 
       it('List Deposit - 200', async () => {
         mock1
-          .onPost('/sapi/v1/payment/stark/list/')
+          .onPost('/sapi/v1/deposits')
           .reply(200, responses.listDepositsResponse)
-        const res = await client.listDeposits()
+        const res = await client.listDeposits({ network: 'ETHEREUM' })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+    })
+    describe('Polygon Deposits', () => {
+      it('Start Polygon Deposit - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits/crosschain/create/')
+          .reply(200, responses.depositFromPolygonNetworkStartResponse)
+        const res = await client.crossChainDepositStart(
+          '100000',
+          '0x27..',
+          '0x67..',
+          '930',
+        )
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+
+      it('Start Polygon Deposit - 400', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits/crosschain/create/')
+          .reply(400, responses.depositFromPolygonNetworkStartMissingParameters)
+
+        try {
+          const res = await client.crossChainDepositStart(
+            '100000',
+            '0x27..',
+            '0x67..',
+            '930',
+          )
+        } catch (e: unknown) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('Essential parameters')
+          }
+        }
+      })
+
+      it('List Polygon Deposit - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits')
+          .reply(200, responses.listPolygonDeposits)
+        const res = await client.listDeposits({ network: 'POLYGON' })
         expect(res).to.have.property('status')
         expect(res.status).to.eql('success')
         expect(res).to.have.property('payload')
@@ -600,13 +651,27 @@ describe('Brine Connector', () => {
       })
     })
     describe('Fast Withdrawals', () => {
-      it('Initiate Fast Withdrawals - 200', async () => {
+      it('Initiate Fast Withdrawals Ethereum - 200', async () => {
         mock1
           .onPost('/sapi/v1/payment/fast-withdrawals/v2/initiate/')
           .reply(200, responses.initiateWithdrawalResponse)
         const res = await client.startFastWithdrawal({
           amount: 0.00001,
           symbol: 'eth',
+          network: 'ETHEREUM',
+        })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+      it('Initiate Fast Withdrawals Polygon - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/fast-withdrawals/v2/initiate/')
+          .reply(200, responses.initiateWithdrawalResponse)
+        const res = await client.startFastWithdrawal({
+          amount: 0.00001,
+          symbol: 'eth',
+          network: 'ETHEREUM',
         })
         expect(res).to.have.property('status')
         expect(res.status).to.eql('success')

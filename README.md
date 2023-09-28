@@ -405,18 +405,20 @@ const internalTransferResponse =
 
 ### Deposit
 
-To make a deposit, two methods are available:
+#### Ethereum Deposit
+
+There are two ways to make a deposit on the Ethereum network:
 
 <!-- 1. Using ETH Private Key and RPC URL: This approach utilizes your ETH private key and an rpcUrl (e.g., from Infura or Alchemy).
 2. Custom Provider and Signer: This method involves creating your provider and signer using ethers.js or web3.js. You'll also need the stark_public_key. -->
 
 #### 1. Using ETH Private Key and RPC URL:
 
-In this method, you are utilizing an ETH private key and an RPC URL to execute a deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
+In this method, you will use an ETH private key and an RPC URL to execute a deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
 
 ```javascript
-  const res = await client.deposit(
-    process.env.RPC_PROVIDER as string, // Use 'goreli' for the testnet and 'ethereum mainnet' for the mainnet.
+  const res = await client.depositFromEthereumNetwork(
+    process.env.RPC_PROVIDER as string, // Use 'goerli' for the testnet and 'ethereum mainnet' for the mainnet.
     privateKey, // Your ETH private key.
     'testnet', // Network allowed values are 'testnet' or 'mainnet'.
     'eth', // Enter the coin symbol.
@@ -433,12 +435,12 @@ This method involves using a custom provider and signer, which can be created us
 import { Wallet, ethers } from 'ethers'
 
 const provider = new ethers.providers.JsonRpcProvider(
-  process.env.RPC_PROVIDER, // Use 'goreli' for testnet and 'ethereum mainnet' for the mainnet.
+  process.env.RPC_PROVIDER, // Use 'goerli' for testnet and 'ethereum mainnet' for the mainnet.
 )
 
 const signer = new Wallet(privateKey, provider)
 
-const depositRes = await client.depositWithStarkKey(
+const depositRes = await client.depositFromEthereumNetworkWithStarkKey(
   signer, // The signer created above.
   provider, // The provider created above.
   `0x${stark_public_key}`, // The stark_public_key created above.
@@ -447,10 +449,52 @@ const depositRes = await client.depositWithStarkKey(
 )
 ```
 
+#### Polygon Deposit
+
+There are two ways to make a deposit on the Polygon network:
+
+#### 1. Using ETH Private Key and RPC URL:
+
+In this method, you will use an ETH private key and an RPC URL to execute a Polygon deposit. You'll also need to create an RPC URL using services like Infura, Alchemy, etc. Here's the code snippet for this method:
+
+```javascript
+  const depositRes = await client.depositFromPolygonNetwork(
+    process.env.RPC_PROVIDER as string, // Use 'Polygon Mumbai' for the testnet and 'Polygon mainnet' for the mainnet.
+    privateKey, // Your ETH private key.
+    'btc', // Enter the coin symbol.
+    0.00001, // Enter the amount you want to deposit.
+  );
+```
+
+#### 2. Using Custom Provider and Signer:
+
+This method involves using a custom provider and signer, which can be created using the ethers.js library. Here's the code snippet for this method:
+
+```javascript
+// Note: Please use ethers version 5.5.3.
+import { Wallet, ethers } from 'ethers'
+
+const provider = new ethers.providers.JsonRpcProvider(
+  process.env.RPC_PROVIDER, // Use 'Polygon Mumbai' for the testnet and 'Polygon mainnet' for the mainnet.
+)
+
+const signer = new Wallet(privateKey, provider)
+
+const depositPolygonRes = await client.depositFromPolygonNetworkWithSigner(
+  signer, // The signer created above.
+  provider, // The provider created above.
+  'btc', // Enter the coin symbol.
+  0.00001, // Enter the amount you want to deposit.
+)
+```
+
+#### List Deposits
+
 To get the deposit history, you can use the following code:
 
 ```javascript
 const depositsList = await client.listDeposits({
+  network: 'ETHEREUM', // Network for which you want to list the deposit history. Allowed networks are ETHEREUM & POLYGON
   page: 2, // This is an optional field
   limit: 1, // This is an optional field
 })
@@ -458,7 +502,7 @@ const depositsList = await client.listDeposits({
 
 ### Withdrawal
 
-Generally, we have two modes of withdrawal: Normal Withdrawal and Fast Withdrawal. For some withdrawal methods that require a signer and provider, please refer to the deposit method mentioned above.
+Generally, we have two modes of withdrawal: Normal Withdrawal and Fast Withdrawal. For withdrawal methods that require a signer and provider, please refer to the deposit method mentioned above.
 
 #### Normal Withdrawal
 
@@ -503,10 +547,24 @@ const fastWithdrawalRes = await client.fastWithdrawal(
   keyPair, // The keyPair created above
   0.0001, // Enter the amount you want to deposit
   'usdc', // Enter the coin symbol
+  'ETHEREUM', // Allowed networks are POLYGON & ETHEREUM
 )
 
 //Get a list of fast withdrawals
 const fastwithdrawalsList = await client.listFastWithdrawals({
   page: 2, // This is an optional field
 })
+```
+
+#### Polygon withdrawal
+
+On the Polygon network, we only support fast withdrawals.
+
+```javascript
+const fastWithdrawalRes = await client.fastWithdrawal(
+  keyPair, // The keyPair created above
+  0.0001, // Enter the amount you want to deposit
+  'usdc', // Enter the coin symbol
+  'POLYGON', // Allowed networks are POLYGON & ETHEREUM
+)
 ```

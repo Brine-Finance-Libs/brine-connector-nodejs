@@ -7,6 +7,7 @@ import {
   CreateOrderNoncePayload,
   StarkSignature,
   Sign,
+  NetworkCoinStat,
 } from './types'
 import { Wallet, ethers } from 'ethers'
 import { CONFIG, MAX_INT_ALLOWANCE } from './constants'
@@ -136,18 +137,34 @@ export const getAllowance = async (
 }
 
 export const approveUnlimitedAllowanceUtil = async (
-  starkContract: string,
+  contractAddress: string,
   tokenContract: string,
   signer: ethers.Signer,
 ) => {
+  const gasPrice = signer.getGasPrice()
   const contract = new ethers.Contract(tokenContract, CONFIG.ERC20_ABI, signer)
+
+  const gasLimit = await contract.estimateGas.approve(
+    contractAddress,
+    ethers.BigNumber.from(
+      '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+    ),
+  )
+
+  console.log({ gasLimit, gasPrice })
   const amount = ethers.BigNumber.from(MAX_INT_ALLOWANCE)
-  console.log({ amount: amount.toString() })
-  const approval = await contract.approve(starkContract, amount)
+
+  const approval = await contract.approve(contractAddress, amount, {
+    gasLimit,
+    gasPrice,
+  })
   return approval
 }
 
-export const filterCurrentCoin = (coinStatsPayload: CoinStat, coin: string) => {
+export const filterEthereumCoin = (
+  coinStatsPayload: CoinStat,
+  coin: string,
+) => {
   const currentCoin = Object.keys(coinStatsPayload)
     .map((coinName) => {
       if (coinStatsPayload[coinName].symbol === coin) {
@@ -156,6 +173,37 @@ export const filterCurrentCoin = (coinStatsPayload: CoinStat, coin: string) => {
     })
     .filter((c) => c !== undefined)[0]
   if (!currentCoin) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  return currentCoin
+}
+
+export const filterCrossChainCoin = (
+  config: NetworkCoinStat,
+  coin: string,
+  type: string,
+) => {
+  const allowedTokens = config.tokens
+  const allowedTokensForDeposit = config.allowed_tokens_for_deposit
+  const allowedTokensForFastWithdrawal = config.allowed_tokens_for_fast_wd
+
+  if (type === 'TOKENS') {
+    const allowedToken = allowedTokens[coin]
+    if (!allowedToken) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  } else if (type === 'WITHDRAWAL') {
+    const allowedToken = allowedTokensForFastWithdrawal?.find(
+      (token) => token === coin,
+    )
+    if (!allowedToken) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  } else if (type === 'DEPOSIT') {
+    const allowedToken = allowedTokensForDeposit?.find(
+      (token) => token === coin,
+    )
+    if (!allowedToken) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  } else {
+    throw new CoinNotFoundError(`Type not found`)
+  }
+
+  const currentCoin = allowedTokens[coin]
+
   return currentCoin
 }
 
