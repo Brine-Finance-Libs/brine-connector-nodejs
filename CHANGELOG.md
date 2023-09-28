@@ -1,5 +1,11 @@
 # brine-connector
 
+## 1.4.2
+
+### Patch Changes
+
+- Update readme
+
 ## 1.4.1
 
 ### Patch Changes
