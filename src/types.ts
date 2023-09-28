@@ -308,13 +308,20 @@ export interface NetworkStat {
         blockchain_decimal: string
       }
     }
+    allowed_tokens_for_deposit: string[]
+    allowed_tokens_for_fast_wd: string[]
   }
 }
 
 export interface NetworkCoinStat {
-  [coinName: string]: {
-    token_contract: string
-    blockchain_decimal: string
+  deposit_contract: string
+  allowed_tokens_for_deposit: string[]
+  allowed_tokens_for_fast_wd: string[]
+  tokens: {
+    [coinName: string]: {
+      token_contract: string
+      blockchain_decimal: string
+    }
   }
 }
 

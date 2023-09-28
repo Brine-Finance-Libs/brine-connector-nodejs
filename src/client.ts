@@ -44,6 +44,7 @@ import {
   FastWithdrawal,
   Network,
   NetworkStat,
+  NetworkCoinStat,
 } from './types'
 import { AxiosInstance } from './axiosInstance'
 import { signMsg } from './bin/blockchain_utils'
@@ -231,7 +232,7 @@ export class Client {
     const allowedTokens = polygonConfig.tokens
     const contractAddress = polygonConfig.deposit_contract
 
-    const currentCoin = filterCrossChainCoin(allowedTokens, coin)
+    const currentCoin = filterCrossChainCoin(polygonConfig, coin, 'DEPOSIT')
     const { token_contract: tokenContract } = currentCoin
 
     const res = await approveUnlimitedAllowanceUtil(
@@ -279,7 +280,7 @@ export class Client {
     const polygonConfig = network_config['POLYGON']
     const allowedTokens = polygonConfig.tokens
 
-    const currentCoin = filterCrossChainCoin(allowedTokens, currency)
+    const currentCoin = filterCrossChainCoin(polygonConfig, currency, 'TOKENS')
 
     const { blockchain_decimal: decimal, token_contract: tokenContract } =
       currentCoin
@@ -311,13 +312,6 @@ export class Client {
       stark_asset_id: starkAssetId,
     } = currentCoin
 
-    console.log({
-      quanitization,
-      decimal,
-      token_contract: tokenContract,
-      stark_asset_id: starkAssetId,
-    })
-
     const quantizedAmount = ethers.utils.parseUnits(
       amount?.toString(),
       Number(quanitization),
@@ -341,8 +335,6 @@ export class Client {
       signer.address,
       currency,
     )
-
-    console.log({ overrides })
 
     if (balance < +amount) {
       throw new BalanceTooLowError(
@@ -428,7 +420,7 @@ export class Client {
     const allowedTokens = polygonConfig.tokens
     const contractAddress = polygonConfig.deposit_contract
 
-    const currentCoin = filterCrossChainCoin(allowedTokens, currency)
+    const currentCoin = filterCrossChainCoin(polygonConfig, currency, 'DEPOSIT')
 
     const { blockchain_decimal: decimal, token_contract: tokenContract } =
       currentCoin
@@ -457,8 +449,6 @@ export class Client {
       signer.address,
       currency,
     )
-
-    console.log({ balance })
 
     if (balance < +amount) {
       throw new BalanceTooLowError(
@@ -594,8 +584,16 @@ export class Client {
     network: string,
   ): Promise<Response<ProcessFastWithdrawalResponse>> {
     this.getAuthStatus()
-    const { payload: coinStats } = await this.getCoinStatus()
-    const _ = filterEthereumCoin(coinStats, coinSymbol)
+
+    if (network === 'POLYGON') {
+      const network_config = await this.getNetworkConfig()
+      const polygonConfig = network_config['POLYGON']
+      const _ = filterCrossChainCoin(polygonConfig, coinSymbol, 'WITHDRAWAL')
+    } else {
+      const { payload: coinStats } = await this.getCoinStatus()
+      const _ = filterEthereumCoin(coinStats, coinSymbol)
+    }
+
     const initiateResponse = await this.startFastWithdrawal({
       amount: Number(amount),
       symbol: coinSymbol,

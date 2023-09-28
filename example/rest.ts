@@ -230,21 +230,21 @@ const polygonDeposit = async () => {
       )
       const signer = new Wallet(privateKey, provider)
 
-      // //  deposit with eth private key
+      // deposit with eth private key
       const deposit = await client.depositFromPolygonNetwork(
         process.env.RPC_PROVIDER as string,
         privateKey,
-        'btc',
+        'matic',
         0.000001,
       )
 
-      const depositWithSigner =
-        await client.depositFromPolygonNetworkWithSigner(
-          signer,
-          provider,
-          'btc',
-          0.0001,
-        )
+      // const depositWithSigner =
+      //   await client.depositFromPolygonNetworkWithSigner(
+      //     signer,
+      //     provider,
+      //     'matic',
+      //     0.0001,
+      //   )
 
       const depositsList = await client.listDeposits({
         page: 2,
@@ -252,7 +252,7 @@ const polygonDeposit = async () => {
         network: 'POLYGON',
       })
 
-      // Fast withdrawal
+      // // Fast withdrawal
       const fastWithdrawalRes = await client.fastWithdrawal(
         keyPair,
         0.001,
@@ -267,7 +267,6 @@ const polygonDeposit = async () => {
 
       console.log({
         depositFromPolygon: deposit,
-        depositWithSigner,
         depositsList,
         fastWithdrawalRes,
       })
@@ -276,14 +275,14 @@ const polygonDeposit = async () => {
       if (isAuthenticationError(e)) {
         console.log(e)
       } else {
-        console.log((e as AxiosError<Response<string>>)?.response?.data)
+        console.log(e)
       }
     }
   }
 }
 
-// polygonDeposit()
-depositAndWithdrawal()
+polygonDeposit()
+// depositAndWithdrawal()
 
 const internalTransfers = async () => {
   // load your privateKey and walletAddress
