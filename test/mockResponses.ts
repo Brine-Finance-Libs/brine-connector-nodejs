@@ -543,10 +543,26 @@ export const responses = {
       updated_at: '2023-07-26T05:16:32.047285Z',
     },
   },
-  getInternalTransfersByIdNotExist: {
+  getInternalTransfersByIdNotExists: {
     status: 'error',
     message: 'Transfer does not exist',
     payload: '',
+  },
+  checkUserExists: {
+    status: 'success',
+    message: 'User exists',
+    payload: {
+      destination_address: '0xF5F467c3D86760A4Ff6262880727E854428a4996',
+      exists: true,
+    },
+  },
+  checkUserNotExists: {
+    status: 'error',
+    message: 'User does not exist',
+    payload: {
+      destination_address: '0xF5F467c3D86760A4Ff6262880727E854428s4996',
+      exists: false,
+    },
   },
   depositFromEthereumNetworkStartResponse: {
     status: 'success',

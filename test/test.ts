@@ -335,7 +335,7 @@ describe('Brine Connector', () => {
       describe('Initiate and Process Internal Transfers', () => {
         it('Initiate Internal Transfer - 200', async () => {
           mock1
-            .onPost('/sapi/v1/internal_transfers/initiate/')
+            .onPost('/sapi/v1/internal_transfers/v2/initiate/')
             .reply(200, responses.initiateInternalTransferResponse)
           const res = await client.initiateInternalTransfer({
             organization_key: brineOrganizationKey as string,
@@ -352,7 +352,7 @@ describe('Brine Connector', () => {
 
         it('Execute Internal Transfer - 200', async () => {
           mock1
-            .onPost('/sapi/v1/internal_transfers/process/')
+            .onPost('/sapi/v1/internal_transfers/v2/process/')
             .reply(200, responses.executeInternalTransferResponse)
           const res = await client.executeInternalTransfers({
             organization_key: brineOrganizationKey as string,
@@ -375,7 +375,7 @@ describe('Brine Connector', () => {
         it('Initiate Internal Transfer - 403 Invalid credential', async () => {
           const clientId = 'random_id'
           mock1
-            .onPost('/sapi/v1/internal_transfers/initiate/')
+            .onPost('/sapi/v1/internal_transfers/v2/initiate/')
             .reply(403, responses.internalTransferResponseInvalidKey)
           try {
             const res = await client.getInternalTransferByClientId(clientId)
@@ -392,7 +392,7 @@ describe('Brine Connector', () => {
         it('Execute Internal Transfer - 403 Invalid credential', async () => {
           const clientId = 'random_id'
           mock1
-            .onPost('/sapi/v1/internal_transfers/process/')
+            .onPost('/sapi/v1/internal_transfers/v2/process/')
             .reply(403, responses.internalTransferResponseInvalidKey)
           try {
             const res = await client.getInternalTransferByClientId(clientId)
@@ -409,7 +409,7 @@ describe('Brine Connector', () => {
         it('Initiate Internal Transfer - 401 Invalid JWT', async () => {
           const clientId = 'random_id'
           mock1
-            .onPost('/sapi/v1/internal_transfers/initiate/')
+            .onPost('/sapi/v1/internal_transfers/v2/initiate/')
             .reply(403, responses.internalTransferResponseInvalidKey)
           try {
             const res = await client.getInternalTransferByClientId(clientId)
@@ -426,7 +426,7 @@ describe('Brine Connector', () => {
         it('Execute Internal Transfer - 401 Invalid JWT', async () => {
           const clientId = 'random_id'
           mock1
-            .onPost('/sapi/v1/internal_transfers/process/')
+            .onPost('/sapi/v1/internal_transfers/v2/process/')
             .reply(403, responses.internalTransferResponseInvalidKey)
           try {
             const res = await client.getInternalTransferByClientId(clientId)
@@ -443,7 +443,7 @@ describe('Brine Connector', () => {
       describe('List & Get By Client ID', () => {
         it('List Internal Transfers - 200', async () => {
           mock1
-            .onGet('/sapi/v1/internal_transfers')
+            .onGet('/sapi/v1/internal_transfers/v2/')
             .reply(200, responses.listInternalTransfers)
           const res = await client.listInternalTransfers()
           expect(res).to.have.property('status')
@@ -456,7 +456,7 @@ describe('Brine Connector', () => {
         it('Get Internal Transfer By Client Id  - 200', async () => {
           const clientId = '6883122327947226'
           mock1
-            .onGet(`/sapi/v1/internal_transfers/${clientId}`)
+            .onGet(`/sapi/v1/internal_transfers/v2/${clientId}`)
             .reply(200, responses.getInternalTransfersById)
           const res = await client.getInternalTransferByClientId(clientId)
           expect(res).to.have.property('status')
@@ -467,8 +467,8 @@ describe('Brine Connector', () => {
         it('Transfer does not exist with the given ID - 404', async () => {
           const clientId = 'random_id'
           mock1
-            .onGet('/sapi/v1/market/kline/')
-            .reply(404, responses.getInternalTransfersByIdNotExist)
+            .onGet(`/sapi/v1/internal_transfers/v2/${clientId}`)
+            .reply(404, responses.getInternalTransfersByIdNotExists)
           try {
             const res = await client.getInternalTransferByClientId(clientId)
           } catch (e: unknown) {
@@ -476,7 +476,44 @@ describe('Brine Connector', () => {
             if (data) {
               expect(data).to.have.property('status')
               expect(data.status).to.eql('error')
-              expect(data.message).to.include('transfer does not exist')
+              expect(data.message).to.include('Transfer does not exist')
+            }
+          }
+        })
+      })
+
+      describe('Check User Existence API', () => {
+        it('Check if a user exists - 200', async () => {
+          mock1
+            .onPost(`/sapi/v1/internal_transfers/v2/check_user_exists/`)
+            .reply(200, responses.checkUserExists)
+          const res = await client.checkInternalTransferUserExists(
+            brineOrganizationKey as string,
+            brineApiKey as string,
+            '0x..',
+          )
+          expect(res).to.have.property('status')
+          expect(res.status).to.eql('success')
+          expect(res).to.have.property('payload')
+          expect(res.payload).to.have.property('destination_address')
+          expect(res.payload).to.have.property('exists')
+        })
+        it('Check if a user exists - 404', async () => {
+          try {
+            mock1
+              .onPost(`/sapi/v1/internal_transfers/v2/check_user_exists/`)
+              .reply(200, responses.checkUserNotExists)
+            const res = await client.checkInternalTransferUserExists(
+              brineOrganizationKey as string,
+              brineApiKey as string,
+              '0x..',
+            )
+          } catch (e: unknown) {
+            const data = (e as AxiosError<Response<string>>)?.response?.data
+            if (data) {
+              expect(data).to.have.property('status')
+              expect(data.status).to.eql('error')
+              expect(data.message).to.include('User does not exist')
             }
           }
         })

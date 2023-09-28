@@ -388,7 +388,9 @@ import { generateKeyPairFromEthPrivateKey } from '@brine-fi/brine-connector'
 const keypair = generateKeyPairFromEthPrivateKey(ethPrivateKey, 'testnet')
 ```
 
-3. Call the `initiateAndProcessInternalTransfers` method and pass the necessary arguments to process the method:
+### Available methods:
+
+#### To process the internal transfer, call the `initiateAndProcessInternalTransfers` method and pass the necessary arguments:
 
 ```ts
 const internalTransferResponse =
@@ -399,7 +401,7 @@ const internalTransferResponse =
     'usdc', // The currency (e.g., USDC). Currently, we support USDC.
     amount, // The amount (e.g., 10).
     destination_address, // The receiver's eth address.
-    client_transfer_id, // This is an optional field. If not specified, then it’s generated randomly. You can use this to uniquely identify a transfer at your end.
+    client_reference_id, // This is an optional field. If not specified, then it’s generated randomly. You can use this to uniquely identify a transfer at your end.
   )
 ```
 
@@ -560,11 +562,35 @@ const fastwithdrawalsList = await client.listFastWithdrawals({
 
 On the Polygon network, we only support fast withdrawals.
 
-```javascript
+````javascript
 const fastWithdrawalRes = await client.fastWithdrawal(
   keyPair, // The keyPair created above
   0.0001, // Enter the amount you want to deposit
   'usdc', // Enter the coin symbol
   'POLYGON', // Allowed networks are POLYGON & ETHEREUM
+#### Retrieve a list of transfers initiated by the authenticated user:
+
+```javascript
+const internalTransferList = await client.listInternalTransfers({
+  limit: 10, // This field is optional.
+  offset: 10, // This field is optional.
+})
+````
+
+#### Retrieve an internal transfer using its client reference id:
+
+```javascript
+const internalTransferList = await client.getInternalTransferByClientId(
+  client_reference_id, // The client reference id you want to retrieve
+)
+```
+
+#### Check if a user exists by their destination address.
+
+```javascript
+const checkUserRes = await client.checkInternalTransferUserExists(
+  brineOrganizationKey,
+  brineApiKey,
+  destination_address, // The destination address you want to check.
 )
 ```

@@ -94,7 +94,7 @@ const main = async () => {
 
 // main()
 
-const depositAndWithdrawal = async () => {
+const ethereumDepositAndWithdrawal = async () => {
   // load your privateKey and walletAddress
   const privateKey = process.env.PRIVATE_KEY
   const ethAddress = process.env.ETH_ADDRESS
@@ -162,12 +162,12 @@ const depositAndWithdrawal = async () => {
       )
 
       // Fast withdrawal
-      const fastWithdrawalRes = await client.fastWithdrawal(
-        keyPair,
-        10,
-        'usdc',
-        'ETHEREUM',
-      )
+      // const fastWithdrawalRes = await client.fastWithdrawal(
+      //   keyPair,
+      //   10,
+      //   'usdc',
+      //   'ETHEREUM',
+      // )
 
       //Get a list of deposit
       const depositsList = await client.listDeposits({
@@ -188,7 +188,7 @@ const depositAndWithdrawal = async () => {
         withdrawalRes,
         pendingBalance,
         completeNWRes,
-        fastWithdrawalRes,
+        // fastWithdrawalRes,
         depositsList,
         withdrawalsList,
         fastwithdrawalsList,
@@ -205,7 +205,7 @@ const depositAndWithdrawal = async () => {
   }
 }
 
-const polygonDeposit = async () => {
+const polygonDepositAndWithdrawal = async () => {
   // load your privateKey and walletAddress
   const privateKey = process.env.PRIVATE_KEY
   const ethAddress = process.env.ETH_ADDRESS
@@ -234,7 +234,7 @@ const polygonDeposit = async () => {
       const deposit = await client.depositFromPolygonNetwork(
         process.env.RPC_PROVIDER as string,
         privateKey,
-        'matic',
+        'btc',
         0.000001,
       )
 
@@ -281,8 +281,8 @@ const polygonDeposit = async () => {
   }
 }
 
-polygonDeposit()
-// depositAndWithdrawal()
+// polygonDepositAndWithdrawal()
+// ethereumDepositAndWithdrawal()
 
 const internalTransfers = async () => {
   // load your privateKey and walletAddress
@@ -302,6 +302,7 @@ const internalTransfers = async () => {
 
       // Getting the L2 keypair
       const keypair = generateKeyPairFromEthPrivateKey(privateKey, 'testnet') // default is mainnet
+
       // Executing the internalTransfer
       const internalTransferResponse =
         await client.initiateAndProcessInternalTransfers(
@@ -312,9 +313,13 @@ const internalTransfers = async () => {
           1,
           '0xF5F467c3D86760A4Ff6262880727E854428a4996',
         )
+      console.log({ internalTransferResponse })
+
       // Listing the internalTransfers
-      const internalTransferList = await client.listInternalTransfers()
-      console.log(internalTransferList.payload)
+      const internalTransferList = await client.listInternalTransfers({
+        limit: 10,
+        offset: 10,
+      })
 
       if (internalTransferList.payload.internal_transfers.length) {
         // Get the internal transfer by client ID
@@ -324,7 +329,14 @@ const internalTransfers = async () => {
         )
         console.log(internalTransferById.payload)
       }
+      // Check if a user exists by their destination address.
+      const checkUserRes = await client.checkInternalTransferUserExists(
+        brineOrganizationKey as string,
+        brineApiKey as string,
+        '0x6c875514E42F14B891399A6a8438E6AA8F77B178',
+      )
     } catch (e) {
+      console.log({ e })
       // Error: AuthenticationError | AxiosError
       if (isAuthenticationError(e)) {
         console.log(e)
@@ -335,4 +347,4 @@ const internalTransfers = async () => {
   }
 }
 
-// internalTransfers()
+internalTransfers()

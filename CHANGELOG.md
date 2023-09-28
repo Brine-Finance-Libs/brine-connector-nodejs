@@ -1,5 +1,11 @@
 # brine-connector
 
+## 1.3.0
+
+### Minor Changes
+
+- Internal transfer v2
+
 ## 1.2.2
 
 ### Patch Changes

@@ -5,6 +5,8 @@ import {
   CandleStickParams,
   CandleStickPayload,
   CoinStat,
+  CheckUserExistsBody,
+  CheckUserExistsPayload,
   CreateNewOrderBody,
   CreateOrderNonceBody,
   CreateOrderNoncePayload,
@@ -829,7 +831,7 @@ export class Client {
   ): Promise<Response<InternalTransferInitiatePayload>> {
     const res = await this.axiosInstance.post<
       Response<InternalTransferInitiatePayload>
-    >('/sapi/v1/internal_transfers/initiate/', body)
+    >('/sapi/v1/internal_transfers/v2/initiate/', body)
     return res.data
   }
 
@@ -837,7 +839,7 @@ export class Client {
     body: InternalTransferProcessBody,
   ): Promise<Response<InternalTransfer>> {
     const res = await this.axiosInstance.post<Response<InternalTransfer>>(
-      '/sapi/v1/internal_transfers/process/',
+      '/sapi/v1/internal_transfers/v2/process/',
       body,
     )
     return res.data
@@ -850,7 +852,7 @@ export class Client {
     currency: string,
     amount: number,
     destination_address: string,
-    client_transfer_id?: string,
+    client_reference_id?: string,
   ): Promise<Response<InternalTransfer>> {
     this.getAuthStatus()
     const initiateResponse = await this.initiateInternalTransfer({
@@ -859,7 +861,7 @@ export class Client {
       currency,
       amount,
       destination_address,
-      client_transfer_id,
+      client_reference_id,
     })
     const signature = signInternalTxMsgHash(
       keyPair,
@@ -881,7 +883,7 @@ export class Client {
     this.getAuthStatus()
     const res = await this.axiosInstance.get<
       Response<ListInternalTransferPayload>
-    >(`/sapi/v1/internal_transfers`, { params: params })
+    >(`/sapi/v1/internal_transfers/v2/`, { params: params })
     return res.data
   }
 
@@ -890,7 +892,20 @@ export class Client {
   ): Promise<Response<InternalTransfer>> {
     this.getAuthStatus()
     const res = await this.axiosInstance.get<Response<InternalTransfer>>(
-      `/sapi/v1/internal_transfers/${client_reference_id}`,
+      `/sapi/v1/internal_transfers/v2/${client_reference_id}`,
+    )
+    return res.data
+  }
+
+  async checkInternalTransferUserExists(
+    organization_key: string,
+    api_key: string,
+    destination_address: string,
+  ): Promise<Response<CheckUserExistsPayload>> {
+    this.getAuthStatus()
+    const res = await this.axiosInstance.post<Response<CheckUserExistsPayload>>(
+      `/sapi/v1/internal_transfers/v2/check_user_exists/`,
+      { destination_address, organization_key, api_key },
     )
     return res.data
   }
