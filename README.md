@@ -597,3 +597,4 @@ const fastWithdrawalRes = await client.fastWithdrawal(
   'POLYGON', // Allowed networks are POLYGON & ETHEREUM
 )
 ```
+
