@@ -1,5 +1,11 @@
 # brine-connector
 
+## 1.4.0
+
+### Minor Changes
+
+- Add Deposit and withdrawal functionality
+
 ## 1.3.0
 
 ### Minor Changes
