@@ -24,6 +24,7 @@ export {
   generateKeyPairFromEthPrivateKey,
 }
 export * from './types'
+export * from './constants'
 
 export default {
   Client,

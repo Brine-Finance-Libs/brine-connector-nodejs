@@ -1,23 +1,9 @@
 export type Market = 'ethusdc' | 'ethusdt' | 'btcusdc' | 'btcusdt'
 
-export const MAINNET = {
-  markets: {
-    ethusdc: 'ethusdc',
-    btcusdc: 'btcusdc',
-  },
-} as const
-export const TESTNET = {
-  markets: {
-    ethusdc: 'ethusdc',
-    btcusdc: 'btcusdc',
-    ethusdt: 'ethusdt',
-    btcusdt: 'btcusdt',
-  },
-} as const
-
 export type Side = 'buy' | 'sell'
 export type OrdType = 'market' | 'limit'
 export type State = 'pending' | 'wait' | 'done' | 'cancel'
+export type Network = 'mainnet' | 'testnet'
 
 export interface Response<T> {
   status: string
@@ -147,7 +133,7 @@ export interface Order {
 export interface StarkSignature {
   r: string
   s: string
-  recoveryParam?: string
+  recoveryParam?: string | number
 }
 
 export interface InternalTransferKey {
@@ -224,7 +210,18 @@ export interface ListOrdersParams {
   start_time?: number
   end_time?: number
   side?: Side
-  order_by: 'asc' | 'desc'
+  order_by?: 'asc' | 'desc'
+}
+
+export interface ListDepositParams {
+  limit?: number
+  page?: number
+  network?: string
+}
+
+export interface ListWithdrawalParams {
+  page?: number
+  network?: string
 }
 
 export interface TradeParams {
@@ -299,3 +296,129 @@ export interface Sign {
   s: string
   signature: string
 }
+
+export interface CoinStat {
+  [coinName: string]: {
+    stark_asset_id: string
+    quanitization: string
+    token_contract: string
+    decimal: string
+    symbol: string
+    blockchain_decimal: string
+  }
+}
+
+export interface NetworkStat {
+  [networkName: string]: {
+    deposit_contract: string
+    tokens: {
+      [coinName: string]: {
+        token_contract: string
+        blockchain_decimal: string
+      }
+    }
+    allowed_tokens_for_deposit: string[]
+    allowed_tokens_for_fast_wd: string[]
+  }
+}
+
+export interface NetworkCoinStat {
+  deposit_contract: string
+  allowed_tokens_for_deposit: string[]
+  allowed_tokens_for_fast_wd: string[]
+  tokens: {
+    [coinName: string]: {
+      token_contract: string
+      blockchain_decimal: string
+    }
+  }
+}
+
+// Withdrawal types
+export interface InitiateNormalWithdrawalResponse {
+  nonce: string
+  msg_hash: string
+}
+
+export interface InitiateFastWithdrawalResponse {
+  fastwithdrawal_withdrawal_id: string
+  msg_hash: string
+}
+
+export interface ValidateNormalWithdrawalResponse {
+  id: string
+  amount: string
+  token_id: string
+  created_at: string
+  transaction_status: string
+  extras?: any
+}
+
+export interface ProcessFastWithdrawalResponse {
+  id: string
+  amount: string
+  fee_amount: string
+  token_id: string
+  created_at: string
+  l1_withdrawal_blockchain_hash: string
+  transaction_status: string
+  extras?: any
+}
+
+export interface InitiateWithdrawalPayload {
+  amount: number
+  symbol: string
+  network?: string
+}
+
+export interface ValidateNormalWithdrawalPayload {
+  msg_hash: string
+  signature: StarkSignature
+  nonce: string | number
+}
+
+export interface ProcessFastWithdrawalPayload {
+  msg_hash: string
+  signature: StarkSignature
+  fastwithdrawal_withdrawal_id?: string | number
+}
+
+export interface Deposit {
+  token_id: string
+  blockchain_deposit_status: string
+  brine_deposit_status: string
+  deposit_blockchain_hash: string
+  amount: string
+  created_at: string
+}
+
+export interface NormalWithdrawal {
+  id: number
+  amount: string
+  token_id: string
+  created_at: string
+  transaction_status: string
+  extras?: any
+}
+
+export interface FastWithdrawal {
+  id: number
+  amount: string
+  fee_amount: string
+  token_id: string
+  created_at: string
+  l1_withdrawal_blockchain_hash: string
+  transaction_status: string
+  extras?: any
+}
+
+export interface Pagination<T> {
+  count: number
+  next: string | null
+  previous: string | null
+  results: T[]
+}
+
+// export interface DepositResponse extends {}
+// export interface NormalResponse extends {}
+// export interface FastWithdrawalResponse extends Pagination<FastWithdrawal> {}

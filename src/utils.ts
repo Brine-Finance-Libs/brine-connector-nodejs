@@ -2,11 +2,17 @@ import { ec } from 'elliptic'
 import { signMsg } from './bin/blockchain_utils'
 import { getKeyPairFromSignature, sign } from './bin/signature'
 import {
+  CoinStat,
   CreateNewOrderBody,
   CreateOrderNoncePayload,
-  Sign,
   StarkSignature,
+  Sign,
+  NetworkCoinStat,
 } from './types'
+import { Wallet, ethers } from 'ethers'
+import { CONFIG, MAX_INT_ALLOWANCE } from './constants'
+import { CoinNotFoundError } from './error'
+import { BigNumber } from 'ethers'
 
 export const signMsgHash = (
   nonce: CreateOrderNoncePayload,
@@ -65,10 +71,159 @@ export const signInternalTxMsgHash = (
   return signature
 }
 
+export const signWithdrawalTxMsgHash = (
+  keyPair: ec.KeyPair,
+  msgHash: string,
+): StarkSignature => {
+  const msgHex = BigNumber.from(msgHash).toHexString()
+  const msg = sign(keyPair, removeHexPrefix(msgHex))
+
+  const signature: StarkSignature = {
+    r: `0x${msg.r.toString('hex')}`,
+    s: `0x${msg.s.toString('hex')}`,
+    recoveryParam: msg.recoveryParam,
+  }
+
+  return signature
+}
+
 export const generateKeyPairFromEthPrivateKey = (
   ethPrivateKey: string,
   option: 'mainnet' | 'testnet' = 'mainnet',
 ) => {
   const signature = createUserSignature(ethPrivateKey, option)
   return getKeyPairFromSignature(signature.signature)
+}
+
+export const getNonce = (
+  signer: Wallet,
+  provider: ethers.providers.Provider,
+) => {
+  const baseNonce = provider.getTransactionCount(signer.getAddress())
+  let nonceOffset = 0
+  return baseNonce.then((nonce: number) => nonce + nonceOffset++)
+}
+
+export const dequantize = (number: number, decimals: number) => {
+  const factor = 10 ** decimals
+  return number / factor
+}
+
+export const get0X0to0X = (address: string) => {
+  if (
+    address?.substring(0, 3) === '0x0' ||
+    address?.substring(0, 3) === '0X0'
+  ) {
+    return address.replace('0x0', '0x')
+  } else {
+    return address
+  }
+}
+
+export const getAllowance = async (
+  userAddress: string,
+  starkContract: string,
+  tokenContract: string,
+  decimal: number,
+  provider: ethers.providers.Provider,
+) => {
+  const contract = new ethers.Contract(
+    tokenContract,
+    CONFIG.ERC20_ABI,
+    provider,
+  )
+  const allowance = await contract.allowance(userAddress, starkContract)
+  return dequantize(Number(allowance), decimal)
+}
+
+export const approveUnlimitedAllowanceUtil = async (
+  contractAddress: string,
+  tokenContract: string,
+  signer: ethers.Signer,
+) => {
+  const gasPrice = signer.getGasPrice()
+  const contract = new ethers.Contract(tokenContract, CONFIG.ERC20_ABI, signer)
+
+  const gasLimit = await contract.estimateGas.approve(
+    contractAddress,
+    ethers.BigNumber.from(
+      '115792089237316195423570985008687907853269984665640564039457584007913129639935',
+    ),
+  )
+
+  console.log({ gasLimit, gasPrice })
+  const amount = ethers.BigNumber.from(MAX_INT_ALLOWANCE)
+
+  const approval = await contract.approve(contractAddress, amount, {
+    gasLimit,
+    gasPrice,
+  })
+  return approval
+}
+
+export const filterEthereumCoin = (
+  coinStatsPayload: CoinStat,
+  coin: string,
+) => {
+  const currentCoin = Object.keys(coinStatsPayload)
+    .map((coinName) => {
+      if (coinStatsPayload[coinName].symbol === coin) {
+        return coinStatsPayload[coinName]
+      }
+    })
+    .filter((c) => c !== undefined)[0]
+  if (!currentCoin) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  return currentCoin
+}
+
+export const filterCrossChainCoin = (
+  config: NetworkCoinStat,
+  coin: string,
+  type: string,
+) => {
+  const allowedTokens = config.tokens
+  const allowedTokensForDeposit = config.allowed_tokens_for_deposit
+  const allowedTokensForFastWithdrawal = config.allowed_tokens_for_fast_wd
+
+  if (type === 'TOKENS') {
+    const allowedToken = allowedTokens[coin]
+    if (!allowedToken) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  } else if (type === 'WITHDRAWAL') {
+    const allowedToken = allowedTokensForFastWithdrawal?.find(
+      (token) => token === coin,
+    )
+    if (!allowedToken) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  } else if (type === 'DEPOSIT') {
+    const allowedToken = allowedTokensForDeposit?.find(
+      (token) => token === coin,
+    )
+    if (!allowedToken) throw new CoinNotFoundError(`Coin '${coin}' not found`)
+  } else {
+    throw new CoinNotFoundError(`Type not found`)
+  }
+
+  const currentCoin = allowedTokens[coin]
+
+  return currentCoin
+}
+
+export const formatWithdrawalAmount = (
+  amount: number,
+  decimals: number,
+  symbol: string,
+) => {
+  if (symbol === 'eth') {
+    return amount ? String(ethers.utils.formatEther(amount)) : '0'
+  } else {
+    return String(dequantize(amount, decimals))
+  }
+}
+
+export const removeHexPrefix = (str: string, removeOx0 = false) => {
+  // Use a regular expression to remove "0x0" and "0x" from the beginning of the string
+  if (removeOx0) {
+    return str.replace(/^(0x0|0x)/, '')
+  } else {
+    return str.replace(/^0x/, '')
+  }
 }

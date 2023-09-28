@@ -564,4 +564,610 @@ export const responses = {
       exists: false,
     },
   },
+  depositFromEthereumNetworkStartResponse: {
+    status: 'success',
+    message: 'Success! Awaiting Blockchain Confirmation',
+    payload: '',
+  },
+  depositFromEthereumNetworkStartMissingParameters: {
+    status: 'error',
+    message: 'Essential parameters are missing',
+    payload: '',
+  },
+  listDepositsResponse: {
+    status: 'success',
+    message: '',
+    payload: {
+      count: 493,
+      next: '',
+      previous: null,
+      results: [
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Pending',
+          brine_deposit_status: 'Pending',
+          deposit_blockchain_hash:
+            '0x6dacf57358e59018d5202e78ea5fb5a81ccd8741c524ca712e16f14e55b31ec2',
+          amount: '100',
+          created_at: '2023-08-07T04:29:57.732857Z',
+        },
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Pending',
+          brine_deposit_status: 'Pending',
+          deposit_blockchain_hash:
+            '0xbf41fa3a08446f5a8041fa7a3c80b3e2437a5f102de6d537e1cd9dc9b9258a87',
+          amount: '100000',
+          created_at: '2023-08-07T04:28:37.996150Z',
+        },
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Pending',
+          brine_deposit_status: 'Pending',
+          deposit_blockchain_hash:
+            '0x3e21ef7e8cd5cb3ebab7fe755d732f17ebc6f2ae5c8a9e1cae2b71ffb162a0aa',
+          amount: '100',
+          created_at: '2023-08-07T04:27:12.461843Z',
+        },
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Failed',
+          brine_deposit_status: 'Pending',
+          deposit_blockchain_hash:
+            '0xde7bdb6b221f09c066682da04c413eab89f71c08a4f629efee4c1e38eb2fca54',
+          amount: '100',
+          created_at: '2023-08-07T04:26:33.142663Z',
+        },
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'Success',
+          deposit_blockchain_hash:
+            '0x0531e0192df925f5d3d9de3333c699a01228ee8e636e5900ea03546ea4f8a35e',
+          amount: '100',
+          created_at: '2023-08-07T04:24:50.528657Z',
+        },
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'Success',
+          deposit_blockchain_hash:
+            '0x6789e1aa8db08a697e88381788503ea8e5714a3d59d524a84f619585cb56ace5',
+          amount: '100000',
+          created_at: '2023-08-07T04:16:37.757650Z',
+        },
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'Success',
+          deposit_blockchain_hash:
+            '0x24e2dd84b19410a59a00440794f6a70e111ec4fa4a30e3827fdc5e4a000c5461',
+          amount: '100000',
+          created_at: '2023-08-04T16:30:51.278421Z',
+        },
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'Success',
+          deposit_blockchain_hash:
+            '0x1b83e88ef5a8f4ad8c2de83ea366474727c7e64b10f6b2d1e1f0a9911170af47',
+          amount: '1000',
+          created_at: '2023-08-04T16:29:01.481086Z',
+        },
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'Success',
+          deposit_blockchain_hash:
+            '0xa4f05745ac8653b1a94f52835a94800c72475f348052dd1584c3b71e6c4d12c1',
+          amount: '1000',
+          created_at: '2023-08-04T13:39:42.430514Z',
+        },
+        {
+          token_id:
+            '0x2705737cd248ac819034b5de474c8f0368224f72a0fda9e031499d519992d9e',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'Success',
+          deposit_blockchain_hash:
+            '0x1e654643b696f33d54a05c2c5f17a104be8a0a17da2bcb7dc310459e0e7c3a52',
+          amount: '1000',
+          created_at: '2023-08-04T06:57:32.045140Z',
+        },
+      ],
+    },
+  },
+  depositFromPolygonNetworkStartResponse: {
+    status: 'success',
+    message: 'Success! Awaiting Blockchain Confirmation',
+    payload: {
+      transaction_hash: '',
+    },
+  },
+  depositFromPolygonNetworkStartMissingParameters: {
+    status: 'error',
+    message: 'Essential parameters are missing',
+    payload: '',
+  },
+  listPolygonDeposits: {
+    status: 'success',
+    message: '',
+    payload: {
+      count: 23,
+      next: 'http://api-testnet.brine.fi/sapi/v1/deposits/?limit=1&network=POLYGON&page=3',
+      previous:
+        'http://api-testnet.brine.fi/sapi/v1/deposits/?limit=1&network=POLYGON',
+      results: [
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x2a868c8884b6b5f0f3b44c2ec6f4278b56652d33ad98bbb51cd45656e8bfc65e',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:53:31.761603Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x54c3505c612797ce01d11b73e7bb1238f4be292be6771cf2ea38cfb48353052c',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:53:20.098033Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x0edc159590c62769631ab92bae0fd1a20754444f471704fa40106226bc430a7e',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:37:40.229312Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x561122a3fefa8aa2e9cacd60874e3ee5cea58bbf562dc23f95c3f3f05727bdee',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:29:18.100068Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x539ba8330580add2723c76af88386f1d31e3b93315839b4eae7a174c5e59c2ed',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:28:21.778246Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0xe032d2c9115b83d77d981cb77fac88207631bcf23cee0574b1ffbbe40685cada',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-16T06:01:51.446800Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0xbb08968f78b81143066e13b995a588587dfafee9b1040f942858fd3e37080f4a',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-11T10:24:54.095723Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0xe72d32666acf7aa3f1ade0bea4440ada3457a99b5d617f20e075ea06c49d6263',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-11T10:21:43.632555Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0xf9a8ab38af7ccc694078b7622761e392964c1f32e76c44d723451cf27b90fcf7',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-11T10:19:43.389197Z',
+        },
+        {
+          token_id:
+            '0x36823b9f4fa9bdbae9eecdef9f69432df22ad79e2f8fcf2d826a0f4ae15dd77',
+          blockchain_deposit_status: 'Success',
+          brine_deposit_status: 'SUCCESS',
+          deposit_blockchain_hash:
+            '0x42e414638908dc566ee5fee6f3a5c8413da9ee5276ab33cfbd1fb4659a63ffab',
+          network: 'POLYGON',
+          amount: '100',
+          created_at: '2023-08-11T10:18:43.681993Z',
+        },
+      ],
+    },
+  },
+  initiateWithdrawalResponse: {
+    status: 'success',
+    message: 'successfully initiated withdrawal',
+    payload: {
+      nonce: 7819,
+      msg_hash:
+        '686148137588728084357640508492604406021032862346002124816784805415214096923',
+    },
+  },
+  validateWithdrawalResponse: {
+    status: 'success',
+    message: 'successfully initiated withdrawal',
+    payload: {
+      id: 7819,
+      amount: '0.0000100000000000',
+      token_id: 'eth',
+      created_at: '2023-08-07T05:12:50.012516Z',
+      transaction_status: 'INITIATED',
+      extras: {
+        errors: [],
+        exp_timestamp: 3997985,
+        quantised_amount: 100000,
+      },
+    },
+  },
+  validateWithdrawalValidationFailed: {
+    status: 'error',
+    message: 'Withdrawal Validation Failed, please try again',
+    payload: '',
+  },
+  initiateFastWithdrawalResponse: {
+    status: 'success',
+    message: 'successfully initiated withdrawal',
+    payload: {
+      fastwithdrawal_withdrawal_id: 1071,
+      msg_hash: '0x6170a...',
+    },
+  },
+  processFastWithdrawalResponse: {
+    status: 'success',
+    message: 'successfully processed withdrawal',
+    payload: {
+      id: 1071,
+      amount: '10.0000000000000000',
+      fee_amount: '20',
+      token_id: 'usdc',
+      created_at: '2023-08-07T05:32:15.371735Z',
+      l1_withdrawal_blockchain_hash: '0xc9cda14...',
+      transaction_status: 'TRANSFER_INITIATED',
+      extras: {
+        errors: [],
+        exp_timestamp: 3997985,
+        quantised_amount: 30000000,
+      },
+    },
+  },
+  processFWithdrawalValidationFailed: {
+    status: 'error',
+    message:
+      'Fast-Withdrawal Validation Failed, Please initiate a new transaction',
+    payload: '',
+  },
+  listWithdrawalsResponse: {
+    status: 'success',
+    message: '',
+    payload: {
+      count: 315,
+      next: 'http://api-testnet.brine.fi/main/payment/withdrawals/?page=2',
+      previous: null,
+      results: [
+        {
+          id: 7817,
+          amount: '20.0000000000000000',
+          token_id: 'usdc',
+          created_at: '2023-08-04T12:34:14.863865Z',
+          transaction_status: 'CONFIRMING',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 20000000,
+          },
+        },
+        {
+          id: 7816,
+          amount: '20.0000000000000000',
+          token_id: 'usdc',
+          created_at: '2023-08-04T11:11:06.828763Z',
+          transaction_status: 'CONFIRMING',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 20000000,
+          },
+        },
+        {
+          id: 7815,
+          amount: '20.0000000000000000',
+          token_id: 'usdc',
+          created_at: '2023-08-04T11:10:35.030033Z',
+          transaction_status: 'FAILED',
+          extras: {
+            errors: ['NOT_VALIDATED'],
+            exp_timestamp: 3997985,
+            quantised_amount: 20000000,
+          },
+        },
+        {
+          id: 7814,
+          amount: '20.0000000000000000',
+          token_id: 'eth',
+          created_at: '2023-08-04T10:42:12.537837Z',
+          transaction_status: 'FAILED',
+          extras: {
+            errors: ['NOT_VALIDATED'],
+            exp_timestamp: 3997985,
+            quantised_amount: 200000000000,
+          },
+        },
+        {
+          id: 7813,
+          amount: '0.0000100000000000',
+          token_id: 'eth',
+          created_at: '2023-08-04T10:30:30.232291Z',
+          transaction_status: 'CONFIRMING',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 100000,
+          },
+        },
+        {
+          id: 7812,
+          amount: '0.0000100000000000',
+          token_id: 'eth',
+          created_at: '2023-08-04T10:28:54.938646Z',
+          transaction_status: 'CONFIRMING',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 100000,
+          },
+        },
+        {
+          id: 7811,
+          amount: '0.0000100000000000',
+          token_id: 'eth',
+          created_at: '2023-08-04T10:27:48.480858Z',
+          transaction_status: 'CONFIRMING',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 100000,
+          },
+        },
+        {
+          id: 7810,
+          amount: '0.0000100000000000',
+          token_id: 'eth',
+          created_at: '2023-08-04T10:26:03.211778Z',
+          transaction_status: 'FAILED',
+          extras: {
+            errors: ['HASH_MISMATCH'],
+            exp_timestamp: 3997985,
+            quantised_amount: 100000,
+          },
+        },
+        {
+          id: 7809,
+          amount: '0.0000100000000000',
+          token_id: 'eth',
+          created_at: '2023-08-04T10:24:56.251147Z',
+          transaction_status: 'FAILED',
+          extras: {
+            errors: ['HASH_MISMATCH'],
+            exp_timestamp: 3997985,
+            quantised_amount: 100000,
+          },
+        },
+        {
+          id: 7808,
+          amount: '0.0000100000000000',
+          token_id: 'eth',
+          created_at: '2023-08-04T09:42:35.114010Z',
+          transaction_status: 'CONFIRMING',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 100000,
+          },
+        },
+      ],
+    },
+  },
+  listFastWithdrawalsResponse: {
+    status: 'success',
+    message: '',
+    payload: {
+      count: 72,
+      next: 'http://api-testnet.brine.fi/main/payment/fast-withdrawals/?page=2',
+      previous: null,
+      results: [
+        {
+          id: 1070,
+          amount: '10.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-04T16:15:55.217867Z',
+          l1_withdrawal_blockchain_hash:
+            '0x1f207bbc02e4e56ae80a7391149149b5db559ee0a55632002aa56da0001be783',
+          transaction_status: 'TRANSFER_INITIATED',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 30000000,
+          },
+        },
+        {
+          id: 1069,
+          amount: '20.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-04T11:10:08.093921Z',
+          l1_withdrawal_blockchain_hash:
+            '0xbef26f1ef3298d6fe286f0fa1a439cfba886316bd31572b79052a853ac3d95d9',
+          transaction_status: 'TRANSFER_INITIATED',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 40000000,
+          },
+        },
+        {
+          id: 1068,
+          amount: '20.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-04T11:01:29.108031Z',
+          l1_withdrawal_blockchain_hash:
+            '0x7c961face213181233baf3b91f76ed0a83d5c7f42bfb6c4c7e690751dd042b68',
+          transaction_status: 'TRANSFER_INITIATED',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 40000000,
+          },
+        },
+        {
+          id: 1067,
+          amount: '20.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-04T10:55:52.283063Z',
+          l1_withdrawal_blockchain_hash: '',
+          transaction_status: 'FAILED',
+          extras: {
+            errors: ['SIGN_VERIFICATION_FAILED'],
+            exp_timestamp: 3997985,
+            quantised_amount: 40000000,
+          },
+        },
+        {
+          id: 1066,
+          amount: '20.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-04T10:53:32.634445Z',
+          l1_withdrawal_blockchain_hash: '',
+          transaction_status: 'FAILED',
+          extras: {
+            errors: ['SIGN_VERIFICATION_FAILED'],
+            exp_timestamp: 3997985,
+            quantised_amount: 40000000,
+          },
+        },
+        {
+          id: 1065,
+          amount: '20.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-04T10:45:16.189165Z',
+          l1_withdrawal_blockchain_hash: '',
+          transaction_status: 'FAILED',
+          extras: {
+            errors: ['SIGN_VERIFICATION_FAILED'],
+            exp_timestamp: 3997985,
+            quantised_amount: 40000000,
+          },
+        },
+        {
+          id: 1064,
+          amount: '10.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-04T10:34:15.619665Z',
+          l1_withdrawal_blockchain_hash:
+            '0x2c7ef2a5e9eb765f13ecfa5ed8aa7aabe6564e7f6873d819e92e27ff9cd05abd',
+          transaction_status: 'TRANSFER_INITIATED',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 30000000,
+          },
+        },
+        {
+          id: 1062,
+          amount: '10.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-03T13:49:22.249541Z',
+          l1_withdrawal_blockchain_hash:
+            '0x297e64cf8a4df5e90c03219f7cadedae40ffa1488b1b193ad6fdcf7c293c51d1',
+          transaction_status: 'TRANSFER_INITIATED',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 30000000,
+          },
+        },
+        {
+          id: 1061,
+          amount: '10.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-03T13:47:49.957037Z',
+          l1_withdrawal_blockchain_hash:
+            '0x3e62316bfaa6b86364d23639872c75fdaa7c4b5ec25e24761dd6521b20b8acf1',
+          transaction_status: 'TRANSFER_INITIATED',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 30000000,
+          },
+        },
+        {
+          id: 1060,
+          amount: '10.0000000000000000',
+          fee_amount: '20',
+          token_id: 'usdc',
+          created_at: '2023-08-03T13:45:06.889378Z',
+          l1_withdrawal_blockchain_hash:
+            '0xee879f5217ebc9895411517c2f6bd15bb5e8fc7549844dcf31f8a768303e0789',
+          transaction_status: 'TRANSFER_INITIATED',
+          extras: {
+            errors: [],
+            exp_timestamp: 3997985,
+            quantised_amount: 30000000,
+          },
+        },
+      ],
+    },
+  },
 }

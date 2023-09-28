@@ -11,7 +11,8 @@
     "skipLibCheck": true,
     "declaration": true,
     "strictFunctionTypes": true,
-    "preserveSymlinks": true
+    "preserveSymlinks": true,
+    "resolveJsonModule": true
   },
   "include": ["./src/**/*", "example/rest.ts", "index.ts"],
   "exclude": ["./src/**/*.spec.ts"]

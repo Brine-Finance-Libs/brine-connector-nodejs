@@ -519,5 +519,251 @@ describe('Brine Connector', () => {
         })
       })
     })
+    describe('Deposits', () => {
+      it('Start Deposit - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/stark/start/')
+          .reply(200, responses.depositFromEthereumNetworkStartResponse)
+        const res = await client.cryptoDepositStart(
+          '100000',
+          '0x27..',
+          '0x27..',
+          '0x67..',
+          '930',
+          65707,
+        )
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+
+      it('Start Deposit - 400', async () => {
+        mock1
+          .onPost('/main/payment/stark/start/')
+          .reply(
+            400,
+            responses.depositFromEthereumNetworkStartMissingParameters,
+          )
+
+        try {
+          const res = await client.cryptoDepositStart(
+            '100000',
+            '0x27..',
+            '0x27..',
+            '0x67..',
+            '930',
+            65707,
+          )
+        } catch (e: unknown) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('Essential parameters')
+          }
+        }
+      })
+
+      it('List Deposit - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits')
+          .reply(200, responses.listDepositsResponse)
+        const res = await client.listDeposits({ network: 'ETHEREUM' })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+    })
+    describe('Polygon Deposits', () => {
+      it('Start Polygon Deposit - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits/crosschain/create/')
+          .reply(200, responses.depositFromPolygonNetworkStartResponse)
+        const res = await client.crossChainDepositStart(
+          '100000',
+          '0x27..',
+          '0x67..',
+          '930',
+        )
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+
+      it('Start Polygon Deposit - 400', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits/crosschain/create/')
+          .reply(400, responses.depositFromPolygonNetworkStartMissingParameters)
+
+        try {
+          const res = await client.crossChainDepositStart(
+            '100000',
+            '0x27..',
+            '0x67..',
+            '930',
+          )
+        } catch (e: unknown) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('Essential parameters')
+          }
+        }
+      })
+
+      it('List Polygon Deposit - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/deposits')
+          .reply(200, responses.listPolygonDeposits)
+        const res = await client.listDeposits({ network: 'POLYGON' })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+    })
+    describe('Withdrawals', () => {
+      it('Initiate Withdrawals - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/withdrawals/v1/initiate/')
+          .reply(200, responses.initiateWithdrawalResponse)
+        const res = await client.startNormalWithdrawal({
+          amount: 0.00001,
+          symbol: 'eth',
+        })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+      it('Validate Withdrawals - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/withdrawals/v1/validate/')
+          .reply(200, responses.validateWithdrawalResponse)
+        const res = await client.validateNormalWithdrawal({
+          msg_hash:
+            '1845898ec19c65beac9eb12be93adc8fa4fe00a494aa005e2f2cc5bade3a21b',
+          signature: {
+            r: '0x4a0a8a...',
+            s: '0x7fc5d01...',
+            recoveryParam: '1',
+          },
+          nonce: '7819',
+        })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+      it('Validate Withdrawals - 406', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/withdrawals/v1/validate/')
+          .reply(406, responses.validateWithdrawalValidationFailed)
+        try {
+          const res = await client.validateNormalWithdrawal({
+            msg_hash:
+              '1845898ec19c65beac9eb12be93adc8fa4fe00a494aa005e2f2cc5bade3a21b',
+            signature: {
+              r: '0x4a0a8a...',
+              s: '0x7fc5d01...',
+              recoveryParam: '1',
+            },
+            nonce: '7819',
+          })
+        } catch (e: unknown) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('Withdrawal Validation Failed')
+          }
+        }
+      })
+      it('List Withdrawals - 200', async () => {
+        mock1
+          .onGet('/sapi/v1/payment/withdrawals/')
+          .reply(200, responses.listWithdrawalsResponse)
+        const res = await client.listNormalWithdrawals()
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+    })
+    describe('Fast Withdrawals', () => {
+      it('Initiate Fast Withdrawals Ethereum - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/fast-withdrawals/v2/initiate/')
+          .reply(200, responses.initiateWithdrawalResponse)
+        const res = await client.startFastWithdrawal({
+          amount: 0.00001,
+          symbol: 'eth',
+          network: 'ETHEREUM',
+        })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+      it('Initiate Fast Withdrawals Polygon - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/fast-withdrawals/v2/initiate/')
+          .reply(200, responses.initiateWithdrawalResponse)
+        const res = await client.startFastWithdrawal({
+          amount: 0.00001,
+          symbol: 'eth',
+          network: 'ETHEREUM',
+        })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+      it('Process Fast Withdrawals - 200', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/fast-withdrawals/v2/process/')
+          .reply(200, responses.validateWithdrawalResponse)
+        const res = await client.processFastWithdrawal({
+          msg_hash: '0x617...',
+          signature: {
+            r: '0x5303...',
+            s: '0x26ecf..',
+            recoveryParam: 0,
+          },
+          fastwithdrawal_withdrawal_id: 1071,
+        })
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+      it('Process Fast Withdrawals - 406', async () => {
+        mock1
+          .onPost('/sapi/v1/payment/fast-withdrawals/v2/process/')
+          .reply(406, responses.processFWithdrawalValidationFailed)
+        try {
+          const res = await client.processFastWithdrawal({
+            msg_hash:
+              '1845898ec19c65beac9eb12be93adc8fa4fe00a494aa005e2f2cc5bade3a21b',
+            signature: {
+              r: '0x4a0a8a...',
+              s: '0x7fc5d01...',
+              recoveryParam: '1',
+            },
+            fastwithdrawal_withdrawal_id: '7819',
+          })
+        } catch (e: unknown) {
+          const data = (e as AxiosError<Response<string>>)?.response?.data
+          if (data) {
+            expect(data).to.have.property('status')
+            expect(data.status).to.eql('error')
+            expect(data.message).to.include('Fast-Withdrawal Validation Failed')
+          }
+        }
+      })
+      it('List Fast Withdrawals - 200', async () => {
+        mock1
+          .onGet('/sapi/v1/payment/fast-withdrawals/')
+          .reply(200, responses.listFastWithdrawalsResponse)
+        const res = await client.listFastWithdrawals()
+        expect(res).to.have.property('status')
+        expect(res.status).to.eql('success')
+        expect(res).to.have.property('payload')
+      })
+    })
   })
 })
