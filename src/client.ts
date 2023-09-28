@@ -430,7 +430,7 @@ export class Client {
       Number(decimal),
     )
 
-    let polygonContract = new ethers.Contract(
+    const polygonContract = new ethers.Contract(
       contractAddress,
       CONFIG.POLYGON_ABI.abi,
       signer,
