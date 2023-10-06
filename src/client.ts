@@ -75,6 +75,7 @@ import {
   AllowanceTooLowError,
   BalanceTooLowError,
   CoinNotFoundError,
+  InvalidAmountError,
 } from './error'
 
 export class Client {
@@ -303,6 +304,11 @@ export class Client {
     amount: string | number,
     currency: string,
   ) {
+    if (!(Number(amount) > 0)) {
+      throw new InvalidAmountError(
+        `Please enter a valid amount. It should be a numerical value greater than zero.`,
+      )
+    }
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
     const currentCoin = filterEthereumCoin(coinStats, currency)
@@ -416,6 +422,11 @@ export class Client {
     currency: string,
     amount: string | number,
   ) {
+    if (!(Number(amount) > 0)) {
+      throw new InvalidAmountError(
+        `Please enter a valid amount. It should be a numerical value greater than zero.`,
+      )
+    }
     this.getAuthStatus()
     const network_config = await this.getNetworkConfig()
     const polygonConfig = network_config['POLYGON']
@@ -585,8 +596,12 @@ export class Client {
     coinSymbol: string,
     network: string,
   ): Promise<Response<ProcessFastWithdrawalResponse>> {
+    if (!(Number(amount) > 0)) {
+      throw new InvalidAmountError(
+        `Please enter a valid amount. It should be a numerical value greater than zero.`,
+      )
+    }
     this.getAuthStatus()
-
     if (network === 'POLYGON') {
       const network_config = await this.getNetworkConfig()
       const polygonConfig = network_config['POLYGON']
@@ -622,6 +637,11 @@ export class Client {
     amount: number | string,
     coinSymbol: string,
   ): Promise<Response<ValidateNormalWithdrawalResponse>> {
+    if (!(Number(amount) > 0)) {
+      throw new InvalidAmountError(
+        `Please enter a valid amount. It should be a numerical value greater than zero.`,
+      )
+    }
     this.getAuthStatus()
     const { payload: coinStats } = await this.getCoinStatus()
     const _ = filterEthereumCoin(coinStats, coinSymbol)

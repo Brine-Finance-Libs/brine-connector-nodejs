@@ -1,6 +1,6 @@
 {
   "name": "@brine-fi/brine-connector",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "A NodeJS Connector for the Brine API",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

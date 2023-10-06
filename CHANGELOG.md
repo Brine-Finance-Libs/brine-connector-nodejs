@@ -1,5 +1,11 @@
 # brine-connector
 
+## 1.4.3
+
+### Patch Changes
+
+- add validation for amount
+
 ## 1.4.2
 
 ### Patch Changes

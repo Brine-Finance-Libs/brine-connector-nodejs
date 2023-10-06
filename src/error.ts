@@ -14,6 +14,14 @@ class CoinNotFoundError extends Error {
   }
 }
 
+class InvalidAmountError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'InvalidAmountError'
+    this.message = message
+  }
+}
+
 class AllowanceTooLowError extends Error {
   constructor(message: string) {
     super(message)
@@ -40,6 +48,7 @@ export default {
   CoinNotFoundError,
   AllowanceTooLowError,
   BalanceTooLowError,
+  InvalidAmountError,
 }
 
 export {
@@ -48,4 +57,5 @@ export {
   CoinNotFoundError,
   AllowanceTooLowError,
   BalanceTooLowError,
+  InvalidAmountError,
 }
