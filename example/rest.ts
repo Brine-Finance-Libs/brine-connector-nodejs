@@ -121,13 +121,13 @@ const ethereumDepositAndWithdrawal = async () => {
       const signer = new Wallet(privateKey, provider)
 
       //  deposit with eth private key
-      const depositRes = await client.depositFromEthereumNetwork(
-        process.env.RPC_PROVIDER as string,
-        privateKey,
-        'testnet',
-        'eth',
-        0.00001,
-      )
+      // const depositRes = await client.depositFromEthereumNetwork(
+      //   process.env.RPC_PROVIDER as string,
+      //   privateKey,
+      //   'testnet',
+      //   'eth',
+      //   0.00001,
+      // )
       //  or
       //  deposit with L2 Key
       // const depositStarkKeyRes =
@@ -162,12 +162,12 @@ const ethereumDepositAndWithdrawal = async () => {
       )
 
       // Fast withdrawal
-      // const fastWithdrawalRes = await client.fastWithdrawal(
-      //   keyPair,
-      //   10,
-      //   'usdc',
-      //   'ETHEREUM',
-      // )
+      const fastWithdrawalRes = await client.fastWithdrawal(
+        keyPair,
+        10,
+        'usdc',
+        'ETHEREUM',
+      )
 
       //Get a list of deposit
       const depositsList = await client.listDeposits({
@@ -183,7 +183,7 @@ const ethereumDepositAndWithdrawal = async () => {
       const fastwithdrawalsList = await client.listFastWithdrawals()
 
       console.log({
-        depositRes,
+        // depositRes,
         // depositStarkKeyRes,
         withdrawalRes,
         pendingBalance,
@@ -235,7 +235,7 @@ const polygonDepositAndWithdrawal = async () => {
         process.env.RPC_PROVIDER as string,
         privateKey,
         'btc',
-        0.000001,
+        '0.00001',
       )
 
       // const depositWithSigner =
@@ -282,7 +282,7 @@ const polygonDepositAndWithdrawal = async () => {
 }
 
 // polygonDepositAndWithdrawal()
-// ethereumDepositAndWithdrawal()
+ethereumDepositAndWithdrawal()
 
 const internalTransfers = async () => {
   // load your privateKey and walletAddress
