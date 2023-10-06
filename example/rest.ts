@@ -234,7 +234,7 @@ const polygonDeposit = async () => {
       const deposit = await client.depositFromPolygonNetwork(
         process.env.RPC_PROVIDER as string,
         privateKey,
-        'matic',
+        'btc',
         0.000001,
       )
 

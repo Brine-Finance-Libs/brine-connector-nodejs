@@ -30,6 +30,14 @@ class BalanceTooLowError extends Error {
   }
 }
 
+class InvalidAmountError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'InvalidAmountError'
+    this.message = message
+  }
+}
+
 const isAuthenticationError = (err: unknown): err is AuthenticationError => {
   return (<AuthenticationError>err).name === 'AuthenticationError'
 }
@@ -40,6 +48,7 @@ export default {
   CoinNotFoundError,
   AllowanceTooLowError,
   BalanceTooLowError,
+  InvalidAmountError,
 }
 
 export {
@@ -48,4 +57,5 @@ export {
   CoinNotFoundError,
   AllowanceTooLowError,
   BalanceTooLowError,
+  InvalidAmountError,
 }
