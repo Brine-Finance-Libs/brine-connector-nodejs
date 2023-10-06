@@ -48,7 +48,7 @@ export default {
   CoinNotFoundError,
   AllowanceTooLowError,
   BalanceTooLowError,
-  InvalidAmountError
+  InvalidAmountError,
 }
 
 export {
@@ -57,5 +57,5 @@ export {
   CoinNotFoundError,
   AllowanceTooLowError,
   BalanceTooLowError,
-  InvalidAmountError
+  InvalidAmountError,
 }
