@@ -92,7 +92,7 @@ export class Client {
     const baseURL =
       option === 'testnet'
         ? 'https://api-testnet.brine.fi'
-        : 'https://api.brine.fi'
+        : 'https://api.tanx.fi'
     const axios = new AxiosInstance(this.refreshTokens, baseURL)
     this.axiosInstance = axios.axiosInstance
     this.setAccessToken = (token: string | null) => {
@@ -157,7 +157,7 @@ export class Client {
 
   async getNonce(ethAddress: string): Promise<Response<string>> {
     const nonceRes = await this.axiosInstance.post<Response<string>>(
-      '/sapi/v1/auth/nonce/',
+      '/sapi/v1/auth/v2/nonce/',
       {
         eth_address: ethAddress,
       },
@@ -171,7 +171,7 @@ export class Client {
     userSignature: string,
   ): Promise<LoginResponse> {
     const loginRes = await this.axiosInstance.post<LoginResponse>(
-      '/sapi/v1/auth/login/',
+      '/sapi/v1/auth/v2/login/',
       {
         eth_address: ethAddress,
         user_signature: userSignature,

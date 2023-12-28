@@ -25,7 +25,7 @@ const main = async () => {
     // handle in try catch block
     try {
       // create a rest client instance (you can pass option)
-      const client = new Client('testnet')
+      const client = new Client('mainnet')
 
       //you can use public endpoints right away
       const test = await client.testConnection()
@@ -348,3 +348,17 @@ const internalTransfers = async () => {
 }
 
 // internalTransfers()
+
+
+const getL2Keys = async (ethPrivateKey: string) => {
+
+  const keypair = generateKeyPairFromEthPrivateKey(ethPrivateKey, 'mainnet') // default is mainnet
+
+  const stark_public_key = keypair.getPublic().getX().toString('hex')
+  const stark_private_key = keypair.getPrivate().toString('hex')
+
+  console.log(`stark public_key ${stark_public_key}`)
+  console.log(`stark private_key ${stark_private_key}`)
+}
+
+// getL2Keys("<enter your eth private key>")

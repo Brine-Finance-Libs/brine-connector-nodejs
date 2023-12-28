@@ -30,7 +30,7 @@ export const createUserSignature = (
   const msgToBeSigned =
     option === 'testnet'
       ? "Click sign to verify you're a human - Brine.finance"
-      : 'Get started with Brine. Make sure the origin is https://trade.brine.fi'
+      : 'Get started with TanX. Make sure the origin is https://trade.tanx.fi'
   const userSignature = signMsg(msgToBeSigned, privateKey)
   return userSignature
 }
