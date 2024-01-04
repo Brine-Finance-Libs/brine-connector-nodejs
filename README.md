@@ -1,16 +1,8 @@
 <h1 align="center">Brine Connector NodeJS</h1>
 
-<p align="center">
-  The official NodeJS connector for <a href="https://docs.brine.fi/api-documentation">Brine's API</a> 🚀
-</p>
-
-<div align="center">
-
-[![npm version](https://img.shields.io/npm/v/@brine-fi/brine-connector)](https://www.npmjs.org/package/@brine-fi/brine-connector)
-[![Build status](https://img.shields.io/github/actions/workflow/status/Brine-Finance-Libs/brine-connector-nodejs/main.yml)](https://github.com/Brine-Finance-Libs/brine-connector-nodejs/actions/workflows/main.yml)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@brine-fi/brine-connector)](https://bundlephobia.com/package/@brine-fi/brine-connector@latest)
-
-</div>
+> **Note:**
+>
+> This package has been deprecated. It is recommended to visit [@tanx-libs/tanx-connector](https://www.npmjs.com/package/@tanx-libs/tanx-connector) for the latest supported version.
 
 ## Features
 
@@ -597,4 +589,3 @@ const fastWithdrawalRes = await client.fastWithdrawal(
   'POLYGON', // Allowed networks are POLYGON & ETHEREUM
 )
 ```
-

@@ -1,5 +1,11 @@
 # brine-connector
 
+## 1.4.4
+
+### Patch Changes
+
+- deprecating package
+
 ## 1.4.3
 
 ### Patch Changes
